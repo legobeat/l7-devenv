@@ -129,7 +129,7 @@ COPY --chown=${UID}:${GID} config/zshrc        .zshrc
 # ...just ~/.vimrc?
 COPY --chown=${UID}:${GID} config/nvim         .config/nvim
 
-RUN cat /home/user/.env | tee -a /etc/profile
+RUN cat /home/user/.env >> /etc/profile
 
 USER ${UID}
 WORKDIR /home/user/src
