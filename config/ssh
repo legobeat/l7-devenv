@@ -1,3 +1,7 @@
 Include config.d/*
-#Include /home/user/.ssh/config.d/*
-#Include /home/user/.config/ssh.d/*
+
+Host github.com-*
+  HostName github.com
+  User git
+  IdentitiesFile .ssh/SSH_AUTH_SOCK
+  IdentitiesOnly yes
