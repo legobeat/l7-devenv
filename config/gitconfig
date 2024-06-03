@@ -1,0 +1,73 @@
+[include]
+  path = ~/.config/gitconfig
+
+[init]
+  defaultBranch = main
+[pull]
+  rebase = true
+[core]
+  autocrlf = false
+  filemode = false
+
+[advice]
+  detachedHead = true
+[color]
+  ui = auto
+[filter "lfs"]
+  clean = git-lfs clean -- %f
+  smudge = git-lfs smudge -- %f
+  process = git-lfs filter-process
+  required = true
+[http]
+  postBuffer = 1048576000
+[rebase]
+  autostash = true
+  instructionFormat = (%an) %s
+
+[alias]
+  a    = add
+  b    = branch
+  ba   = branch -av
+  br   = branch -avr
+  cl   = clone
+  co   = checkout
+  cm   = !git commit --date="$(date --utc +%Y-%m-%dT%H:%M:%S%z)"
+  cma  = !git commit --date="$(date --utc +%Y-%m-%dT%H:%M:%S%z)" --amend
+  cp   = cherry-pick
+  cpa  = cherry-pick --abort
+  cpc  = cherry-pick --continue
+  d    = diff
+  dc   = diff --cached
+  f    = fetch
+  wt   = worktree
+  wta  = worktree add
+  wtl  = worktree list
+  wtp  = worktree prune
+  wtr  = worktree remove
+  l    = log
+  m    = merge
+  ma   = merge --abort
+  mc   = merge --continue
+  p    = push
+  ph   = push
+  phf  = push --force-with-lease
+  pl   = pull
+  r    = remote
+  ra   = remote add
+  rb   = rebase
+  rbc  = rebase --continue
+  rbi  = rebase -i
+  rl   = reflog
+  ru   = remote -v update
+  rr   = remote remove
+  rv   = remote -v
+  sh   = show
+  sm   = submodule
+  sma  = submodule add
+  smu  = submodule update
+  st   = status
+  t    = tag
+  tv   = tag -v
+  tree = log --graph --decorate --oneline
+  unstage = restore --staged
+  us      = unstage

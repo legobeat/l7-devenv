@@ -1,0 +1,4 @@
+require('/home/user/.nvim/init.vim')
+require('/home/user/.nvim/init.vim')
+"runtime /home/user/.nvim/init.vim
+

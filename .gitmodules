@@ -1,0 +1,36 @@
+[submodule "contrib/l7-scripts"]
+	path = contrib/l7-scripts
+	url = https://github.com/legobeat/l7-scripts
+[submodule "nvim/plugins/nvim-treesitter"]
+	path = contrib/nvim-plugins/nvim-treesitter
+	url = https://github.com/nvim-treesitter/nvim-treesitter.git
+[submodule "nvim/plugins/nvim-lspconfig"]
+	path = contrib/nvim-plugins/nvim-lspconfig
+	url = https://github.com/neovim/nvim-lspconfig.git
+[submodule "nvim/plugins/neo-tree.nvim"]
+	path = contrib/nvim-plugins/neo-tree.nvim
+	url = https://github.com/nvim-neo-tree/neo-tree.nvim
+[submodule "nvim/plugins/nvim-bufferline.lua"]
+	path = contrib/nvim-plugins/nvim-bufferline.lua
+	url = https://github.com/akinsho/nvim-bufferline.lua
+[submodule "nvim/plugins/plenary.nvim"]
+	path = contrib/nvim-plugins/plenary.nvim
+	url = https://github.com/nvim-lua/plenary.nvim
+[submodule "nvim/plugins/nvim-web-devicons"]
+	path = contrib/nvim-plugins/nvim-web-devicons
+	url = https://github.com/kyazdani42/nvim-web-devicons
+[submodule "nvim/plugins/octo.nvim"]
+	path = contrib/nvim-plugins/octo.nvim
+	url = https://github.com/legobeat/octo.nvim
+[submodule "nvim/plugins/telescope.nvim"]
+	path = contrib/nvim-plugins/telescope.nvim
+	url = https://github.com/nvim-telescope/telescope.nvim
+[submodule "nvim/plugins/nui.nvim"]
+	path = contrib/nvim-plugins/nui.nvim
+	url = https://github.com/MunifTanjim/nui.nvim
+[submodule "nvim/plugins/nvim-window-picker"]
+	path = contrib/nvim-plugins/nvim-window-picker
+	url = https://github.com/s1n7ax/nvim-window-picker
+[submodule "contrib/typescript-language-server"]
+	path = contrib/typescript-language-server
+	url = https://github.com/typescript-language-server/typescript-language-server
