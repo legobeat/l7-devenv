@@ -109,7 +109,7 @@ ARG GID=1000
 # also grant passwordless sudo
 # this means image will have to be rebuilt with --build-arg UID=$(id -u) if runtime user has different UID from default 1000
 RUN  bash -c "groupadd -g ${GID} userz || true" \
-  && bash -c "useradd -u ${UID} -g ${GID} -d /home/user -m user && chown -R ${UID}:${GID} /home/user || true" \
+  && bash -c "useradd -u ${UID} -g ${GID} -d /home/user -m user -s "${SHELL}" && chown -R ${UID}:${GID} /home/user || true" \
   && usermod -G wheel -a $(id -un ${UID}) \
   && echo '%wheel ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers
 
@@ -131,4 +131,4 @@ COPY --chown=${UID}:${GID} config/zshrc        .zshrc
 COPY --chown=${UID}:${GID} config/nvim         .config/nvim
 
 WORKDIR /home/user/src
-
+ENTRYPOINT ${SHELL}
