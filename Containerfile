@@ -116,7 +116,6 @@ RUN  bash -c "groupadd -g ${GID} userz || true" \
 # treesitter needs write to parsers dirs
 RUN chown -R $UID /etc/xdg/nvim/pack/l7ide/start/nvim-treesitter/parser{-info,}
 
-USER ${UID}
 WORKDIR ${HOME}
 COPY --chown=${UID}:${GID} config/bash_profile .bash_profile
 COPY --chown=${UID}:${GID} config/bashrc       .bashrc
@@ -130,5 +129,8 @@ COPY --chown=${UID}:${GID} config/zshrc        .zshrc
 # ...just ~/.vimrc?
 COPY --chown=${UID}:${GID} config/nvim         .config/nvim
 
+RUN cat /home/user/.env | tee -a /etc/profile
+
+USER ${UID}
 WORKDIR /home/user/src
 ENTRYPOINT ${SHELL}
