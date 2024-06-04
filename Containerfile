@@ -133,4 +133,3 @@ RUN cat /home/user/.env >> /etc/profile
 
 USER ${UID}
 WORKDIR /home/user/src
-ENTRYPOINT ${SHELL}
