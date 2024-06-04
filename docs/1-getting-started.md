@@ -12,7 +12,7 @@ You should be able to use this with Docker by replacing `podman` with `docker`.
 $ sudo apt-get update && sudo apt-get upgrade
 
 ## Install system dependencies
-$ sudo apt-get install make podman slirp4netns fuse-overlayfs uidmap which
+$ sudo apt-get install make podman slirp4netns fuse-overlayfs uidmap gnu-which
 ```
 
 ## Building
