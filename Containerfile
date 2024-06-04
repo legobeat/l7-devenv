@@ -117,10 +117,28 @@ RUN  bash -c "groupadd -g ${GID} userz || true" \
   && usermod -G wheel -a $(id -un ${UID}) \
   && echo '%wheel ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers
 
-# treesitter needs write to parsers dirs
-RUN chown -R $UID /etc/xdg/nvim/pack/l7ide/start/nvim-treesitter/parser{-info,}
+
+# allow accessing mounted docker socket ("docker-in-docker")
+RUN usermod --add-subuids 100000-165535 --add-subgids 100000-165535 user \
+ && usermod --add-subuids 1-999         --add-subgids 1-999 user \
+ && setcap cap_setuid=ep /usr/bin/newuidmap \
+ && setcap cap_setgid=ep /usr/bin/newgidmap
 
 WORKDIR ${HOME}
+
+# https://github.com/gabyx/container-nesting/blob/7efbd79707e1be366bee462f6200443ca23bc077/src/podman/container/Containerfile#L46
+RUN mkdir -p /etc/containers && \
+    mkdir -p .config/containers && \
+    sed -e 's|^#mount_program|mount_program|g' \
+           -e '/additionalimage.*/a "/var/lib/shared",' \
+           -e 's|^mountopt[[:space:]]*=.*$|mountopt = "nodev,fsync=0"|g' \
+           /usr/share/containers/storage.conf \
+           > /etc/containers/storage.conf && \
+    sed -e 's|^graphroot|#graphroot|g' \
+        -e 's|^runroot|#runroot|g' \
+           /etc/containers/storage.conf > .config/containers/storage.conf && \
+    chown 1000:1000 .config/containers/storage.conf
+
 COPY --chown=${UID}:${GID} config/bash_profile .bash_profile
 COPY --chown=${UID}:${GID} config/bashrc       .bashrc
 COPY --chown=${UID}:${GID} config/env          .env
@@ -134,6 +152,9 @@ COPY --chown=${UID}:${GID} config/zshrc        .zshrc
 COPY --chown=${UID}:${GID} config/nvim         .config/nvim
 
 RUN cat /home/user/.env >> /etc/profile
+
+# treesitter needs write to parsers dirs
+RUN chown -R $UID /etc/xdg/nvim/pack/l7ide/start/nvim-treesitter/parser{-info,}
 
 USER ${UID}
 WORKDIR /home/user/src

@@ -15,6 +15,7 @@ SSH_SOCKET="${SSH_SOCKET:-${SSH_AUTH_SOCK}}"
 NAME=""
 RUN_ARGS=""
 CWD="${CWD:-${SRC_DIR}}"
+DOCKER_SOCKET="${XDG_RUNTIME_DIR}/podman/podman.sock"
 
 mkdir -p "${CONF_DIR}/ssh.d" "${LOCAL_DIR}"
 touch "${CONF_DIR}/gitconfig"
@@ -31,13 +32,16 @@ fi
 
 # uid mapping wip, sudo not working yet
 # https://github.com/containers/podman/discussions/22444
+  #--user "$(id -u):$(id -g)" --uidmap "$(id -u):0:1" --uidmap '0:1:1' --sysctl "net.ipv4.ping_group_range=1000 1000" \
 ${cmd} run --rm -it \
-  --user "$(id -u):$(id -g)" --uidmap "$(id -u):0:1" --uidmap '0:1:1' --sysctl "net.ipv4.ping_group_range=1000 1000" \
+  --user "$(id -u):$(id -g)" --userns=keep-id:uid=$(id -u),gid=$(id -g) --sysctl "net.ipv4.ping_group_range=1000 1000" \
   --mount type=bind,source="${LOCAL_DIR},target=/home/user/.local" \
   --mount type=bind,source="${CONF_DIR}/ssh.d,target=/home/user/.ssh/config.d,ro=true" \
   --mount type=bind,source="${CONF_DIR}/gitconfig,target=/home/user/.config/gitconfig,ro=true" \
+  -v "${DOCKER_SOCKET}:/run/docker.sock" \
   -v "${SRC_DIR}:${SRC_DIR}:Z" \
   -w "${CWD}" \
+  -e "DOCKER_HOST=/run/docker.sock" \
   -e HOME=/home/user \
   "${IMAGE}" \
   ${@}
