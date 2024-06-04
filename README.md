@@ -2,7 +2,7 @@
 
 Containerized neovim development environment. Primarily intended for contributors on [MetaMask](https://github.com/MetaMask) repositories.
 
-For a guided tutorial, see [`GETTING_STARTED_DEBIAN.md`](./GETTING_STARTED_DEBIAN.md).
+For a guided tutorial, see [`docs/GETTING_STARTED_DEBIAN.md`](./docs/GETTING_STARTED_DEBIAN.md).
 
 > ⚠️ This is under early development and things might still shift around a bit. Open an issue if you have any!
 
