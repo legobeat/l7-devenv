@@ -24,6 +24,7 @@ FROM base AS nvim-builder
 
 WORKDIR /etc/xdg/nvim/pack/build-l7ide/start
 COPY --chown=1001:1001 contrib/nvim-plugins/ .
+RUN mkdir -p /out && chown 1001:1001 /out
 USER 1001
 
 # enable/disable treesitter language parsers. These are fetched remotely.
@@ -44,7 +45,10 @@ RUN mv /etc/xdg/nvim/pack/build-l7ide/start /out/plugins
 ##### TYPESCRIPT-LANGUAGE-SERVER BUILDER #####
 FROM base AS tsserver-builder
 ENV NODE_OPTIONS='--no-network-family-autoselection --trace-warnings'
-RUN microdnf install -y --setopt=install_weak_deps=False npm && npm i -gf corepack
+RUN microdnf install -y --setopt=install_weak_deps=False npm \
+  && npm i -gf corepack \
+  && mkdir -p /out \
+  && chown 1002:1002 /out
 
 WORKDIR /build/typescript-language-server
 COPY --chown=1002:1002 contrib/typescript-language-server/ .
