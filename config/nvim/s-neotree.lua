@@ -25,6 +25,7 @@ require('neo-tree').setup({
       -- highlight = "NeoTreeFileIcon"
       highlight = ""
     },
+    bind_to_cwd = false, -- true creates a 2-way binding between vim's cwd and neo-tree's root
     name = {
       trailing_slash = false,
       use_git_status_colors = true,
