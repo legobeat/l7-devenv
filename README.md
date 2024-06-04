@@ -4,12 +4,15 @@ Containerized neovim development environment. Primarily intended for contributor
 
 For a guided tutorial, see [`GETTING_STARTED_DEBIAN.md`](./GETTING_STARTED_DEBIAN.md).
 
+> ⚠️ This is under early development and things might still shift around a bit. Open an issue if you have any!
+
 ## Goals
 - Ease-of-use
   - Quick and easy to set up with minimal configuration and sane defaults
   - Easy to maintain and update at your leisure
   - Easily extensible, configurable and customizable
   - Adapted for contribution to MetaMask and LavaMoat codebases
+  - Familiar setup for vscode/vim users
 - Secure
   - Principle-of-least privilege applied
     - Text editor and plugins shouldn't need access to secrets like GitHub tokens
@@ -20,7 +23,9 @@ For a guided tutorial, see [`GETTING_STARTED_DEBIAN.md`](./GETTING_STARTED_DEBIA
     - Everything beyond your sources and configuration are a clean slate after a restart
   - Auditable
 - Fast and efficient
+  - Low performance overhead - save your memory and CPU for more interesting work
 - Productivity-enhanching
+  - Code-analysis and refactoring features familiar for IDE users
 
 ## Dependencies
 - OCI Container runtime
