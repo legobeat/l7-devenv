@@ -8,7 +8,6 @@ CMD:=$(shell which podman || which docker)
 
 image_nvim:
 	${CMD} build \
-		--pull=newer \
 		--build-arg "EXTRA_PKGS=${EXTRA_PKGS}" \
 		--build-arg "SHELL=${USER_SHELL}" \
 		--build-arg "UID=${UID}" \
