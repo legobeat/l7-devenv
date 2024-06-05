@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1
 FROM registry.fedoraproject.org/fedora-minimal:40 AS base
 
 RUN microdnf -y update
@@ -23,13 +24,16 @@ RUN microdnf -y install --setopt=install_weak_deps=False \
 FROM base AS nvim-builder
 
 WORKDIR /etc/xdg/nvim/pack/build-l7ide/start
-COPY --chown=1001:1001 contrib/nvim-plugins/ .
-RUN mkdir -p /out && chown 1001:1001 /out
+COPY --chown=1001:1001 contrib/nvim-plugins/ ./
+RUN mkdir -p /out /home/nvim-builder \
+  && chown -R 1001:1001 /home/nvim-builder
+
 USER 1001
 
 # enable/disable treesitter language parsers. These are fetched remotely.
 ARG TREESITTER_INSTALL='bash c dockerfile hcl javascript lua markdown nix python ruby typescript vim vimdoc yaml'
 
+ENV HOME=/home/nvim-builder
 # make nvim plugins, but skip running long-running test-only makefiles
 RUN bash -c 'find . -maxdepth 1 -mindepth 1 -type d ! -name "plenary.nvim" ! -name "neo-tree.nvim" | xargs -I{} -P8 bash -c "cd {}; make -j4 build || make -j4 || true"'
 RUN nvim --headless \
@@ -40,7 +44,9 @@ RUN nvim --headless \
     -c "TSEnable ${TREESITTER_INSTALL}" \
     -c q
 WORKDIR /out
-RUN mv /etc/xdg/nvim/pack/build-l7ide/start /out/plugins
+USER root
+RUN mkdir -p /out/plugins \
+  && mv /etc/xdg/nvim/pack/build-l7ide/start/* /out/plugins/
 
 ##### TYPESCRIPT-LANGUAGE-SERVER BUILDER #####
 FROM base AS tsserver-builder
@@ -50,12 +56,15 @@ RUN microdnf install -y --setopt=install_weak_deps=False npm \
   && mkdir -p /out \
   && chown 1002:1002 /out
 
+COPY --chown=1002:1002 contrib/typescript-language-server/ /build/typescript-language-server/
+
 WORKDIR /build/typescript-language-server
-COPY --chown=1002:1002 contrib/typescript-language-server/ .
-ENV HOME=/tmp/1002-home
+RUN chown -R 1002:1002 .
+
 USER 1002
-RUN mkdir -p ${HOME} \
-  && yarn install --frozen-lockfile --network-concurrency 10 \
+ENV HOME=/tmp/1002-home
+
+RUN yarn install --frozen-lockfile --network-concurrency 10 \
   && yarn build \
   && yarn pack
 WORKDIR /out
@@ -94,7 +103,7 @@ RUN microdnf -y install --setopt=install_weak_deps=False \
     screen \
     w3m \
     which procps-ng \
-    $EXTRA_PKGS \
+    ${EXTRA_PKGS} \
   && ln -sf nvim /usr/bin/vim
 
 

@@ -1,7 +1,7 @@
-IMAGE_NAME:=localhost/l7/nvim
-IMAGE_TAG:=latest
+IMAGE_NAME := localhost/l7/nvim
+IMAGE_TAG  := latest
 USER_SHELL ?= ${SHELL}
-EXTRA_PKGS := 'zsh podman'
+EXTRA_PKGS := zsh podman
 UID:=$(shell id -u)
 GID:=$(shell id -g)
 CMD:=$(shell which podman || which docker)
@@ -13,6 +13,7 @@ image_nvim:
 		--build-arg "UID=${UID}" \
 		--build-arg "GID=${GID}" \
 		-t "${IMAGE_NAME}:${IMAGE_TAG}" \
+		-f './Containerfile' \
 		.
 test:
 	@echo TODO: tests
