@@ -10,7 +10,7 @@ ARG EXTRA_BASE_PKGS=''
 
 RUN microdnf -y install --setopt=install_weak_deps=False \
     make automake gcc gcc-c++ cpp binutils patch  \
-    curl wget jq yq moreutils \
+    curl wget jq yq moreutils tar \
     git git-lfs openssh-clients gnupg2 \
     libnotify \
     man-db \
