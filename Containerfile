@@ -38,6 +38,8 @@ RUN mkdir -p /out /home/nvim-builder \
 
 RUN luarocks install vusted
 
+# lua build expects user to exist
+RUN useradd -u 1001 -d /home/nvim-builder -m nvim-builder -s /usr/sbin/nologin && chown -R 1001 /home/nvim-builder
 USER 1001
 
 # enable/disable treesitter language parsers. These are fetched remotely.
