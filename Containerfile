@@ -50,9 +50,11 @@ RUN mkdir -p /out/plugins \
 
 ##### TYPESCRIPT-LANGUAGE-SERVER BUILDER #####
 FROM base AS tsserver-builder
+
 ENV NODE_OPTIONS='--no-network-family-autoselection --trace-warnings'
-RUN microdnf install -y --setopt=install_weak_deps=False npm \
-  && npm i -gf yarn@1.22.22 \
+
+RUN microdnf -y install --setopt=install_weak_deps=False \
+    nodejs npm typescript yarnpkg \
   && mkdir -p /out \
   && chown 1002:1002 /out
 
