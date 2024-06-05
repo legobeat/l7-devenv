@@ -7,6 +7,18 @@ on:
 jobs:
   docker-buildx:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # test with nonstandard uid and gid
+        build-args:
+          - |
+            UID=1234
+            GID=1235
+          - |
+            UID=1000
+            GID=1000
+          - ''
     steps:
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -14,17 +26,16 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
 
       - name: Build and load
         uses: docker/build-push-action@v5
         with:
           context: .
           file: Containerfile
-          # test with nonstandard uid and gid
-          build-args: |
-            UID=1234
-            GID=1235
+          build-args: ${{ matrix.build-args }}
           load: true
           tags: l7/nvim:latest
           # could enable push to gh registry
