@@ -32,10 +32,12 @@ USER 1001
 
 # enable/disable treesitter language parsers. These are fetched remotely.
 ARG TREESITTER_INSTALL='bash c dockerfile hcl javascript lua markdown nix python ruby typescript vim vimdoc yaml'
+ARG BUILD_STYLUA_VERSION=0.20.0
 
 ENV HOME=/home/nvim-builder
 # make nvim plugins, but skip running long-running test-only makefiles
-RUN bash -c 'find . -maxdepth 1 -mindepth 1 -type d ! -name "plenary.nvim" ! -name "neo-tree.nvim" | xargs -I{} -P8 bash -c "cd {}; make -j4 build || make -j4 || true"'
+RUN cargo install stylua --version "${BUILD_STYLUA_VERSION}" --locked --all-features \
+  && bash -c 'find . -maxdepth 1 -mindepth 1 -type d ! -name "plenary.nvim" ! -name "neo-tree.nvim" | xargs -I{} -P8 bash -c "cd {}; make -j4 build || make -j4 || true"'
 RUN nvim --headless \
     -c 'packadd nvim-treesitter' \
     -c 'packloadall' \
