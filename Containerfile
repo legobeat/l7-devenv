@@ -27,7 +27,7 @@ ARG EXTRA_BUILD_PKGS=''
 RUN microdnf -y install --setopt=install_weak_deps=False \
     binutils patch \
     cargo \
-    luarocks lua-lunitx \
+    luarocks lua-devel lua-lunitx \
     nodejs typescript \
     ${EXTRA_BUILD_PKGS}
 
