@@ -36,7 +36,7 @@ COPY --chown=1001:1001 contrib/nvim-plugins/ ./
 RUN mkdir -p /out /home/nvim-builder \
   && chown -R 1001:1001 /home/nvim-builder
 
-RUN luarocks --lua-version=5.1 install vusted
+RUN luarocks install vusted
 
 USER 1001
 
