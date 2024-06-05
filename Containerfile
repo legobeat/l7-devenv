@@ -23,6 +23,14 @@ RUN microdnf -y install --setopt=install_weak_deps=False \
 ##### NEOVIM PLUGINS BUILDER #####
 FROM base AS nvim-builder
 
+ARG EXTRA_BUILD_PKGS=''
+RUN microdnf -y install --setopt=install_weak_deps=False \
+    binutils patch \
+    cargo \
+    lua-lunitx \
+    nodejs typescript \
+    ${EXTRA_BUILD_PKGS}
+
 WORKDIR /etc/xdg/nvim/pack/build-l7ide/start
 COPY --chown=1001:1001 contrib/nvim-plugins/ ./
 RUN mkdir -p /out /home/nvim-builder \
