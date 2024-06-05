@@ -7,6 +7,18 @@ on:
 jobs:
   docker-buildx:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # test with nonstandard uid and gid
+        build-args:
+          - |
+            UID=1234
+            GID=1235
+          - |
+            UID=1000
+            GID=1000
+          - ''
     steps:
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -14,20 +26,47 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
 
       - name: Build and load
         uses: docker/build-push-action@v5
         with:
           context: .
           file: Containerfile
-          # test with nonstandard uid and gid
-          build-args: |
-            UID=1234
-            GID=1235
+          build-args: ${{ matrix.build-args }}
           load: true
           tags: l7/nvim:latest
           # could enable push to gh registry
           push: false
           cache-from: type=gha
           cache-to: type=gha,mode=max
+  test-make:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        cmd:
+          - ''
+          - docker
+          - podman
+        os:
+          - ubuntu-20.04
+          - ubuntu-22.04
+          - ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+      - run: make IMAGE_NAME=localhost/foo IMAGE_TAG=bar CMD=${{ matrix.cmd }}
+        if: ${{ matrix.cmd != '' }}
+        env:
+          CMD: ${{ matrix.cmd }}
+      - run: make IMAGE_NAME=localhost/foo IMAGE_TAG=bar
+        if: ${{ matrix.cmd == '' }}
+      - run: ${{ matrix.cmd }} image inspect localhost/foo:bar
+        if: ${{ matrix.cmd != '' }}
+      - run: podman image inspect localhost/foo:bar
+        if: ${{ matrix.cmd == '' }}
+      - run: make test

@@ -14,3 +14,5 @@ image_nvim:
 		--build-arg "GID=${GID}" \
 		-t "${IMAGE_NAME}:${IMAGE_TAG}" \
 		.
+test:
+	@echo TODO: tests
