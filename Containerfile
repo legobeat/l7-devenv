@@ -46,7 +46,7 @@ RUN mv /etc/xdg/nvim/pack/build-l7ide/start /out/plugins
 FROM base AS tsserver-builder
 ENV NODE_OPTIONS='--no-network-family-autoselection --trace-warnings'
 RUN microdnf install -y --setopt=install_weak_deps=False npm \
-  && npm i -gf corepack \
+  && npm i -gf yarn@1.22.22 \
   && mkdir -p /out \
   && chown 1002:1002 /out
 
@@ -54,7 +54,7 @@ WORKDIR /build/typescript-language-server
 COPY --chown=1002:1002 contrib/typescript-language-server/ .
 ENV HOME=/tmp/1002-home
 USER 1002
-RUN mkdir -p ${HOME} corepack enable \
+RUN mkdir -p ${HOME} \
   && yarn install --frozen-lockfile --network-concurrency 10 \
   && yarn build \
   && yarn pack
