@@ -13,7 +13,6 @@ LOCAL_DIR="${LOCAL_DIR:-${HOME}/.local/share/l7ide/local}"
 SRC_DIR="${SRC_DIR:-$(pwd)}"
 SSH_SOCKET="${SSH_SOCKET:-${SSH_AUTH_SOCK}}"
 NAME=""
-RUN_ARGS=""
 CWD="${CWD:-${SRC_DIR}}"
 DOCKER_SOCKET="${XDG_RUNTIME_DIR}/podman/podman.sock"
 
@@ -24,7 +23,7 @@ touch "${CONF_DIR}/gitconfig"
 cmd=$(which podman || which docker)
 
 if [[ -n "${SSH_SOCKET}" ]]; then
-  RUN_ARGS="${RUN_ARGS} -v '${SSH_SOCKET}:${HOME}/.ssh/SSH_AUTH_SOCK' -e SSH_AUTH_SOCK=${HOME}/.ssh/SSH_AUTH_SOCK"
+  RUN_ARGS="${RUN_ARGS} -v ${SSH_SOCKET}:${HOME}/.ssh/SSH_AUTH_SOCK -e SSH_AUTH_SOCK=${HOME}/.ssh/SSH_AUTH_SOCK"
 fi
 if [[ -n "${NAME}" ]]; then
   RUN_ARGS="${RUN_ARGS} --name ${NAME}"
@@ -43,5 +42,6 @@ ${cmd} run --rm -it \
   -w "${CWD}" \
   -e "DOCKER_HOST=/run/docker.sock" \
   -e HOME=/home/user \
+  ${RUN_ARGS} \
   "${IMAGE}" \
   ${@}
