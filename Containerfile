@@ -148,7 +148,7 @@ RUN mkdir -p /etc/containers && \
     sed -e 's|^graphroot|#graphroot|g' \
         -e 's|^runroot|#runroot|g' \
            /etc/containers/storage.conf > .config/containers/storage.conf && \
-    chown 1000:1000 .config/containers/storage.conf
+    chown ${UID}:${GID} .config/containers/storage.conf
 
 COPY --chown=${UID}:${GID} config/bash_profile .bash_profile
 COPY --chown=${UID}:${GID} config/bashrc       .bashrc
