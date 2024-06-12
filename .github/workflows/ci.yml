@@ -1,4 +1,4 @@
-name: docker
+name: 'oci-image'
 on:
   push:
     branches: main
