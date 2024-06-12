@@ -40,6 +40,7 @@ ${cmd} run --rm -it \
   -v "${DOCKER_SOCKET}:/run/docker.sock" \
   -v "${SRC_DIR}:${SRC_DIR}:Z" \
   -w "${CWD}" \
+  --mount type=tmpfs,tmpfs-size=2G,destination=/tmp,U=true,tmpfs-mode=0777 \
   -e "DOCKER_HOST=/run/docker.sock" \
   -e HOME=/home/user \
   ${RUN_ARGS} \
