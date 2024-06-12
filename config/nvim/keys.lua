@@ -33,7 +33,7 @@ vim.keymap.set('n', '<space>q', vim.diagnostic.setloclist, {desc = 'Show diagnos
 
 
 -- These are enabled conditionally when LSP activated inside s-lsp.lua
-function _G.enable_lsp_keybindings()
+function _G.enable_lsp_keybindings(client, bufnr)
   -- Enable completion triggered by <c-x><c-o>
   vim.api.nvim_buf_set_option(bufnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
 
