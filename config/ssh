@@ -3,5 +3,4 @@ Include config.d/*
 Host github.com-*
   HostName github.com
   User git
-  IdentitiesFile .ssh/SSH_AUTH_SOCK
-  IdentitiesOnly yes
+  IdentityAgent ~/.ssh/SSH_AUTH_SOCK
