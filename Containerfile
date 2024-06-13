@@ -129,17 +129,17 @@ RUN  bash -c "groupadd -g ${GID} userz || true" \
   && echo '%wheel ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers
 
 
-# allow accessing mounted docker socket ("docker-in-docker")
-RUN usermod --add-subuids 100000-165535 --add-subgids 100000-165535 user \
- && usermod --add-subuids 1-999         --add-subgids 1-999 user \
- && setcap cap_setuid=ep /usr/bin/newuidmap \
- && setcap cap_setgid=ep /usr/bin/newgidmap
+# allow accessing mounted container runtime socket ("docker-in-docker"/"podman-in-podman"/"d-i-p")
+# https://github.com/containers/image_build/blob/main/podman/Containerfile
+RUN usermod --add-subuids 1001-64535    --add-subgids 1001-64535 user \
+ && usermod --add-subuids 1-999         --add-subgids 1-999      user \
+ && setcap cap_setuid=+eip /usr/bin/newuidmap \
+ && setcap cap_setgid=+eip /usr/bin/newgidmap
 
 WORKDIR ${HOME}
 
 # https://github.com/gabyx/container-nesting/blob/7efbd79707e1be366bee462f6200443ca23bc077/src/podman/container/Containerfile#L46
-RUN mkdir -p /etc/containers && \
-    mkdir -p .config/containers && \
+RUN mkdir -p /etc/containers .config/containers && \
     sed -e 's|^#mount_program|mount_program|g' \
            -e '/additionalimage.*/a "/var/lib/shared",' \
            -e 's|^mountopt[[:space:]]*=.*$|mountopt = "nodev,fsync=0"|g' \
@@ -148,7 +148,21 @@ RUN mkdir -p /etc/containers && \
     sed -e 's|^graphroot|#graphroot|g' \
         -e 's|^runroot|#runroot|g' \
            /etc/containers/storage.conf > .config/containers/storage.conf && \
-    chown ${UID}:${GID} .config/containers/storage.conf
+    chown -R ${UID}:${GID} .config  && \
+    cat <<EOT > /etc/containers/containers.conf
+  [containers]
+  netns="host"
+  userns="host"
+  ipcns="host"
+  utsns="host"
+  cgroupns="host"
+  cgroups="disabled"
+  log_driver = "k8s-file"
+  [engine]
+  cgroup_manager = "cgroupfs"
+  events_logger="file"
+  runtime="crun"
+EOT
 
 COPY --chown=${UID}:${GID} config/bash_profile .bash_profile
 COPY --chown=${UID}:${GID} config/bashrc       .bashrc
