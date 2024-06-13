@@ -38,6 +38,7 @@ ${cmd} run --rm -it \
   --mount type=bind,source="${CONF_DIR}/gitconfig,target=/home/user/.config/gitconfig,ro=true" \
   -v "${DOCKER_SOCKET}:/run/docker.sock" \
   -v "${SRC_DIR}:${SRC_DIR}:Z" \
+  -v "${SRC_DIR}:/src:Z" \
   -w "${CWD}" \
   --mount type=tmpfs,tmpfs-size=2G,destination=/tmp,U=true,tmpfs-mode=0777 \
   -e "DOCKER_HOST=/run/docker.sock" \
