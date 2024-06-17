@@ -168,6 +168,7 @@ COPY --chown=${UID}:${GID} config/bash_profile .bash_profile
 COPY --chown=${UID}:${GID} config/bashrc       .bashrc
 COPY --chown=${UID}:${GID} config/env          .env
 COPY --chown=${UID}:${GID} config/gitconfig    .gitconfig
+COPY --chown=${UID}:${GID} config/gh.yml        gh/config.yml
 COPY --chown=${UID}:${GID} config/profile      .profile
 COPY --chown=${UID}:${GID} config/ssh          .ssh/config
 # COPY config/ssh         /etc/ssh/ssh_config.d/60-user.conf
