@@ -147,22 +147,8 @@ RUN mkdir -p /etc/containers .config/containers && \
            > /etc/containers/storage.conf && \
     sed -e 's|^graphroot|#graphroot|g' \
         -e 's|^runroot|#runroot|g' \
-           /etc/containers/storage.conf > .config/containers/storage.conf && \
-    chown -R ${UID}:${GID} .config  && \
-    cat <<EOT > /etc/containers/containers.conf
-  [containers]
-  netns="host"
-  userns="host"
-  ipcns="host"
-  utsns="host"
-  cgroupns="host"
-  cgroups="disabled"
-  log_driver = "k8s-file"
-  [engine]
-  cgroup_manager = "cgroupfs"
-  events_logger="file"
-  runtime="crun"
-EOT
+           /etc/containers/storage.conf > .config/containers/storage.conf
+COPY config/containers/containers.conf /etc/containers/containers.conf
 
 COPY --chown=${UID}:${GID} config/bash_profile .bash_profile
 COPY --chown=${UID}:${GID} config/bashrc       .bashrc
@@ -180,7 +166,9 @@ COPY --chown=${UID}:${GID} config/nvim         .config/nvim
 RUN cat /home/user/.env >> /etc/profile
 
 # treesitter needs write to parsers dirs
-RUN chown -R $UID /etc/xdg/nvim/pack/l7ide/start/nvim-treesitter/parser{-info,}
+RUN chown -R ${UID}:${GID} \
+  .config \
+  /etc/xdg/nvim/pack/l7ide/start/nvim-treesitter/parser{-info,}
 
 USER ${UID}
 WORKDIR /home/user/src
