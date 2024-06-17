@@ -1,4 +1,4 @@
-# syntax=docker/dockerfile:1
+# syntax=docker/dockerfile:1.4-labs
 FROM registry.fedoraproject.org/fedora-minimal:40 AS base
 
 RUN microdnf -y update
