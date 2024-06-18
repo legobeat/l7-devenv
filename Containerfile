@@ -109,7 +109,7 @@ COPY contrib/bin/* contrib/*/bin/*       /usr/local/bin/
 
 ARG HOME=/home/user
 ENV HOME=${HOME}
-ARG SHELL=/usr/bin/bash
+ARG SHELL=/usr/bin/zsh
 ARG UID=1000
 ARG GID=1000
 
