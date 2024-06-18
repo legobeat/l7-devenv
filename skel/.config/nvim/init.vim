@@ -37,6 +37,7 @@ packloadall
 
 runtime lib.lua
 runtime keys.lua
+runtime s-lualine.lua
 runtime s-neotree.lua
 runtime s-lsp.lua
 runtime s-bufferlinetabs.lua
