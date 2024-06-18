@@ -25,7 +25,7 @@ if [[ -n "${SSH_SOCKET}" ]]; then
   RUN_ARGS="${RUN_ARGS} -v ${SSH_SOCKET}:${HOME}/.ssh/SSH_AUTH_SOCK -e SSH_AUTH_SOCK=${HOME}/.ssh/SSH_AUTH_SOCK"
 fi
 if [[ -n "${NAME}" ]]; then
-  RUN_ARGS="${RUN_ARGS} --name ${NAME}"
+  RUN_ARGS="${RUN_ARGS} --name ${NAME} --hostname ${NAME}"
 fi
 
 # uid mapping wip, sudo not working yet
