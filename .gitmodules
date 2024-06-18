@@ -37,3 +37,7 @@
 [submodule "contrib/nvim-plugins/lualine.nvim"]
 	path = contrib/nvim-plugins/lualine.nvim
 	url = https://github.com/nvim-lualine/lualine.nvim
+[submodule "contrib/zsh/pure"]
+	path = skel/.zsh/pure
+	url = https://github.com/sindresorhus/pure
+	branch = a02209d36c8509c0e62f44324127632999c9c0cf

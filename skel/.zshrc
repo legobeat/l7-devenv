@@ -8,9 +8,12 @@ WORDCHARS='*?.[]~=&;!#$%^(){}<>'
 plugins=(git man)
 
 set -o emacs
+
+fpath+=($HOME/.zsh/pure)
 autoload -Uz compinit promptinit
 compinit
 promptinit
+prompt pure
 
 # sudo autocomplete
 zstyle ':completion::complete:*' gain-privileges 1
