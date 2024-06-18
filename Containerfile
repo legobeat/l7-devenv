@@ -1,78 +1,82 @@
 # syntax=docker/dockerfile:1.4-labs
 FROM registry.fedoraproject.org/fedora-minimal:40 AS base
 
-RUN microdnf -y update
 
 # EXTRA_BASE_PKGS get installed in both build and runtime. Example of useful packages:
 ### golang LSP support
 ## ARG EXTRA_PKGS='go golang-x-tools-gopls'
 ARG EXTRA_BASE_PKGS=''
 
-RUN microdnf -y install --setopt=install_weak_deps=False \
-    make automake gcc gcc-c++ cpp binutils patch  \
-    curl wget jq yq moreutils tar \
-    git git-lfs openssh-clients gnupg2 \
-    libnotify \
-    man-db \
-    neovim lua python3-neovim \
-    lua-lunitx \
-    nodejs typescript \
-    $EXTRA_BASE_PKGS \
+RUN microdnf -y update \
+  && microdnf -y install --setopt=install_weak_deps=False \
+     make automake gcc gcc-c++ cpp binutils patch  \
+     curl wget jq yq moreutils tar \
+     git git-lfs openssh-clients gnupg2 \
+     libnotify \
+     man-db \
+     neovim lua python3-neovim \
+     nodejs typescript \
+     $EXTRA_BASE_PKGS \
   && ln -sf nvim /usr/bin/vim
 
+##################################
 ##### NEOVIM PLUGINS BUILDER #####
+
 FROM base AS nvim-builder
 
-WORKDIR /etc/xdg/nvim/pack/build-l7ide/start
-COPY --chown=1001:1001 contrib/nvim-plugins/ ./
-RUN mkdir -p /out /home/nvim-builder \
-  && chown -R 1001:1001 /home/nvim-builder
-
-USER 1001
-
 # enable/disable treesitter language parsers. These are fetched remotely.
-ARG TREESITTER_INSTALL='bash c dockerfile hcl javascript lua markdown nix python ruby typescript vim vimdoc yaml'
+ARG TREESITTER_INSTALL='bash c dockerfile hcl javascript lua make markdown nix python ruby typescript vim vimdoc yaml'
+ENV HOME=/tmp/1001-home
 
-ENV HOME=/home/nvim-builder
-# make nvim plugins, but skip running long-running test-only makefiles
-RUN bash -c 'find . -maxdepth 1 -mindepth 1 -type d ! -name "plenary.nvim" ! -name "neo-tree.nvim" | xargs -I{} -P8 bash -c "cd {}; make -j4 build || make -j4 || true"'
-RUN nvim --headless \
-    -c 'packadd nvim-treesitter' \
-    -c 'packloadall' \
-    -c "TSEnable ${TREESITTER_INSTALL}" \
-    -c "TSUpdateSync ${TREESITTER_INSTALL}" \
-    -c "TSEnable ${TREESITTER_INSTALL}" \
-    -c q
-WORKDIR /out
-USER root
-RUN mkdir -p /out/plugins \
-  && mv /etc/xdg/nvim/pack/build-l7ide/start/* /out/plugins/
+# TODO: not supported on podman ubuntu-22.03
+# Using RUN --mount is more efficient than COPY for stuff only used during image build.
+# RUN --mount=source=contrib/nvim-plugins,target=/etc/xdg/nvim/pack/build-l7ide/start,rw=true \
+COPY contrib/nvim-plugins /etc/xdg/nvim/pack/build-l7ide/start
+RUN \
+  microdnf install -y lua-lunitx \
+  && microdnf clean all \
+  && cd /etc/xdg/nvim/pack/build-l7ide/start \
+  # make nvim plugins, but skip running long-running test-only makefiles
+  # TODO: disabled for now; run separately in tests
+  && bash -c 'find . -maxdepth 1 -mindepth 1 -type d ! -name "plenary.nvim" ! -name "neo-tree.nvim" | xargs -I{} echo SKIPPING: bash -c "cd {}; make -j4 build || make -j4 || true"' >&2 \
+  && nvim --headless \
+     -c 'packadd nvim-treesitter' \
+     -c 'packloadall' \
+     -c "TSEnable ${TREESITTER_INSTALL}" \
+     -c "TSUpdateSync ${TREESITTER_INSTALL}" \
+     -c "TSEnable ${TREESITTER_INSTALL}" \
+     -c q \
+  && mkdir -p /out/plugins \
+  && cd /out \
+  && cp -a /etc/xdg/nvim/pack/build-l7ide/start/* /out/plugins/
 
+
+##############################################
 ##### TYPESCRIPT-LANGUAGE-SERVER BUILDER #####
+
 FROM base AS tsserver-builder
 
 ENV NODE_OPTIONS='--no-network-family-autoselection --trace-warnings'
-
-RUN microdnf -y install --setopt=install_weak_deps=False \
-    nodejs npm typescript yarnpkg \
-  && mkdir -p /out /build/typescript-language-server \
-  && chown 1002:1002 /out /build/typescript-language-server \
-  && microdnf clean all
-
-COPY --chown=1002:1002 contrib/typescript-language-server/ /build/typescript-language-server/
-
-WORKDIR /build/typescript-language-server
-USER 1002
 ENV HOME=/tmp/1002-home
 
-RUN yarn install --frozen-lockfile --network-concurrency 10 \
+# TODO: not supported on podman ubuntu-22.03
+# RUN --mount=source=contrib/typescript-language-server,target=/build/typescript-language-server,rw=true \
+COPY contrib/typescript-language-server /build/typescript-language-server
+RUN \
+  microdnf -y install --setopt=install_weak_deps=False \
+    nodejs npm typescript yarnpkg \
+  && mkdir -p /out /build/typescript-language-server \
+  && microdnf clean all \
+  # build, pack, and install typescript-language-server
+  && cd /build/typescript-language-server  \
+  && yarn install --frozen-lockfile --network-concurrency 10 \
   && yarn build \
   && yarn pack \
   && cd /out \
   && npm i /build/typescript-language-server/*.t*gz \
-  && ls \
-  && rm -rf /tmp/1002-home
+  && rm -rf /tmp/1002-home /build/typescript-language-server/*.t*gz
 
+#######################
 ##### FINAL IMAGE #####
 FROM base
 
@@ -96,8 +100,6 @@ FROM base
 ## ARG EXTRA_PKGS='podman docker-compose' # TODO: wire up docker socket
 
 ARG EXTRA_PKGS='bat zsh podman'
-
-
 
 COPY --from=nvim-builder     --chown=2:2 /out/plugins /etc/xdg/nvim/pack/l7ide/start
 COPY --from=tsserver-builder --chown=2:2 /out/node_modules/ /usr/lib/node_modules/
@@ -166,9 +168,9 @@ COPY --chown=${UID}:${GID} config/zshrc        .zshrc
 COPY --chown=${UID}:${GID} config/nvim         .config/nvim
 
 RUN cat /home/user/.env >> /etc/profile \
-  # treesitter needs write to parsers dirs
   && chown -R ${UID}:${GID} \
     .config \
+    # treesitter needs write to parsers dirs
     /etc/xdg/nvim/pack/l7ide/start/nvim-treesitter/parser{-info,}
 
 USER ${UID}
