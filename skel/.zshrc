@@ -14,6 +14,7 @@ autoload -Uz compinit promptinit
 compinit
 promptinit
 prompt pure
+zstyle :prompt:pure:git:fetch only_upstream yes
 
 # sudo autocomplete
 zstyle ':completion::complete:*' gain-privileges 1
