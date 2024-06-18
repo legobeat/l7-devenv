@@ -35,6 +35,9 @@ endif
 
 packloadall
 
+runtime theme.lua
+colorscheme tokyonight-moon
+
 runtime lib.lua
 runtime keys.lua
 runtime s-lualine.lua

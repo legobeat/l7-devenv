@@ -41,3 +41,6 @@
 	path = skel/.zsh/pure
 	url = https://github.com/sindresorhus/pure
 	branch = a02209d36c8509c0e62f44324127632999c9c0cf
+[submodule "contrib/nvim-plugins/tokyonight.nvim"]
+	path = contrib/nvim-plugins/tokyonight.nvim
+	url = https://github.com/folke/tokyonight.nvim
