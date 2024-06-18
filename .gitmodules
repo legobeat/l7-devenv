@@ -34,3 +34,6 @@
 [submodule "contrib/typescript-language-server"]
 	path = contrib/typescript-language-server
 	url = https://github.com/typescript-language-server/typescript-language-server
+[submodule "contrib/nvim-plugins/lualine.nvim"]
+	path = contrib/nvim-plugins/lualine.nvim
+	url = https://github.com/nvim-lualine/lualine.nvim
