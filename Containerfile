@@ -164,4 +164,4 @@ RUN cat /home/user/.env >> /etc/profile \
     /etc/xdg/nvim/pack/l7ide/start/nvim-treesitter/parser{-info,}
 
 USER ${UID}
-WORKDIR /home/user/src
+WORKDIR /src
