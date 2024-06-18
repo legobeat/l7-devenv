@@ -154,24 +154,12 @@ RUN microdnf -y install --setopt=install_weak_deps=False \
   && microdnf -y install podman fuse-overlayfs openssh-clients --exclude container-selinux \
   && microdnf clean all
 
-COPY config/containers/containers.conf /etc/containers/containers.conf
-
-COPY --chown=${UID}:${GID} config/bash_profile .bash_profile
-COPY --chown=${UID}:${GID} config/bashrc       .bashrc
-COPY --chown=${UID}:${GID} config/env          .env
-COPY --chown=${UID}:${GID} config/gitconfig    .gitconfig
-COPY --chown=${UID}:${GID} config/gh.yml        gh/config.yml
-COPY --chown=${UID}:${GID} config/profile      .profile
-COPY --chown=${UID}:${GID} config/ssh          .ssh/config
-# COPY config/ssh         /etc/ssh/ssh_config.d/60-user.conf
-COPY --chown=${UID}:${GID} config/zshrc        .zshrc
-# TODO: see if we can get everything loading right without using .config so users can mount it as volume
-# ...just ~/.vimrc?
-COPY --chown=${UID}:${GID} config/nvim         .config/nvim
+COPY skel/.config/containers/containers.conf /etc/containers/containers.conf
+COPY --chown=${UID}:${GID} skel/ /home/user/
 
 RUN cat /home/user/.env >> /etc/profile \
   && chown -R ${UID}:${GID} \
-    .config \
+    /home/user \
     # treesitter needs write to parsers dirs
     /etc/xdg/nvim/pack/l7ide/start/nvim-treesitter/parser{-info,}
 

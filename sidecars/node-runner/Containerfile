@@ -53,12 +53,7 @@ RUN bash -c 'eval "$(/home/node/.rbenv/bin/rbenv init -)" \
 
 COPY contrib/l*-scripts/bin/*      /usr/local/bin/
 
-COPY --chown=${UID}:${GID} config/bash_profile /home/node/.bash_profile
-COPY --chown=${UID}:${GID} config/bashrc       /home/node/.bashrc
-COPY --chown=${UID}:${GID} config/gitconfig    /home/node/.gitconfig
-COPY --chown=${UID}:${GID} config/env          /home/node/.env
-COPY --chown=${UID}:${GID} config/profile      /home/node/.profile
-COPY --chown=${UID}:${GID} config/zshrc        /home/node/.zshrc
+COPY --chown=${UID}:${GID} skel/ /home/node/
 
 # fix broken ipv6 on nodejs v20
 env NODE_OPTIONS="--no-network-family-autoselection --trace-warnings"
