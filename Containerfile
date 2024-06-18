@@ -55,22 +55,23 @@ ENV NODE_OPTIONS='--no-network-family-autoselection --trace-warnings'
 
 RUN microdnf -y install --setopt=install_weak_deps=False \
     nodejs npm typescript yarnpkg \
-  && mkdir -p /out \
-  && chown 1002:1002 /out
+  && mkdir -p /out /build/typescript-language-server \
+  && chown 1002:1002 /out /build/typescript-language-server \
+  && microdnf clean all
 
 COPY --chown=1002:1002 contrib/typescript-language-server/ /build/typescript-language-server/
 
 WORKDIR /build/typescript-language-server
-RUN chown -R 1002:1002 .
-
 USER 1002
 ENV HOME=/tmp/1002-home
 
 RUN yarn install --frozen-lockfile --network-concurrency 10 \
   && yarn build \
-  && yarn pack
-WORKDIR /out
-RUN npm i /build/typescript-language-server/*.t*gz && ls
+  && yarn pack \
+  && cd /out \
+  && npm i /build/typescript-language-server/*.t*gz \
+  && ls \
+  && rm -rf /tmp/1002-home
 
 ##### FINAL IMAGE #####
 FROM base
@@ -96,6 +97,20 @@ FROM base
 
 ARG EXTRA_PKGS='bat zsh podman'
 
+
+
+COPY --from=nvim-builder     --chown=2:2 /out/plugins /etc/xdg/nvim/pack/l7ide/start
+COPY --from=tsserver-builder --chown=2:2 /out/node_modules/ /usr/lib/node_modules/
+COPY contrib/bin/* contrib/*/bin/*       /usr/local/bin/
+
+ARG HOME=/home/user
+ENV HOME=${HOME}
+ARG SHELL=/usr/bin/bash
+ARG UID=1000
+ARG GID=1000
+
+WORKDIR ${HOME}
+
 RUN microdnf -y install --setopt=install_weak_deps=False \
     tree fzf ripgrep \
     sshpass \
@@ -106,48 +121,35 @@ RUN microdnf -y install --setopt=install_weak_deps=False \
     w3m \
     which procps-ng \
     ${EXTRA_PKGS} \
-  && ln -sf nvim /usr/bin/vim
+  && ln -sf nvim /usr/bin/vim \
 
-
-COPY --from=nvim-builder     --chown=2:2 /out/plugins /etc/xdg/nvim/pack/l7ide/start
-COPY --from=tsserver-builder --chown=2:2 /out/node_modules/ /usr/lib/node_modules/
-COPY contrib/bin/*        /usr/local/bin/
-COPY contrib/*/bin/*      /usr/local/bin/
-
-ARG HOME=/home/user
-ENV HOME=${HOME}
-ARG SHELL=/usr/bin/bash
-ARG UID=1000
-ARG GID=1000
-
-# create user entry or podman will mess up /etc/passwd entry
-# also grant passwordless sudo
-# this means image will have to be rebuilt with --build-arg UID=$(id -u) if runtime user has different UID from default 1000
-RUN  bash -c "groupadd -g ${GID} userz || true" \
+  # create user entry or podman will mess up /etc/passwd entry
+  # also grant passwordless sudo
+  # this means image will have to be rebuilt with --build-arg UID=$(id -u) if runtime user has different UID from default 1000
+  && bash -c "groupadd -g ${GID} userz || true" \
   && bash -c "useradd -u ${UID} -g ${GID} -d /home/user -m user -s "${SHELL}" && chown -R ${UID}:${GID} /home/user || true" \
   && usermod -G wheel -a $(id -un ${UID}) \
-  && echo '%wheel ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers
+  && echo '%wheel ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers \
+  # allow accessing mounted container runtime socket ("docker-in-docker"/"podman-in-podman"/"d-i-p")
+  # https://github.com/containers/image_build/blob/main/podman/Containerfile
+  && usermod --add-subuids 1001-64535    --add-subgids 1001-64535 user \
+  && usermod --add-subuids 1-999         --add-subgids 1-999      user \
+  && setcap cap_setuid=+eip /usr/bin/newuidmap \
+  && setcap cap_setgid=+eip /usr/bin/newgidmap \
+  # https://github.com/gabyx/container-nesting/blob/7efbd79707e1be366bee462f6200443ca23bc077/src/podman/container/Containerfile#L46
+  && mkdir -p /etc/containers .config/containers \
+  && sed -e 's|^#mount_program|mount_program|g' \
+         -e '/additionalimage.*/a "/var/lib/shared",' \
+         -e 's|^mountopt[[:space:]]*=.*$|mountopt = "nodev,fsync=0"|g' \
+         /usr/share/containers/storage.conf \
+         > /etc/containers/storage.conf \
+  && sed -e 's|^graphroot|#graphroot|g' \
+         -e 's|^runroot|#runroot|g' \
+         /etc/containers/storage.conf > .config/containers/storage.conf \
+  && rpm --setcaps shadow-utils 2>/dev/null \
+  && microdnf -y install podman fuse-overlayfs openssh-clients --exclude container-selinux \
+  && microdnf clean all
 
-
-# allow accessing mounted container runtime socket ("docker-in-docker"/"podman-in-podman"/"d-i-p")
-# https://github.com/containers/image_build/blob/main/podman/Containerfile
-RUN usermod --add-subuids 1001-64535    --add-subgids 1001-64535 user \
- && usermod --add-subuids 1-999         --add-subgids 1-999      user \
- && setcap cap_setuid=+eip /usr/bin/newuidmap \
- && setcap cap_setgid=+eip /usr/bin/newgidmap
-
-WORKDIR ${HOME}
-
-# https://github.com/gabyx/container-nesting/blob/7efbd79707e1be366bee462f6200443ca23bc077/src/podman/container/Containerfile#L46
-RUN mkdir -p /etc/containers .config/containers && \
-    sed -e 's|^#mount_program|mount_program|g' \
-           -e '/additionalimage.*/a "/var/lib/shared",' \
-           -e 's|^mountopt[[:space:]]*=.*$|mountopt = "nodev,fsync=0"|g' \
-           /usr/share/containers/storage.conf \
-           > /etc/containers/storage.conf && \
-    sed -e 's|^graphroot|#graphroot|g' \
-        -e 's|^runroot|#runroot|g' \
-           /etc/containers/storage.conf > .config/containers/storage.conf
 COPY config/containers/containers.conf /etc/containers/containers.conf
 
 COPY --chown=${UID}:${GID} config/bash_profile .bash_profile
@@ -163,12 +165,11 @@ COPY --chown=${UID}:${GID} config/zshrc        .zshrc
 # ...just ~/.vimrc?
 COPY --chown=${UID}:${GID} config/nvim         .config/nvim
 
-RUN cat /home/user/.env >> /etc/profile
-
-# treesitter needs write to parsers dirs
-RUN chown -R ${UID}:${GID} \
-  .config \
-  /etc/xdg/nvim/pack/l7ide/start/nvim-treesitter/parser{-info,}
+RUN cat /home/user/.env >> /etc/profile \
+  # treesitter needs write to parsers dirs
+  && chown -R ${UID}:${GID} \
+    .config \
+    /etc/xdg/nvim/pack/l7ide/start/nvim-treesitter/parser{-info,}
 
 USER ${UID}
 WORKDIR /home/user/src
