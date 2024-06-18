@@ -165,3 +165,4 @@ RUN cat /home/user/.env >> /etc/profile \
 
 USER ${UID}
 WORKDIR /src
+ENTRYPOINT ${SHELL}
