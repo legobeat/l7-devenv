@@ -34,7 +34,6 @@ ENV HOME=/tmp/1001-home
 COPY contrib/nvim-plugins /etc/xdg/nvim/pack/build-l7ide/start
 RUN \
   microdnf install -y lua-lunitx \
-  && microdnf clean all \
   && cd /etc/xdg/nvim/pack/build-l7ide/start \
   # make nvim plugins, but skip running long-running test-only makefiles
   # TODO: disabled for now; run separately in tests
@@ -48,6 +47,8 @@ RUN \
      -c q \
   && mkdir -p /out/plugins \
   && cd /out \
+  && microdnf remove -y lua-lunitx \
+  && microdnf clean all \
   && cp -a /etc/xdg/nvim/pack/build-l7ide/start/* /out/plugins/
 
 
@@ -64,9 +65,8 @@ ENV HOME=/tmp/1002-home
 COPY contrib/typescript-language-server /build/typescript-language-server
 RUN \
   microdnf -y install --setopt=install_weak_deps=False \
-    nodejs npm typescript yarnpkg \
+    npm yarnpkg \
   && mkdir -p /out /build/typescript-language-server \
-  && microdnf clean all \
   # build, pack, and install typescript-language-server
   && cd /build/typescript-language-server  \
   && yarn install --frozen-lockfile --network-concurrency 10 \
@@ -74,6 +74,8 @@ RUN \
   && yarn pack \
   && cd /out \
   && npm i /build/typescript-language-server/*.t*gz \
+  && microdnf remove -y npm yarnpkg \
+  && microdnf clean all \
   && rm -rf /tmp/1002-home /build/typescript-language-server/*.t*gz
 
 #######################
