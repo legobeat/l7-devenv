@@ -118,7 +118,7 @@ WORKDIR ${HOME}
 RUN microdnf -y install --setopt=install_weak_deps=False \
     tree fzf ripgrep \
     sshpass \
-    hub gh tig git-gui \
+    hub gh tig \
     libnotify \
     man-db \
     screen \
