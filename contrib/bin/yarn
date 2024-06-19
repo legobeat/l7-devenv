@@ -1,2 +1,2 @@
 #!/bin/bash
-podman exec -it "${YARN_RUNNER}" yarn $@
+podman exec -it "${YARN_RUNNER}" -- yarn ${@}
