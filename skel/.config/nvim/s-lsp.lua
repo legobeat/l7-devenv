@@ -1,7 +1,7 @@
 -- Use an on_attach function to only map the following keys
 -- after the language server attaches to the current buffer
 local on_attach = function(client, bufnr)
-  _G.enable_lsp_keybindings()
+  _G.enable_lsp_keybindings(client, bufnr)
 end
 
 local lsp_flags = {
