@@ -1,6 +1,4 @@
 #!/bin/bash
 export RUNNER_IMAGE=${NODE_RUNNER_IMAGE:-${RUNNER_IMAGE}}
+l7-cnt-run "${RUNNER_IMAGE}" node ${@}
 
-sudo --preserve-env=CONTAINER_HOST,container,TERM \
-  podman run --rm -it "${RUNNER_IMAGE}" \
-  -- node ${@}

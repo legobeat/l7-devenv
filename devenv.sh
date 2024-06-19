@@ -51,6 +51,7 @@ ${cmd} run --rm -it \
   -e "CONTAINER_HOST=unix:///run/docker.sock" \
   -e NODE_RUNNER_IMAGE=l7/node:20-bookworm \
   -e HOME=/home/user \
+  -e "SRC_DIR=${SRC_DIR}" \
   ${RUN_ARGS} \
   "${IMAGE}" \
   ${@}
