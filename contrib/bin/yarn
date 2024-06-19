@@ -1,2 +1,3 @@
 #!/bin/bash
-podman exec -it "${YARN_RUNNER}" -- yarn ${@}
+export RUNNER_IMAGE=${YARN_RUNNER_IMAGE:-${NODE_RUNNER_IMAGE:-${RUNNER_IMAGE}}}
+podman run --rm -it "${RUNNER_IMAGE}" -- yarn ${@}
