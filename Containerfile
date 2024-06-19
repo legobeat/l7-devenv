@@ -152,6 +152,7 @@ RUN microdnf -y install --setopt=install_weak_deps=False \
          /etc/containers/storage.conf > .config/containers/storage.conf \
   && rpm --setcaps shadow-utils 2>/dev/null \
   && microdnf -y install podman fuse-overlayfs openssh-clients --exclude container-selinux \
+  && microdnf remove npm yarnpkg \
   && microdnf clean all
 
 COPY skel/.config/containers/containers.conf /etc/containers/containers.conf
