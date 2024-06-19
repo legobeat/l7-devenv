@@ -2,9 +2,9 @@ require('octo').setup({
   use_local_fs = true,
   default_remote = {'mm', 'origin', 'upstream'},
   default_merge_method = 'rebase', -- commit, merge, rebase
-  -- ssh_aliases = {
-  --   ["github.com-user"] = "github.com"
-  -- },
+  ssh_aliases = {
+    ["github.com-.*"] = "github.com"
+  },
   picker_config = {
     use_emojis = false, -- only used by "fzf-lua" picker for now
     -- mappings = {                           -- mappings for the pickers
