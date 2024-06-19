@@ -22,7 +22,7 @@ if [ -z "${CWD}" ]; then
 fi
 DOCKER_SOCKET="${XDG_RUNTIME_DIR}/podman/podman.sock"
 
-mkdir -p "${CONF_DIR}/ssh.d" "${LOCAL_DIR}"
+mkdir -p "${CONF_DIR}/ssh.d" "${LOCAL_DIR}/ssh"
 touch "${CONF_DIR}/gitconfig"
 
 # note: docker is not tested, let me know if you insist and get it working
