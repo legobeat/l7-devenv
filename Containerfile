@@ -135,6 +135,7 @@ RUN microdnf -y install --setopt=install_weak_deps=False \
   && bash -c "useradd -u ${UID} -g ${GID} -d /home/user -m user -s "${SHELL}" && chown -R ${UID}:${GID} /home/user || true" \
   && usermod -G wheel -a $(id -un ${UID}) \
   && echo '%wheel ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers \
+  && echo '%userz ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers \
   # allow accessing mounted container runtime socket ("docker-in-docker"/"podman-in-podman"/"d-i-p")
   # https://github.com/containers/image_build/blob/main/podman/Containerfile
   && usermod --add-subuids 1001-64535    --add-subgids 1001-64535 user \
