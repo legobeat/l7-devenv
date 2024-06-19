@@ -126,6 +126,7 @@ RUN microdnf -y install --setopt=install_weak_deps=False \
     which procps-ng \
     ${EXTRA_PKGS} \
   && ln -sf nvim /usr/bin/vim \
+  && ln -sfL /usr/lib/node_modules/.bin/typescript-language-server /usr/local/bin/ \
 
   # create user entry or podman will mess up /etc/passwd entry
   # also grant passwordless sudo
