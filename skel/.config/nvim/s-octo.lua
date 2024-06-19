@@ -5,8 +5,11 @@ require('octo').setup({
   ssh_aliases = {
     ["github.com-.*"] = "github.com"
   },
+  gh_env = function()
+    return { GITHUB_TOKEN = os.getenv("GITHUB_TOKEN") }
+  end,
   picker_config = {
-    use_emojis = false, -- only used by "fzf-lua" picker for now
+    use_emojis = true, -- only used by "fzf-lua" picker for now
     -- mappings = {                           -- mappings for the pickers
      --  open_in_browser = { lhs = "<C-m>", desc = "open issue in browser" },
     --   copy_url = { lhs = "<C-y>", desc = "copy url to system clipboard" },
