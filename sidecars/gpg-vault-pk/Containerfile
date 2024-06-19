@@ -1,0 +1,11 @@
+FROM alpine:3.19
+
+RUN apk upgrade --no-cache \
+  && apk add --no-cache \
+    gnupg gnupg-doc gnupg-gpgconf gnupg-lang gnupg-scdaemon gnupg-utils \
+    gpg-agent \
+    gpg-tui gpg-tui-doc gpg-tui-bash-completion gpg-tui-zsh-completion \
+    pinentry pinentry-doc pinentry-curses-ss pinentry-tty
+
+# for graphical pinentry, one of:
+#    pinentry-gnome | pinentry-gtk | pinentry-qt | pinentry-ui
