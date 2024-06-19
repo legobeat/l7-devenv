@@ -1,6 +1,8 @@
 IMAGE_NAME := localhost/l7/nvim
 IMAGE_TAG  := latest
 USER_SHELL ?= ${SHELL}
+RUNNER_IMAGE_NAME := localhost/l7/node
+RUNNER_IMAGE_TAG  := 20-bookworm
 BUILD_OPTIONS :=
 EXTRA_PKGS := zsh podman
 UID:=$(shell id -u)
@@ -17,5 +19,16 @@ image_nvim:
 		-t "${IMAGE_NAME}:${IMAGE_TAG}" \
 		-f './Containerfile' \
 		.
+
+image_runner:
+	${CMD} buildx build \
+		${BUILD_OPTIONS} \
+		--build-arg "SHELL=${USER_SHELL}" \
+		--build-arg "UID=${UID}" \
+		--build-arg "GID=${GID}" \
+		-t "${RUNNER_IMAGE_NAME}:${RUNNER_IMAGE_TAG}" \
+		-f './sidecars/node-runner/Containerfile' \
+		.
+
 test:
 	@echo TODO: tests
