@@ -55,6 +55,18 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
+      - name: Build and load gpg-vault-pk image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: sidecars/gpg-vault-pk/Containerfile
+          build-args: ${{ matrix.build-args }}
+          load: true
+          tags: l7/gpg-vault:pk
+          push: false
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
   test-make:
     runs-on: ${{ matrix.os }}
     strategy:
@@ -69,6 +81,7 @@ jobs:
           - ubuntu-22.04
           - ubuntu-24.04
         image:
+          - gpg_pk
           - nvim
           - runner
     steps:
