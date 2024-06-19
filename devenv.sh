@@ -12,7 +12,14 @@ CONF_DIR="${CONF_DIR:-${HOME}/.config/l7ide/config}"
 LOCAL_DIR="${LOCAL_DIR:-${HOME}/.local/share/l7ide/local}"
 SRC_DIR="${SRC_DIR:-$(pwd)}"
 SSH_SOCKET="${SSH_SOCKET:-${SSH_AUTH_SOCK}}"
-CWD="${CWD:-$(pwd)}"
+# default workdir to pwd if within SRC_DIR or /src; otherwise SRC_DIR
+if [ -z "${CWD}" ]; then
+  case $PWD/ in
+    ${SRC_DIR}/*) export CWD="${PWD}";;
+    /src/*)       export CWD="${PWD}";;
+    *)            export CWD="${SRC_DIR}";;
+  esac
+fi
 DOCKER_SOCKET="${XDG_RUNTIME_DIR}/podman/podman.sock"
 
 mkdir -p "${CONF_DIR}/ssh.d" "${LOCAL_DIR}"
