@@ -2,12 +2,14 @@
 FROM node:20-bookworm-slim
 
 RUN apt-get update \
-  && apt-get install -y \
-    git curl jq time \
-    sudo locales \
+  && apt-get install -y --no-install-recommends \
+    git curl ca-certificates gnupg ssh-client less psmisc jq time man manpages zsh \
+    sudo locales fakeroot libpcre3 \
     build-essential ccache cmake cmake-format distcc zlib1g-dev libzlcore-dev libffi-dev libssl-dev libyaml-dev \
   && sed -i '/en_US.UTF-8/s/^# //' /etc/locale.gen \
-  && locale-gen
+  && locale-gen \
+  && rm -rf /var/{cache,lib}/apt
+
 
 ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
 ENV NODE_OPTIONS='--no-network-family-autoselection --trace-warnings'
@@ -20,9 +22,6 @@ RUN  bash -c "[ ${GID} != \"1000\" ] && groupadd -g ${GID} -U node userz || true
   && bash -c "[ ${UID} != \"1000\" ] && useradd -u ${UID} -g ${GID} -s ${SHELL} -d /home/node user && chown -R ${UID}:${GID} /home/node || true" \
   && usermod -G sudo -a $(id -un ${UID}) \
   && echo '%sudo ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers
-
-# install ruby deps
-WORKDIR /tmp/app
 
 ####
 USER ${UID}:${GID}
@@ -37,6 +36,7 @@ RUN corepack install -g yarn@1.22.22 \
 # RUBY_BUILD_VERSION=v20240501
 ARG RBENV_COMMIT=c3ba994ec2daccf4d160aea7f55dd5cc6fc873ef
 ARG RUBY_BUILD_COMMIT=263640c9fe1d44e6fc8f86fc56a67ee58e7b22f7
+WORKDIR /tmp
 RUN (mkdir /home/node/.rbenv \
     && curl -sL https://github.com/rbenv/rbenv/archive/${RBENV_COMMIT}.tar.gz \
     | tar --strip-components=1 -C /home/node/.rbenv/ -xzf - \
@@ -44,9 +44,9 @@ RUN (mkdir /home/node/.rbenv \
     && curl -sL https://github.com/rbenv/ruby-build/archive/${RUBY_BUILD_COMMIT}.tar.gz \
     | tar --strip-components=1 -C /home/node/.rbenv/plugins/ruby-build -xzf - \
   ) \
-  && echo 'eval "$(/home/node/.rbenv/bin/rbenv init -)"' >> /home/node/.bashrc
-
-RUN bash -c 'eval "$(/home/node/.rbenv/bin/rbenv init -)" \
+  && echo 'eval "$(/home/node/.rbenv/bin/rbenv init -)"' >> /home/node/.bashrc \
+  && echo 'eval "$(/home/node/.rbenv/bin/rbenv init -)"' >> /home/node/.zshrc \
+  && bash -c 'eval "$(/home/node/.rbenv/bin/rbenv init -)" \
     && rbenv install 3.3.1 || cat /tmp/ruby-build.* /tmp/ruby-build.*/ruby-*/ext/psych/mkmf.log \
     && rbenv global 3.3.1 \
     && gem install bundler -v 2.5.8 \
