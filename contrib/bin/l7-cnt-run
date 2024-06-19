@@ -2,14 +2,19 @@
 # proxy command to run in ephemeral sibling container
 # expects a container engine socket on $CONTAINER_HOST
 
-
 RUNNER_IMAGE="$1"
 COMMAND="$2"
 ARGS="${@:3}"
+if [ -n "${RUNNER_PORTS}"  ]; then
+  for ports in ${RUNNER_PORTS}; do
+    export RUNNER_OPTS="${RUNNER_OPTS} -p ${RUNNER_PORTS}"
+  done
+fi
 
 sudo --preserve-env=CONTAINER_HOST,container \
   podman run --rm -it \
   --user "$(id -u):$(id -g)" --userns=keep-id:uid=$(id -u),gid=$(id -g) \
   -e NODE_OPTIONS="${NODE_OPTIONS}" \
   -v "${SRC_DIR}:${SRC_DIR}" -v "${SRC_DIR}:/src" -w "${PWD}" \
+  ${RUNNER_OPTS} \
   --entrypoint "${COMMAND}" -- $RUNNER_IMAGE ${ARGS}
