@@ -116,7 +116,7 @@ ARG GID=1000
 WORKDIR ${HOME}
 
 RUN microdnf -y install --setopt=install_weak_deps=False \
-    tree fzf ripgrep \
+    diffutils tree fzf ripgrep \
     sshpass \
     hub gh tig \
     libnotify \
