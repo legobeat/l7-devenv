@@ -126,7 +126,6 @@ RUN microdnf -y install --setopt=install_weak_deps=False \
     which procps-ng \
     ${EXTRA_PKGS} \
   && ln -sf nvim /usr/bin/vim \
-  && ln -sfL /usr/lib/node_modules/.bin/typescript-language-server /usr/local/bin/ \
 
   # create user entry or podman will mess up /etc/passwd entry
   # also grant passwordless sudo
@@ -166,7 +165,11 @@ RUN cat /home/user/.env >> /etc/profile \
     # treesitter needs write to parsers dirs
     /etc/xdg/nvim/pack/l7ide/start/nvim-treesitter/parser{-info,} \
   # hardcode node path for lsp to use in-container binary
-  && sed -i 's@^#!/usr/bin/env node@#!/usr/bin/node@' /usr/local/bin/typescript-language-server
+  && sed -i 's@^#!/usr/bin/env node@#!/usr/bin/node@' /usr/lib/node_modules/typescript-language-server/lib/cli.mjs \
+  # symlink can get messed up by copy; effective .mjs extension is important for node
+  && ln -sf \
+    /usr/lib/node_modules/typescript-language-server/lib/cli.mjs \
+    /usr/lib/node_modules/.bin/typescript-language-server
 
 USER ${UID}
 WORKDIR /src
