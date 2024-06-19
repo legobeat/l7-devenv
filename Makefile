@@ -1,8 +1,8 @@
 IMAGE_NAME := localhost/l7/nvim
 IMAGE_TAG  := latest
-USER_SHELL ?= ${SHELL}
 RUNNER_IMAGE_NAME := localhost/l7/node
 RUNNER_IMAGE_TAG  := 20-bookworm
+USER_SHELL ?= /usr/bin/zsh
 BUILD_OPTIONS :=
 EXTRA_PKGS := zsh podman
 UID:=$(shell id -u)
