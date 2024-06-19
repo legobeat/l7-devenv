@@ -30,5 +30,10 @@ image_runner:
 		-f './sidecars/node-runner/Containerfile' \
 		.
 
-test:
-	@echo TODO: tests
+test: test_nvim test_runner
+
+test_nvim:
+	@echo TODO: nvim image tests
+
+test_runner:
+	@echo TODO: node-runner image tests
