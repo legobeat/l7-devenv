@@ -49,6 +49,7 @@ ${cmd} run --rm -it \
   -w "${CWD}" \
   --mount type=tmpfs,tmpfs-size=2G,destination=/tmp,U=true,tmpfs-mode=0777 \
   -e "CONTAINER_HOST=unix:///run/docker.sock" \
+  -e YARN_RUNNER=l7-node-20 \
   -e HOME=/home/user \
   ${RUN_ARGS} \
   "${IMAGE}" \
