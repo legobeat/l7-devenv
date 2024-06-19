@@ -30,7 +30,7 @@ jobs:
         with:
           submodules: true
 
-      - name: Build and load
+      - name: Build and load nvim image
         uses: docker/build-push-action@v5
         with:
           context: .
@@ -42,6 +42,19 @@ jobs:
           push: false
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      - name: Build and load node-runner image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: sidecars/node-runner/Containerfile
+          build-args: ${{ matrix.build-args }}
+          load: true
+          tags: l7/node:20-bookworm
+          push: false
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
   test-make:
     runs-on: ${{ matrix.os }}
     strategy:
@@ -55,18 +68,21 @@ jobs:
           - ubuntu-20.04
           - ubuntu-22.04
           - ubuntu-24.04
+        image:
+          - nvim
+          - runner
     steps:
       - uses: actions/checkout@v4
         with:
           submodules: true
-      - run: make IMAGE_NAME=localhost/foo IMAGE_TAG=bar CMD=${{ matrix.cmd }}
+      - run: make IMAGE_NAME=localhost/foo-${{ matrix.image }} IMAGE_TAG=bar CMD=${{ matrix.cmd }}
         if: ${{ matrix.cmd != '' }}
         env:
           CMD: ${{ matrix.cmd }}
-      - run: make IMAGE_NAME=localhost/foo IMAGE_TAG=bar
+      - run: make IMAGE_NAME=localhost/foo-${{ matrix.image }} IMAGE_TAG=bar
         if: ${{ matrix.cmd == '' }}
-      - run: ${{ matrix.cmd }} image inspect localhost/foo:bar
+      - run: ${{ matrix.cmd }} image inspect localhost/foo-${{ matrix.image }}:bar
         if: ${{ matrix.cmd != '' }}
-      - run: podman image inspect localhost/foo:bar
+      - run: podman image inspect localhost/foo-${{ matrix.image }}:bar
         if: ${{ matrix.cmd == '' }}
       - run: make test
