@@ -1,5 +1,3 @@
 #!/bin/bash
 export RUNNER_IMAGE=${NPM_RUNNER_IMAGE:-${NODE_RUNNER_IMAGE:-${RUNNER_IMAGE}}}
-sudo --preserve-env=CONTAINER_HOST,container,TERM \
-  podman run --rm -it "${RUNNER_IMAGE}" \
-  -- npm ${@}
+l7-cnt-run "${RUNNER_IMAGE}" npm ${@}
