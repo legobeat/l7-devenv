@@ -48,7 +48,7 @@ ${cmd} run --rm -it \
   -v "${SRC_DIR}:/src:Z" \
   -w "${CWD}" \
   --mount type=tmpfs,tmpfs-size=2G,destination=/tmp,U=true,tmpfs-mode=0777 \
-  -e "DOCKER_HOST=/run/docker.sock" \
+  -e "CONTAINER_HOST=unix:///run/docker.sock" \
   -e HOME=/home/user \
   ${RUN_ARGS} \
   "${IMAGE}" \
