@@ -1,5 +1,7 @@
 IMAGE_NAME := localhost/l7/nvim
 IMAGE_TAG  := latest
+GPG_IMAGE_NAME := localhost/l7/gpg-vault
+GPG_IMAGE_TAG  := pk
 RUNNER_IMAGE_NAME := localhost/l7/node
 RUNNER_IMAGE_TAG  := 20-bookworm
 USER_SHELL ?= /usr/bin/zsh
@@ -8,6 +10,13 @@ EXTRA_PKGS := zsh podman
 UID:=$(shell id -u)
 GID:=$(shell id -g)
 CMD:=$(shell which podman || which docker)
+
+image_gpg_pk:
+	${CMD} buildx build \
+		${BUILD_OPTIONS} \
+		-t "${GPG_IMAGE_NAME}:${GPG_IMAGE_TAG}" \
+		-f './sidecars/gpg-vault-pk/Containerfile' \
+		.
 
 image_nvim: submodules
 	${CMD} buildx build \

@@ -1,0 +1,14 @@
+#!/bin/bash
+# proxy command to run in ephemeral sibling container
+# expects a container engine socket on $CONTAINER_HOST
+
+RUNNER_IMAGE="${GPG_IMAGE:-${RUNNER_IMAGE}}"
+COMMAND="$0"
+ARGS="${@}"
+
+sudo --preserve-env=CONTAINER_HOST,container \
+  podman run --rm -it \
+  -e GNUPGHOME=/vault/gnupg \
+  -v "${GPG_PK_VOLUME}:/vault/gnupg" \
+  ${GPG_PK_OPTS} \
+  --entrypoint "${COMMAND}" -- ${RUNNER_IMAGE} ${ARGS}
