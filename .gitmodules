@@ -43,3 +43,9 @@
 [submodule "skel/.zsh/pure"]
 	path = skel/.zsh/pure
 	url = https://github.com/sindresorhus/pure
+[submodule "contrib/nvim-plugins/tig-explorer.vim"]
+	path = contrib/nvim-plugins/tig-explorer.vim
+	url = https://github.com/iberianpig/tig-explorer.vim
+[submodule "contrib/nvim-plugins/bclose.vim"]
+	path = contrib/nvim-plugins/bclose.vim
+	url = https://github.com/rbgrouleff/bclose.vim
