@@ -9,7 +9,7 @@ UID:=$(shell id -u)
 GID:=$(shell id -g)
 CMD:=$(shell which podman || which docker)
 
-image_nvim:
+image_nvim: submodules
 	${CMD} buildx build \
 		${BUILD_OPTIONS} \
 		--build-arg "EXTRA_PKGS=${EXTRA_PKGS}" \
@@ -20,7 +20,7 @@ image_nvim:
 		-f './Containerfile' \
 		.
 
-image_runner:
+image_runner: submodules
 	${CMD} buildx build \
 		${BUILD_OPTIONS} \
 		--build-arg "SHELL=${USER_SHELL}" \
@@ -29,6 +29,9 @@ image_runner:
 		-t "${RUNNER_IMAGE_NAME}:${RUNNER_IMAGE_TAG}" \
 		-f './sidecars/node-runner/Containerfile' \
 		.
+
+submodules:
+	@git submodule update --checkout --init --recursive --rebase
 
 test: test_nvim test_runner
 
