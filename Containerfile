@@ -164,7 +164,9 @@ RUN cat /home/user/.env >> /etc/profile \
   && chown -R ${UID}:${GID} \
     /home/user \
     # treesitter needs write to parsers dirs
-    /etc/xdg/nvim/pack/l7ide/start/nvim-treesitter/parser{-info,}
+    /etc/xdg/nvim/pack/l7ide/start/nvim-treesitter/parser{-info,} \
+  # hardcode node path for lsp to use in-container binary
+  && sed -i 's@^#!/usr/bin/env node@#!/usr/bin/node@' /usr/local/bin/typescript-language-server
 
 USER ${UID}
 WORKDIR /src
