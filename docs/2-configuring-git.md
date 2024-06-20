@@ -131,4 +131,54 @@ github.com
 
 We also want to be able to sign our commit messages. We will use GPG to do so. Similarly to SSH keys, we will interface with an external agent. In this case, we will have the keyring managed in a dedicated container where signing will be made.
 
-> TODO
+<details><summary>Generating GPG keypair</summary>
+
+This will generate a new keypair, persisted in the private dontainer volume of the gpg proxy container. Commands are run inside IDE container.
+
+```
+> GPG_RUNNER_ENTRYPOINT=init-keyring.sh l7-gpg-proxy yourname you@example.com
+
+# customize via:
+# GPG_NAME
+# GPG_EMAIL
+# GPG_ALGO
+# GPG_EXPIRY
+# see man gpg --quick-gen-key for arguments reference
+
+# list pubkey
+> l7-gpg-proxy -K
+
+# export pubkey again
+> l7-gpg-proxy --export -a
+
+# test signing a message
+> echo 'hello there' | l7-gpg-proxy -bsa
+```
+
+The public key can then be [added on GitHub](https://github.com/settings/gpg/new).
+</details>
+
+The `l7-gpg-proxy` command is a `gpg` proxied to an ephemeral sibling container managing the keyring and handling gpg operations like signing. Once the keypair is under management by `l7-gpg-proxy`, all we need to do is tell git which key to use for signing operations:
+
+```
+# get the fingerprint
+> l7-gpg-proxy -K
+
+/vault/gnupg/pubring.kbx
+------------------------
+sec   ed25519 2025-02-19 [SC] [expires: 2025-05-01]
+      A8EFB623C9138FEEABBADEADBEEF6302783834A0
+uid           [ultimate] yourname <you@example.com>
+
+# set the key (on host)
+$ echo "[user] signingKey = A8EFB623C9138FEEABBADEADBEEF6302783834A0" >> ~/.config/l7ide/config/git/config
+
+# you should now be able to make signed commits. To sign the latest commit on the current branch:
+> g cma -S     # git commit --amend --gpg-sign
+
+# enable commit signing by default (on host)
+$ echo "[commit] gpgSign = true" >> ~/.config/l7ide/config/git/config
+
+# temporarily disable signing
+> g cm --no-gpg-sign
+```

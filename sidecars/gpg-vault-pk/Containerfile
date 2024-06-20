@@ -14,4 +14,6 @@ RUN apk upgrade --no-cache \
 
 # https://imil.net/blog/posts/2020/testing-gpg-keys-with-docker/
 COPY sidecars/gpg-vault-pk/gpg*.conf /root/.gnupg/
+COPY sidecars/gpg-vault-pk/*.sh /usr/local/bin/
+
 ENV GPG_TTY /dev/gpgtty
