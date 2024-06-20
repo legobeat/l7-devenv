@@ -101,7 +101,7 @@ FROM base
 ## ARG EXTRA_PKGS='tree-sitter-cli' # repo version errors right now? try again later
 ## ARG EXTRA_PKGS='podman docker-compose' # TODO: wire up docker socket
 
-ARG EXTRA_PKGS='bat zsh podman'
+ARG EXTRA_PKGS='bat docker-compose zsh'
 
 ARG HOME=/home/user
 ENV HOME=${HOME}
@@ -117,6 +117,7 @@ RUN microdnf -y install --setopt=install_weak_deps=False \
     hub gh tig \
     libnotify \
     man-db \
+    podman sudo containers-common \
     screen \
     w3m \
     which procps-ng \
