@@ -1,0 +1,15 @@
+FROM debian:bookworm-slim
+
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends \
+    gnupg gpg \
+    pinentry-tty \
+    strace \
+  && rm -rf /var/{cache,lib}/apt \
+  && ln -sf pinentry-tty /usr/bin/pinentry
+
+COPY sidecars/gpg-vault-pk/gpg*.conf /root/.gnupg/
+#    scdaemon
+
+# https://imil.net/blog/posts/2020/testing-gpg-keys-with-docker/
+ENV GPG_TTY /dev/gpgtty
