@@ -13,6 +13,9 @@ UID:=$(shell id -u)
 GID:=$(shell id -g)
 CMD:=$(shell which podman || which docker)
 
+install:
+	./scripts/install-command.sh
+
 image_gpg_pk : IMAGE_NAME = ${GPG_IMAGE_NAME}
 image_gpg_pk : IMAGE_TAG = ${GPG_IMAGE_TAG}
 image_gpg_pk:

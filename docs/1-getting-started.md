@@ -3,7 +3,7 @@
 
 This will be a step-by-step guide to getting everything up and running from scratch.
 This assumes you are running in a clean installation of Ubuntu 24.04 LTS or Debian Bookworm.
-You should be able to use this with Docker by replacing `podman` with `docker`.
+You should also be able to use this with Docker by replacing `podman` with `docker`.
 
 ## System preparation
 
@@ -14,7 +14,7 @@ You should be able to use this with Docker by replacing `podman` with `docker`.
 $ sudo apt-get update && sudo apt-get upgrade -y
 
 ## Install system dependencies
-$ sudo apt-get install --no-install-recommends make podman buildah slirp4netns fuse-overlayfs uidmap gnu-which overlayroot containers-storage
+$ sudo apt-get install --no-install-recommends coreutils make podman buildah slirp4netns fuse-overlayfs uidmap gnu-which overlayroot containers-storage
 ```
 
 ### Rootless podman setup
@@ -29,11 +29,15 @@ $ podman info | grep graphDriver
 ```
 
 ## Building
+
+While you could quickly get up and running by pulling prebuilt images from the GitHub container registry, it is expected that you may want to do some customization of the images as part of configuration. By starting out from sources, we make that transition more natural.
+
 ```
-## Example source dir
+## Sources directory - you can create a new directory or reuse an existing path where you keep your git repos checked out
 $ export SRC_DIR=${HOME}/src
 $ mkdir -p "${SRC_DIR}"
 $ cd "${SRC_DIR}"
+
 ## Clone the repository
 $ git clone --recurse-submodules https://github.com/legobeat/l7-devenv
 $ cd l7-devenv
@@ -44,23 +48,42 @@ The environment is set up in the root [`Containerfile`](./Containerfile) (aka `D
 The image will be portable and contain no private information like usernames or auth tokens, though you can of course customize it to your liking.
 
 ### Build the images
-While you can run `podman build` directly, there is also a [`Makefile`](./Makefile) for convenience.
+While you can run `podman build` directly, there is also a [`Makefile`](./Makefile) for convenience that we are going to use.
 
 ```
 $ make images
 ```
 
-That's it! The command should install dependencies, build plugins from sources, and produce ready-to-use images. Inspect the `Makefile` to see supported configuration, e.g. if you want to use fish shell:
+That's it! The command should install dependencies, build plugins from sources, and produce ready-to-use images. Inspect the `Makefile` to see supported configuration, e.g. if you prefer to use fish shell instead of default zsh:
 
 ```
 $ make IMAGE_TAG=myfish SHELL=/usr/bin/fish EXTRA_PKGS=fish
 ```
 
-The first build will take a while to complete. Subsequent builds on the same machine should be faster.
+The first build will take a while to complete. Subsequent builds on the same machine should be cached and faster.
 When it's finished building, we can see our images in the local repository:
 
 ```
 $ podman images | grep /l7 | head
+```
+
+## Installing
+
+The main entrypoint for the IDE is [`devenv.sh`](../devenv.sh). After images are locally loaded, we just want to make it available in the global `PATH`. For convenience, we can call it `de`:
+
+```
+# Convenient installation script in user path
+$ make install
+
+# Or: Custom command name
+$ L7_NVIM_CMD=my-ide make install
+
+# Or: Manual User-local installation; may require modification of your .profile, .*shrc, etc
+$ mkdir -p ~/.bin
+$ ln -s "$(realpath devenv.sh)" ~/.bin/de
+
+# Or: System-wide installation on default path
+$ sudo ln -s ${SRC_DIR}/devenv.sh /usr/local/bin/de
 ```
 
 ## Using
@@ -68,7 +91,7 @@ $ podman images | grep /l7 | head
 Let's run the IDE container! First, let's try browsing this very repository and learn how changes are persisted when restarting. This will open a shell in your current working directory where subsequent commands will be run:
 
 ```
-$ ./devenv.sh
+$ de # or ./devenv.sh, if you are not running an installed version
 
 ## Let's look at the files
 > tree -L 2
@@ -94,7 +117,7 @@ Now we will explore basic usage by using the IDE to make a change, prepare a com
 The main entrypoint aside from your shell (default: `zsh`) will be `neovim`. We can either start a shell in the container lke above and run `neovim`, or run it directly:
 
 ```
-$ ./devenv.sh nvim README.md
+$ de nvim README.md
 ```
 
 This should open up [neovim](https://neovim.io) with the README of this repo.

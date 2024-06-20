@@ -77,7 +77,7 @@ $ ssh github.com-you
 In case you have a dedicated socket, you can define it explicitly by setting the `SSH_SOCKET` environment variable to the path of the desired ssh-agent auth socket when starting the IDE:
 
 ```
-$ SSH_SOCKET=${MY_SSH_AUTH_SOCKET} ~/src/l7-devenv/devenv.sh
+$ SSH_SOCKET=${MY_SSH_AUTH_SOCKET} de
 # inspect remotes
 > g rv # git remote -v
 
