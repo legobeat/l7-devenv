@@ -22,8 +22,8 @@ if [ -z "${CWD}" ]; then
 fi
 CONTAINER_SOCKET="${XDG_RUNTIME_DIR}/podman/podman.sock"
 
-mkdir -p "${CONF_DIR}/ssh.d" "${LOCAL_DIR}/ssh"
-touch "${CONF_DIR}/gitconfig"
+mkdir -p "${CONF_DIR}/ssh.d" "${LOCAL_DIR}/ssh" "${CONF_DIR}/git"
+touch "${CONF_DIR}/git/config"
 # for node modules cache mounts
 mkdir -p ${HOME}/.local/share/l7ide/node-runner/{yarn/cache/classic,yarn/cache/berry,npm/cache,node/cache}
 mkdir -p ~/.local/share/l7ide/gh && touch ~/.local/share/l7ide/gh/hosts.yml && chmod 0600 ~/.local/share/l7ide/gh/hosts.yml
@@ -57,7 +57,7 @@ ${cmd} run --rm -it \
   --user "$(id -u):$(id -g)" --userns=keep-id:uid=$(id -u),gid=$(id -g) \
   --mount type=bind,source="${LOCAL_DIR},target=/home/user/.local" \
   --mount type=bind,source="${CONF_DIR}/ssh.d,target=/home/user/.ssh/config.d,ro=true" \
-  --mount type=bind,source="${CONF_DIR}/gitconfig,target=/home/user/.config/gitconfig,ro=true" \
+  --mount type=bind,source="${CONF_DIR}/git,target=/home/user/.config/git,ro=true" \
   -v "${CONTAINER_SOCKET}:/run/docker.sock" \
   -v "${SRC_DIR}:${SRC_DIR}:Z" \
   -v "${SRC_DIR}:/src:Z" \
