@@ -8,6 +8,11 @@ ARGS="${@:3}"
 
 [[ -n "$DEBUG" ]] && set -x
 
+if [ -n "${RUNNER_ENV}"  ]; then
+  for e in ${RUNNER_ENV}; do
+    export RUNNER_OPTS="${RUNNER_OPTS} -e ${e}"
+  done
+fi
 if [ -n "${RUNNER_PORTS}"  ]; then
   for ports in ${RUNNER_PORTS}; do
     export RUNNER_OPTS="${RUNNER_OPTS} -p ${ports}"
@@ -19,10 +24,17 @@ if [ -n "${RUNNER_VOLS}"  ]; then
   done
 fi
 
+# remove any GITHUB_TOKEN, NPM_TOKEN, etc from env vars automatically propagated
+for tokenvar in $(env | cut -d= -f1 | grep -i _token); do
+  echo "Removing potentially sensitive env var ${tokenvar} from process. You can set it explicitly via RUNNER_ENV".
+  unset "${tokenvar}";
+done
+
 sudo --preserve-env=CONTAINER_HOST,container \
   podman run --rm -it \
   --user "$(id -u):$(id -g)" --userns=keep-id:uid=$(id -u),gid=$(id -g) \
   -e NODE_OPTIONS="${NODE_OPTIONS}" \
+  -e '*' \
   -v "${SRC_DIR}:${SRC_DIR}" -v "${SRC_DIR}:/src" -w "${PWD}" \
   ${RUNNER_OPTS} \
   --entrypoint "${COMMAND}" -- $RUNNER_IMAGE ${ARGS}
