@@ -5,9 +5,12 @@
 RUNNER_IMAGE="$1"
 COMMAND="$2"
 ARGS="${@:3}"
+
+[[ -n "$DEBUG" ]] && set -x
+
 if [ -n "${RUNNER_PORTS}"  ]; then
   for ports in ${RUNNER_PORTS}; do
-    export RUNNER_OPTS="${RUNNER_OPTS} -p ${RUNNER_PORTS}"
+    export RUNNER_OPTS="${RUNNER_OPTS} -p ${ports}"
   done
 fi
 
