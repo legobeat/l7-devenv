@@ -32,3 +32,5 @@ For a guided tutorial, see [`docs/GETTING_STARTED_DEBIAN.md`](./docs/GETTING_STA
   - We will be using rootless podman to minimize privileges but Docker or any other compatible engine should work.
 - An SSH agent socket
   - Typically provided by running `ssh-agent`
+- (Optional) A GPG agent socket
+  - For signing git commits. Typically provided by running `gpg-agent` on the host.
