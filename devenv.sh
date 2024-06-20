@@ -44,8 +44,9 @@ fi
 # uid mapping wip, sudo not working yet
 # https://github.com/containers/podman/discussions/22444
   #--user "$(id -u):$(id -g)" --uidmap "$(id -u):0:1" --uidmap '0:1:1' --sysctl "net.ipv4.ping_group_range=1000 1000" \
+  # --sysctl "net.ipv4.ping_group_range=1000 1000" \
 ${cmd} run --rm -it \
-  --user "$(id -u):$(id -g)" --userns=keep-id:uid=$(id -u),gid=$(id -g) --sysctl "net.ipv4.ping_group_range=1000 1000" \
+  --user "$(id -u):$(id -g)" --userns=keep-id:uid=$(id -u),gid=$(id -g) \
   --mount type=bind,source="${LOCAL_DIR},target=/home/user/.local" \
   --mount type=bind,source="${CONF_DIR}/ssh.d,target=/home/user/.ssh/config.d,ro=true" \
   --mount type=bind,source="${CONF_DIR}/gitconfig,target=/home/user/.config/gitconfig,ro=true" \
