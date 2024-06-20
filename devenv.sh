@@ -7,6 +7,7 @@ fi
 IMAGE_TAG=${IMAGE_TAG:-latest}
 IMAGE_NAME=${IMAGE_NAME:-localhost/l7/nvim}
 IMAGE=${IMAGE:-$IMAGE_NAME:$IMAGE_TAG}
+NAME="${NAME:-l7-nvim}"
 
 CONF_DIR="${CONF_DIR:-${HOME}/.config/l7ide/config}"
 LOCAL_DIR="${LOCAL_DIR:-${HOME}/.local/share/l7ide/local}"
