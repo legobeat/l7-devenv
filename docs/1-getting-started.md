@@ -26,14 +26,14 @@ The environment is set up in the root [`Containerfile`](./Containerfile) (aka `D
 
 The image will be portable and contain no private information like usernames or auth tokens, though you can of course customize it to your liking.
 
-### Build the image
+### Build the images
 While you can run `podman build` directly, there is also a [`Makefile`](./Makefile) for convenience.
 
 ```
-$ make
+$ make images
 ```
 
-That's it! The image should install dependencies, build plugins from sources, and configure a ready-to-use image. Inspect the `Makefile` to see supported configuration, e.g. if you want to use fish shell:
+That's it! The command should install dependencies, build plugins from sources, and produce ready-to-use images. Inspect the `Makefile` to see supported configuration, e.g. if you want to use fish shell:
 ```
 $ make SHELL=/usr/bin/zsh EXTRA_PKGS=fish
 ```
