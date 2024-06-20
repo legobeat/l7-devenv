@@ -3,6 +3,12 @@ export RUNNER_IMAGE=${GPG_IMAGE:-${RUNNER_IMAGE}}
 
 GPG_RUNNER_ENTRYPOINT="${GPG_RUNNER_ENTRYPOINT:-gpg}"
 
+# attach tty if this is keygen script; could be improved by detecting tty presence
+# avoiding attaching tty to gpg
+if [[ "${GPG_RUNNER_ENTRYPOINT}" = *init-keyring.sh ]]; then
+  GPG_RUNNER_OPTS="${GPG_RUNNER_OPTS} -t"
+fi
+
 [[ -n "${DEBUG}" ]] && set -x
 
 # mount/volume source path on host despite run command being run in container
