@@ -13,6 +13,11 @@ if [ -n "${RUNNER_PORTS}"  ]; then
     export RUNNER_OPTS="${RUNNER_OPTS} -p ${ports}"
   done
 fi
+if [ -n "${RUNNER_VOLS}"  ]; then
+  for vol in ${RUNNER_VOLS}; do
+    export RUNNER_OPTS="${RUNNER_OPTS} -v ${vol}"
+  done
+fi
 
 sudo --preserve-env=CONTAINER_HOST,container \
   podman run --rm -it \

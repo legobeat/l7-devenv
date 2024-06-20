@@ -23,6 +23,9 @@ CONTAINER_SOCKET="${XDG_RUNTIME_DIR}/podman/podman.sock"
 
 mkdir -p "${CONF_DIR}/ssh.d" "${LOCAL_DIR}/ssh"
 touch "${CONF_DIR}/gitconfig"
+# for node modules cache mounts
+mkdir -p ${HOME}/.local/share/l7ide/node-runner/{yarn/cache/classic,yarn/cache/berry,npm/cache,node/cache}
+
 
 # note: docker is not tested, let me know if you insist and get it working
 cmd=$(which podman || which docker)
