@@ -25,6 +25,7 @@ mkdir -p "${CONF_DIR}/ssh.d" "${LOCAL_DIR}/ssh"
 touch "${CONF_DIR}/gitconfig"
 # for node modules cache mounts
 mkdir -p ${HOME}/.local/share/l7ide/node-runner/{yarn/cache/classic,yarn/cache/berry,npm/cache,node/cache}
+mkdir -p ~/.local/share/l7ide/gh && touch ~/.local/share/l7ide/gh/hosts.yml && chmod 0600 ~/.local/share/l7ide/gh/hosts.yml
 
 
 # note: docker is not tested, let me know if you insist and get it working
