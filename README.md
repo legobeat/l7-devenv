@@ -34,3 +34,7 @@ For a guided tutorial, see [`docs/1-getting-started.md`](docs/1-getting-started.
   - Typically provided by running `ssh-agent`
 - (Optional) A GPG agent socket
   - For signing git commits. Typically provided by running `gpg-agent` on the host.
+
+## Screenshots
+![screenshot: TypeScript LSP integration](docs/assets/devenv-mm-extension-1.png "LSP")
+![screenshot: Forge issue and PR integration](docs/assets/devenv-mm-core-prs.png "PRs")
