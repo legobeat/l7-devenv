@@ -69,7 +69,7 @@ COPY contrib/l*-scripts/bin/*      /usr/local/bin/
 
 COPY --chown=${UID}:${GID} skel/ /home/node/
 
-ENV PATH=/home/node/.rbenv/shims:${PATH}
+ENV PATH=/home/node/.corepack/bin:/home/node/.rbenv/shims:${PATH}
 
 WORKDIR /src
 ENTRYPOINT ${SHELL}
