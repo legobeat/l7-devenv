@@ -37,7 +37,6 @@ fi
 
 GPG_PK_VOLUME=${GPG_PK_VOLUME:-"l7-gpg-vault-pk"}
 if [[ -n "${GPG_PK_VOLUME}" ]]; then
-  ${cmd} volume create --opt o=nodev,noexec "${GPG_PK_VOLUME}" --ignore
   RUN_ARGS="${RUN_ARGS} -e GPG_PK_VOLUME=${GPG_PK_VOLUME}"
 fi
 

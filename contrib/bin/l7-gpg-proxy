@@ -1,0 +1,32 @@
+#!/bin/bash
+export RUNNER_IMAGE=${GPG_IMAGE:-${RUNNER_IMAGE}}
+COMMAND="gpg"
+
+[[ -n "$DEBUG" ]] && set -x
+
+#l7-cnt-gpg gpg ${@}
+#RUNNER_IMAGE="${GPG_IMAGE:-${RUNNER_IMAGE}}"
+#sudo --preserve-env=CONTAINER_HOST,container \
+#  podman run --rm -it \
+#  --stop-signal 9 --stop-timeout=3 \
+#  -e GNUPGHOME=/vault/gnupg \
+#  --mount "type=volume,chown=true,Z,source=${GPG_PK_VOLUME},target=/vault/gnupg" \
+#  ${GPG_PK_OPTS} \
+#  --entrypoint "${COMMAND}" -- ${RUNNER_IMAGE} "${@}"
+#  #--entrypoint "/bin/sh" -- ${RUNNER_IMAGE} -c "chmod 0700 /vault/gnupg && ${COMMAND} ${@}"
+# # this worked somehow
+#  sudo -E podman run -i --name gpg --env DISPLAY= --rm --stop-signal 9 --stop-timeout=3 -e GNUPGHOME=/vault/gnupg --mount type=volume,source=l7-gpg-vault-pk,target=/vault/gnupg --entrypoint sh -v /run/user/$(id -u)/gnupg:/run/user/0/gnupg:ro -v /run/user/1000/gnupg/S.gpg-agent:/vault/gnupg/S.gpg-agent localhost/l7/gpg-vault:pk -c 'gpg -bsavu lego'
+
+# mount/volume source path on host despite run command being run in container
+sudo -E podman run --rm \
+  -i \
+  --name l7-gpg \
+  --stop-signal 9 --stop-timeout=3 \
+  -e GNUPGHOME=/vault/gnupg \
+  --entrypoint gpg \
+  --mount type=volume,source=l7-gpg-vault-pk,target=/vault/gnupg \
+  -v /run/user/$(id -u)/gnupg:/run/user/0/gnupg:ro \
+  -v /run/user/1000/gnupg/S.gpg-agent:/vault/gnupg/S.gpg-agent \
+  ${GPG_RUNNER_OPTS} \
+  localhost/l7/gpg-vault:pk \
+  ${@}

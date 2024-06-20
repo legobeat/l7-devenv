@@ -5,7 +5,13 @@ RUN apk upgrade --no-cache \
     gnupg gnupg-doc gnupg-gpgconf gnupg-lang gnupg-scdaemon gnupg-utils \
     gpg-agent \
     gpg-tui gpg-tui-doc gpg-tui-bash-completion gpg-tui-zsh-completion \
-    pinentry pinentry-doc pinentry-curses-ss pinentry-tty
-
+    pinentry pinentry-doc pinentry-tty \
+    strace \
+  && ln -sf pinentry-tty /usr/bin/pinentry
+#    pinentry-curses-ss
 # for graphical pinentry, one of:
 #    pinentry-gnome | pinentry-gtk | pinentry-qt | pinentry-ui
+
+# https://imil.net/blog/posts/2020/testing-gpg-keys-with-docker/
+COPY sidecars/gpg-vault-pk/gpg*.conf /root/.gnupg/
+ENV GPG_TTY /dev/gpgtty
