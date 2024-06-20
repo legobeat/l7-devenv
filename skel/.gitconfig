@@ -1,6 +1,9 @@
 [include]
   path = ~/.config/gitconfig
 
+[gpg]
+  program = /usr/local/bin/l7-gpg-proxy
+
 [init]
   defaultBranch = main
 [pull]
