@@ -1,14 +1,5 @@
 # Configuration
 
-High-level overview for integration with git and GitHub:
-
-#### SSH access
-1. Ensure ssh socket is available from host (usually from `ssh-agent` or `gpg-agent`)
-2. Set `SSH_SOCKET` env var when running `devenv.sh` to mount it in container and set `SSH_AUTH_SOCK` env var.
-3. Configure
-
-#### Git
-
 ### Git user configuration
 
 The container comes with a default `.gitconfig`:
@@ -60,12 +51,15 @@ $ ls -la "${SSH_AUTH_SOCKET}"
 ```
 
 <details><summary>Generating new local keys</summary>
+
 ```
 $ ssh-keygen -t ed25519 -f ~/.ssh/github-l7-you
 
 $ cat ~/.ssh/github-l7-you.pub
 ```
+
 [Add SSH authentication pubkey to GitHub](https://github.com/settings/ssh/new)
+
 ```
 $ eval `ssh-agent`
 $ ssh-add github.com-you ~/.ssh/github.com-l7-you
@@ -77,6 +71,7 @@ EOT
 $ echo $SSH_AUTH_SOCK
 $ ssh github.com-you
 ```
+
 </details>
 
 In case you have a dedicated socket, you can define it explicitly by setting the `SSH_SOCKET` environment variable to the path of the desired ssh-agent auth socket when starting the IDE:
