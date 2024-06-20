@@ -76,12 +76,11 @@ $ ./devenv.sh
 
 ## We have a clean home directory
 > tree -L 3 /home
-> echo .DS_STORE >> .containerignore
 > echo .DS_STORE >> .gitignore
 > echo foo > ~/footest
 > echo bar > ~/.local/bartest
 > echo baz > /etc/shouldfail
-> echo bay | sudo tee /etc/canedit
+> echo bay | sudo tee /etc/cansudo
 > git status  # or g st
 > exit        # or C^l
 ```
@@ -103,7 +102,7 @@ This should open up [neovim](https://neovim.io) with the README of this repo.
 The basic navigation (hjkl) and configuration is the same as traditional vim. This neovim installation comes with additional plugins installed and preconfigured, with some extra keybindings.
 We can see how navigation can be done by opening the [keybindings](../skel/.config/nvim/keys.lua) configuration: `:e skel/.config/nvim/keys.lua<CR>` (when we type vim commands, `<CR>` is the same as pressing Enter).
 
-First off, we can inspect the git status (`<C-g>`). Press `?` for keyboard shortcuts, and `<C-g>` again to close, or `H` and `L` to jump between windows.
+First off, we can inspect the git status (`<C-g>`). Press `?` for keyboard shortcuts, `H` and `L` to jump between windows, and `<C-g>` again to close.
 Let's imagine you're a macOS user and just noticed you have a distracting `.DS_STORE` in the diff view.
 
 Use the file browser (`<C-n>`) to open `.containerignore` after displaying hidden files (`H`). Edit the file and save (`:w<CR>`).
@@ -113,8 +112,10 @@ Now that it's time to add and commit the change, we have some options for how we
 
 ##### git cli
 Whatever tooling we use will be using these under the hood.
+
+The usual git commands of course work but have some shortcuts as aliases defined in [`config/bashrc`](`config/bashrc`) and [`config/gitconfig`](`config/gitconfig`).
+
 ```
-# The usual git commands of course work but have some shortcuts as aliases defined in [`config/bashrc`](`config/bashrc`) and [`config/gitconfig`](`config/gitconfig`).
 # Aside from your usual shell, neovim also has an embedded terminal:
 # `:e term://zsh<CR>`
 # Return to Normal mode by `C^l` or `C^\ C^n`
