@@ -103,10 +103,6 @@ FROM base
 
 ARG EXTRA_PKGS='bat zsh podman'
 
-COPY --from=nvim-builder     --chown=2:2 /out/plugins /etc/xdg/nvim/pack/l7ide/start
-COPY --from=tsserver-builder --chown=2:2 /out/node_modules/ /usr/lib/node_modules/
-COPY contrib/bin/* contrib/*/bin/*       /usr/local/bin/
-
 ARG HOME=/home/user
 ENV HOME=${HOME}
 ARG SHELL=/usr/bin/zsh
@@ -156,6 +152,10 @@ RUN microdnf -y install --setopt=install_weak_deps=False \
   # explicitly remove providers for commands proxied to sibling containers
   && microdnf remove npm yarnpkg \
   && microdnf clean all
+
+COPY --from=nvim-builder     --chown=2:2 /out/plugins /etc/xdg/nvim/pack/l7ide/start
+COPY --from=tsserver-builder --chown=2:2 /out/node_modules/ /usr/lib/node_modules/
+COPY contrib/bin/* contrib/*/bin/*       /usr/local/bin/
 
 COPY skel/.config/containers/containers.conf /etc/containers/containers.conf
 COPY --chown=${UID}:${GID} skel/ /home/user/
