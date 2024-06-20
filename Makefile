@@ -65,3 +65,5 @@ test_nvim:
 
 test_runner:
 	@echo TODO: node-runner image tests
+
+images: image_gpg_pk image_runner image_nvim
