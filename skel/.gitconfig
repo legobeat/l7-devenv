@@ -1,5 +1,5 @@
 [include]
-  path = ~/.config/gitconfig
+  path = ~/.config/git/config
 
 [gpg]
   program = /usr/local/bin/l7-gpg-proxy
