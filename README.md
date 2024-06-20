@@ -4,8 +4,6 @@ Containerized neovim development environment. Primarily intended for contributor
 
 For a guided tutorial, see [`docs/1-getting-started.md`](docs/1-getting-started.md).
 
-> ⚠️ This is under early development and things might still shift around a bit. Open an issue if you have any!
-
 ## Goals
 - Ease-of-use
   - Quick and easy to set up with minimal configuration and sane defaults
@@ -38,3 +36,9 @@ For a guided tutorial, see [`docs/1-getting-started.md`](docs/1-getting-started.
 ## Screenshots
 ![screenshot: TypeScript LSP integration](docs/assets/devenv-mm-extension-1.png "LSP")
 ![screenshot: Forge issue and PR integration](docs/assets/devenv-mm-core-prs.png "PRs")
+
+## Contribution Notes
+
+> ⚠️ This is under early development and things might still shift around a bit. Open an [issue](issues/new) if you have any!
+
+PRs with bugfixes, compatibility improvements, documentation and testing are especially welcome. New features may be considered but if they conflict with goals, you are also encouraged to run your own fork.
