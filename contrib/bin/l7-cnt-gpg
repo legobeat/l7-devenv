@@ -3,12 +3,13 @@
 # expects a container engine socket on $CONTAINER_HOST
 
 RUNNER_IMAGE="${GPG_IMAGE:-${RUNNER_IMAGE}}"
-COMMAND="$0"
-ARGS="${@}"
+COMMAND="$1"
+ARGS="${@:2}"
 
 sudo --preserve-env=CONTAINER_HOST,container \
   podman run --rm -it \
+  --stop-signal 9 --stop-timeout=3 \
   -e GNUPGHOME=/vault/gnupg \
-  -v "${GPG_PK_VOLUME}:/vault/gnupg" \
+  --mount "type=volume,chown=true,Z,source=${GPG_PK_VOLUME},target=/vault/gnupg" \
   ${GPG_PK_OPTS} \
-  --entrypoint "${COMMAND}" -- ${RUNNER_IMAGE} ${ARGS}
+  --entrypoint "/bin/sh" -- ${RUNNER_IMAGE} -c "chmod 0700 /vault/gnupg && ${COMMAND} ${ARGS}"

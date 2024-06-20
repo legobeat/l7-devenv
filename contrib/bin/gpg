@@ -1,3 +1,0 @@
-#!/bin/bash
-export RUNNER_IMAGE=${GPG_IMAGE:-${RUNNER_IMAGE}}
-l7-cnt-gpg gpg ${@}
