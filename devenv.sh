@@ -43,6 +43,10 @@ if [[ -n "${GPG_PK_VOLUME}" ]]; then
   RUN_ARGS="${RUN_ARGS} -e GPG_PK_VOLUME=${GPG_PK_VOLUME}"
 fi
 
+if [[ -n "${1}" ]]; then
+  RUN_ARGS="${RUN_ARGS} --entrypoint ${1}"
+fi
+
 # uid mapping wip, sudo not working yet
 # https://github.com/containers/podman/discussions/22444
   #--user "$(id -u):$(id -g)" --uidmap "$(id -u):0:1" --uidmap '0:1:1' --sysctl "net.ipv4.ping_group_range=1000 1000" \
@@ -64,4 +68,4 @@ ${cmd} run --rm -it \
   -e "SRC_DIR=${SRC_DIR}" \
   ${RUN_ARGS} \
   "${IMAGE}" \
-  ${@}
+  ${@:2}
