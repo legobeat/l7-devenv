@@ -17,6 +17,11 @@ image_gpg_pk:
 		-t "${GPG_IMAGE_NAME}:${GPG_IMAGE_TAG}" \
 		-f './sidecars/gpg-vault-pk/Containerfile' \
 		.
+	${CMD} buildx build \
+		${BUILD_OPTIONS} \
+		-t "${GPG_IMAGE_NAME}:${GPG_IMAGE_TAG}-debian" \
+		-f './sidecars/gpg-vault-pk/Containerfile.debian' \
+		.
 
 image_nvim: submodules
 	${CMD} buildx build \
