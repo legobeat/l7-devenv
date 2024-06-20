@@ -3,20 +3,37 @@
 
 This will be a step-by-step guide to getting everything up and running from scratch.
 This assumes you are running in a clean installation of Ubuntu 24.04 LTS or Debian Bookworm.
-You should be able to use this with Docker by replacing `podman` with `docker`. 
+You should be able to use this with Docker by replacing `podman` with `docker`.
 
-## Installing dependencies
+## System preparation
+
+### Installing dependencies
 
 ```
 ## Ensure your system is up to date
-$ sudo apt-get update && sudo apt-get upgrade
+$ sudo apt-get update && sudo apt-get upgrade -y
 
 ## Install system dependencies
-$ sudo apt-get install make podman slirp4netns fuse-overlayfs uidmap gnu-which
+$ sudo apt-get install --no-install-recommends make podman buildah slirp4netns fuse-overlayfs uidmap gnu-which overlayroot containers-storage
+```
+
+### Rootless podman setup
+
+These steps may differ or not be required dependning on your distribution version. They have been tested on Debian 12 / Ubuntu 24.04 LTS.
+
+```
+$ systemctl --user enable --now podman.socket
+$ podman info | grep graphDriver
+# You should see `graphDriverName: overlay` or whatever you have previously configured
+# If you see `vfs`, attempt a `podman system reset` or see Troubleshooting as it produces big and slow image layers
 ```
 
 ## Building
 ```
+## Example source dir
+$ export SRC_DIR=${HOME}/src
+$ mkdir -p "${SRC_DIR}"
+$ cd "${SRC_DIR}"
 ## Clone the repository
 $ git clone --recurse-submodules https://github.com/legobeat/l7-devenv
 $ cd l7-devenv
@@ -34,44 +51,48 @@ $ make images
 ```
 
 That's it! The command should install dependencies, build plugins from sources, and produce ready-to-use images. Inspect the `Makefile` to see supported configuration, e.g. if you want to use fish shell:
+
 ```
-$ make SHELL=/usr/bin/zsh EXTRA_PKGS=fish
+$ make IMAGE_TAG=myfish SHELL=/usr/bin/fish EXTRA_PKGS=fish
 ```
-This image will take a while to build. You can ignore error messages from tests during the plugin build.
-When it's finished building, wen can see our image in the local repository:
+
+The first build will take a while to complete. Subsequent builds on the same machine should be faster.
+When it's finished building, we can see our images in the local repository:
+
 ```
-$ podman images | head
+$ podman images | grep /l7 | head
 ```
 
 ## Using
 
-Let's run the container! First, let's try browsing this very repository and learn how changes are persisted when restarting. This will open a shell in your currenct working directory where subsequent commands will be run:
+Let's run the IDE container! First, let's try browsing this very repository and learn how changes are persisted when restarting. This will open a shell in your current working directory where subsequent commands will be run:
 
 ```
 $ ./devenv.sh
 
 ## Let's look at the files
-$$ tree -L 2
-$$ pwd
+> tree -L 2
+> pwd
 
 ## We have a clean home directory
-$$ tree -L 3 /home
-$$ echo .DS_STORE >> .containerignore
-$$ echo .DS_STORE >> .gitignore
-$$ echo foo > ~/footest
-$$ echo bar > ~/.local/bartest
-$$ echo baz > /etc/shouldfail
-$$ git status
-$$ exit
+> tree -L 3 /home
+> echo .DS_STORE >> .containerignore
+> echo .DS_STORE >> .gitignore
+> echo foo > ~/footest
+> echo bar > ~/.local/bartest
+> echo baz > /etc/shouldfail
+> echo bay | sudo tee /etc/canedit
+> git status  # or g st
+> exit        # or C^l
 ```
 
-You should see changes in your working directory and `$HOME/.local/share/l7dev/local`. This is because these are mounted in the container; any file-system changes in the container file-system itself get wiped on exit.
+You should see changes in your working directory and `$HOME/.local/share/l7dev/local`. This is because these are mounted in the container (the working directory due to being a subdirectory of `$SRC_DIR`); any file-system changes in the container file-system outside of these mounts get wiped on exit.
 
 ### neovim
 
 Now we will explore basic usage by using the IDE to make a change, prepare a commit, and push it for review.
 
-The main entrypoint aside from your shell will be `neovim`. We can either start a shell in the container and run `neovim`, or run it directly:
+The main entrypoint aside from your shell (default: `zsh`) will be `neovim`. We can either start a shell in the container lke above and run `neovim`, or run it directly:
 
 ```
 $ ./devenv.sh nvim README.md
@@ -80,7 +101,7 @@ $ ./devenv.sh nvim README.md
 This should open up [neovim](https://neovim.io) with the README of this repo.
 
 The basic navigation (hjkl) and configuration is the same as traditional vim. This neovim installation comes with additional plugins installed and preconfigured, with some extra keybindings.
-We can see how navigation can be done by opening the [keybindings](./config/nvim/keys.lua) configuration: `:e config/nvim/keys.lua<CR>` (when we type vim commands `<CR>` is the same as pressing Enter).
+We can see how navigation can be done by opening the [keybindings](../skel/.config/nvim/keys.lua) configuration: `:e skel/.config/nvim/keys.lua<CR>` (when we type vim commands, `<CR>` is the same as pressing Enter).
 
 First off, we can inspect the git status (`<C-g>`). Press `?` for keyboard shortcuts, and `<C-g>` again to close, or `H` and `L` to jump between windows.
 Let's imagine you're a macOS user and just noticed you have a distracting `.DS_STORE` in the diff view.
@@ -94,29 +115,35 @@ Now that it's time to add and commit the change, we have some options for how we
 Whatever tooling we use will be using these under the hood.
 ```
 # The usual git commands of course work but have some shortcuts as aliases defined in [`config/bashrc`](`config/bashrc`) and [`config/gitconfig`](`config/gitconfig`).
+# Aside from your usual shell, neovim also has an embedded terminal:
+# `:e term://zsh<CR>`
+# Return to Normal mode by `C^l` or `C^\ C^n`
 
 ## add
-$ g a .containerignore
+> g a .containerignore
 
 ## inspect
-$ g dc
+> g dc
 
 ## commit
-$ g cm .containerignore -m 'Optional message'
+> g cm .containerignore -m 'Optional message'
 
 ## or in one line
-$ g cm .containerignore -m 'Optional message' .containerignore
+> g cm .containerignore -m 'Optional message' .containerignore
 ```
 
 ##### tig
 `tig` is a powerful git TUI client. We can use it to browse diffs and history, as well as preparing and making commits. It's especially useful when you want to stage or unstahe parts of a file.
 
 ```
-$ tig
+# Launch from terminal
+> tig
+# Or directly in neovim:
+# `:Tig<CR>`
 ```
 
 1. Select `Unstaged changes`
-2. stage the line with `u`
+2. Stage the line with `u`
 3. Change to status view with `s`, inspect
 4. Start commit with `C`
 
@@ -141,7 +168,7 @@ to set your account's default identity.
 Omit --global to set the identity only in this repository.
 ```
 
-While this will work for a one-off, porting over or setting up your git configuration is next on the agenda. See you in [`./2-configuring-git.md`](2-configuring-git.md).
+While the suggested instruction will work for a one-off, we are now getting to the point where the defaults need some customization. Setting up your git configuration is next on the agenda. See you in [`./2-configuring-git.md`](2-configuring-git.md).
 
 ## Troubleshooting
 ### Setup rootless podman (if necessary)
