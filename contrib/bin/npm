@@ -1,3 +1,5 @@
 #!/bin/bash
 export RUNNER_IMAGE=${NPM_RUNNER_IMAGE:-${NODE_RUNNER_IMAGE:-${RUNNER_IMAGE}}}
+export RUNNER_VOLS="${RUNNER_VOLS} ${HOME}/.local/share/l7ide/node-runner/npm/cache:/home/node/.npm/_cacache"
+export RUNNER_VOLS="${RUNNER_VOLS} ${HOME}/.local/share/l7ide/node-runner/node/cache:/home/node/.cache/node"
 l7-cnt-run "${RUNNER_IMAGE}" npm ${@}

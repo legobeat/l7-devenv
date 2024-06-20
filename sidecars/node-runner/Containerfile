@@ -39,7 +39,9 @@ RUN corepack install -g yarn@1.22.22 \
   # `corepack enable` determines shim installation path based on `which corepack` directory
   && ln -s /usr/local/bin/corepack /home/node/.corepack/bin/ \
   && npm i -g yarn-deduplicate \
-  && PATH=/home/node/.corepack/bin/:${PATH} corepack enable
+  && PATH=/home/node/.corepack/bin/:${PATH} corepack enable \
+  # ensure ownership
+  && mkdir -p /home/node/.cache /home/node/.yarn/berry /home/node/.npm
 
 # distro rbenv and ruby are out of date - install rbenv from git and manage ruby
 # RUBY_BUILD_VERSION=v20240501
