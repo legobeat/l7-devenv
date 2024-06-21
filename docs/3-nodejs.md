@@ -41,3 +41,11 @@ You may shell into a node container if you need longer sessions or troubleshooti
 ```
 $ make BUILD_OPTIONS='--build-arg NODE_BINS="allow-script npx ..."' images
 ```
+
+## Exposing ports
+
+By default, the node container can not open ports accessible from the host. In order to expose ports for development servers, you can use the `RUNNER_PORTS` env var:
+
+```
+RUNNER_PORTS='8080:8080 8081:80 ${HOSTPORT}:{CONTAINERPORT}' npm run start
+```
