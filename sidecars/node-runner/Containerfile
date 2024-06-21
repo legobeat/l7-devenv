@@ -24,7 +24,7 @@ RUN  bash -c "[ ${GID} != \"1000\" ] && groupadd -g ${GID} -U node userz || true
   && usermod -G sudo -a $(id -un ${UID}) \
   && echo '%sudo ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers
 
-WORKDIR /usr/local/lib/node_modules
+WORKDIR /usr/local/lib/
 COPY sidecars/node-runner/package.json \
      sidecars/node-runner/package-lock.json \
      .
