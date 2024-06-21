@@ -1,0 +1,30 @@
+ARG NODE_VERSION=20
+FROM localhost/l7/node:${NODE_VERSION}-bookworm
+
+# distro rbenv and ruby are out of date - install rbenv from git and manage ruby
+# RUBY_BUILD_VERSION=v20240501
+USER root
+ARG RBENV_COMMIT=c3ba994ec2daccf4d160aea7f55dd5cc6fc873ef
+ARG RUBY_BUILD_COMMIT=263640c9fe1d44e6fc8f86fc56a67ee58e7b22f7
+RUN sed -i '/en_US.UTF-8/s/^# //' /etc/locale.gen \
+  && locale-gen \
+  && (mkdir /home/node/.rbenv \
+    && curl -sL https://github.com/rbenv/rbenv/archive/${RBENV_COMMIT}.tar.gz \
+    | tar --strip-components=1 -C /home/node/.rbenv/ -xzf - \
+  ) && (mkdir -p /home/node/.rbenv/plugins/ruby-build \
+    && curl -sL https://github.com/rbenv/ruby-build/archive/${RUBY_BUILD_COMMIT}.tar.gz \
+    | tar --strip-components=1 -C /home/node/.rbenv/plugins/ruby-build -xzf - \
+  ) \
+  && echo 'eval "$(/home/node/.rbenv/bin/rbenv init -)"' >> /home/node/.bashrc \
+  && echo 'eval "$(/home/node/.rbenv/bin/rbenv init -)"' >> /home/node/.zshrc \
+  && bash -c 'eval "$(/home/node/.rbenv/bin/rbenv init -)" \
+    && rbenv install 3.3.1 || cat /tmp/ruby-build.* /tmp/ruby-build.*/ruby-*/ext/psych/mkmf.log \
+    && rbenv global 3.3.1 \
+    && gem install bundler -v 2.5.8 \
+    && gem install bigdecimal cocoapods'
+
+ENV PATH=:/home/node/.rbenv/shims:${PATH}
+ENV BUNDLE_PATH=/home/node/.bundle
+ARG UID=1000
+ARG GID=1000
+USER ${UID}:${GID}
