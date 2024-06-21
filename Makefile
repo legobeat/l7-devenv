@@ -5,7 +5,7 @@ NVIM_IMAGE_TAG  := latest
 GPG_IMAGE_NAME := localhost/l7/gpg-vault
 GPG_IMAGE_TAG  := pk
 RUNNER_IMAGE_NAME := localhost/l7/node
-RUNNER_IMAGE_TAG  := 20-bookworm
+RUNNER_IMAGE_TAG  := bookworm
 USER_SHELL ?= /usr/bin/zsh
 BUILD_OPTIONS :=
 EXTRA_PKGS := zsh podman
@@ -45,18 +45,64 @@ image_nvim : submodules
 		-f './Containerfile' \
 		.
 
-image_runner : IMAGE_NAME = ${RUNNER_IMAGE_NAME}
-image_runner : IMAGE_TAG = ${RUNNER_IMAGE_TAG}
-image_runner: submodules
+### NODE RUNNERS
+
+image_runner_node_16 : IMAGE_NAME = ${RUNNER_IMAGE_NAME}
+image_runner_node_16 : IMAGE_TAG = ${RUNNER_IMAGE_TAG}
+image_runner_node_16: submodules
 	${CMD} buildx build \
 		${BUILD_OPTIONS} \
 		--build-arg "SHELL=${USER_SHELL}" \
 		--build-arg "UID=${UID}" \
 		--build-arg "GID=${GID}" \
-		-t "${IMAGE_NAME}:${IMAGE_TAG}" \
-		-t "${IMAGE_NAME}:${IMAGE_TAG}" \
+		--build-arg "NODE_VERSION=16" \
+		--build-arg "NODE_OPTIONS='--trace-warnings'" \
+		-t "${IMAGE_NAME}:16-${IMAGE_TAG}" \
 		-f './sidecars/node-runner/Containerfile' \
 		.
+image_runner_node_18 : IMAGE_NAME = ${RUNNER_IMAGE_NAME}
+image_runner_node_18 : IMAGE_TAG = ${RUNNER_IMAGE_TAG}
+image_runner_node_18: submodules
+	${CMD} buildx build \
+		${BUILD_OPTIONS} \
+		--build-arg "SHELL=${USER_SHELL}" \
+		--build-arg "UID=${UID}" \
+		--build-arg "GID=${GID}" \
+		--build-arg "NODE_VERSION=18" \
+		--build-arg "NODE_OPTIONS='--trace-warnings'" \
+		-t "${IMAGE_NAME}:18-${IMAGE_TAG}" \
+		-f './sidecars/node-runner/Containerfile' \
+		.
+image_runner_node_20 : IMAGE_NAME = ${RUNNER_IMAGE_NAME}
+image_runner_node_20 : IMAGE_TAG = ${RUNNER_IMAGE_TAG}
+image_runner_node_20: submodules
+	${CMD} buildx build \
+		${BUILD_OPTIONS} \
+		--build-arg "SHELL=${USER_SHELL}" \
+		--build-arg "UID=${UID}" \
+		--build-arg "GID=${GID}" \
+		--build-arg "NODE_VERSION=20" \
+		-t "${IMAGE_NAME}:20-${IMAGE_TAG}" \
+		-f './sidecars/node-runner/Containerfile' \
+		.
+image_runner_node_22 : IMAGE_NAME = ${RUNNER_IMAGE_NAME}
+image_runner_node_22 : IMAGE_TAG = ${RUNNER_IMAGE_TAG}
+image_runner_node_22: submodules
+	${CMD} buildx build \
+		${BUILD_OPTIONS} \
+		--build-arg "SHELL=${USER_SHELL}" \
+		--build-arg "UID=${UID}" \
+		--build-arg "GID=${GID}" \
+		--build-arg "NODE_VERSION=22" \
+		-t "${IMAGE_NAME}:22-${IMAGE_TAG}" \
+		-f './sidecars/node-runner/Containerfile' \
+
+image_runner_node: IMAGE_NAME = ${RUNNER_IMAGE_NAME}
+image_runner_node: IMAGE_TAG = ${RUNNER_IMAGE_TAG}
+image_runner_node: image_runner_node_20 # image_runner_node_16 image_runner_node_18 image_runner_node_22
+	${CMD} tag \
+		"${IMAGE_NAME}:20-${IMAGE_TAG}" \
+	    "${IMAGE_NAME}:${IMAGE_TAG}"
 
 submodules:
 	@git submodule update --checkout --init --recursive --rebase
@@ -69,4 +115,4 @@ test_nvim:
 test_runner:
 	@echo TODO: node-runner image tests
 
-images: image_gpg_pk image_runner image_nvim
+images: image_gpg_pk image_runner_node image_nvim

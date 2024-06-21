@@ -1,5 +1,6 @@
 # syntax=docker/dockerfile:1
-FROM node:20-bookworm-slim
+ARG NODE_VERSION=20
+FROM node:${NODE_VERSION}-bookworm-slim
 
 RUN apt-get update \
   && apt-get install -y --no-install-recommends \
@@ -13,7 +14,7 @@ RUN apt-get update \
 
 
 ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
-ENV NODE_OPTIONS='--no-network-family-autoselection --trace-warnings'
+ARG NODE_OPTIONS="--no-network-family-autoselection --trace-warnings"
 
 ARG UID=1000
 ARG GID=1000
@@ -36,7 +37,8 @@ USER ${UID}:${GID}
 ENV BUNDLE_PATH=/home/node/.bundle
 ENV HOME=/home/node
 # fix broken ipv6 on nodejs v20
-ENV NODE_OPTIONS="--no-network-family-autoselection --trace-warnings"
+ARG NODE_OPTIONS="--no-network-family-autoselection --trace-warnings"
+ENV NODE_OPTIONS="${NODE_OPTIONS}"
 ENV NPM_CONFIG_PREFIX=/home/node/.npm-global
 
 WORKDIR /tmp
