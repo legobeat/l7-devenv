@@ -32,6 +32,7 @@ touch "${CONF_DIR}/git/config"
 # for node modules cache mounts
 mkdir -p "${HOME}"/.local/share/l7ide/node-runner/{yarn/cache/classic,yarn/cache/berry,npm/cache,node/cache}
 mkdir -p ~/.local/share/l7ide/gh && touch ~/.local/share/l7ide/gh/hosts.yml && chmod 0600 ~/.local/share/l7ide/gh/hosts.yml
+mkdir -p ~/.local/share/l7ide/go-runner/go
 
 
 # note: docker is not tested, let me know if you insist and get it working
@@ -73,6 +74,7 @@ ${cmd} run --rm -it \
   -w "${CWD}" \
   --mount type=tmpfs,tmpfs-size=2G,destination=/tmp,U=true,tmpfs-mode=0777 \
   -e "CONTAINER_HOST=unix:///run/docker.sock" \
+  -e GO_RUNNER_IMAGE=localhost/l7/go:1.20-bookworm \
   -e NODE_RUNNER_IMAGE=localhost/l7/node:20-bookworm \
   -e GPG_IMAGE=localhost/l7/gpg-vault:pk \
   -e HOME=/home/user \

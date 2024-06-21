@@ -2,8 +2,6 @@
 # proxy command to run in ephemeral sibling container
 # expects a container engine socket on $CONTAINER_HOST
 
-RUNNER_IMAGE="${RUNNER_IMAGE:-${NODE_RUNNER_IMAGE}}"
-
 if [[ "$(basename $0)" = "l7-cnt-run" ]]; then
   COMMAND="$1"
   ARGS="${@:2}"
@@ -37,12 +35,9 @@ for tokenvar in $(env | cut -d= -f1 | grep -i _token); do
 done
 
 sudo -E \
-  podman run --rm -it \
+  podman run --rm -i \
   --user "$(id -u):$(id -g)" --userns=keep-id:uid=$(id -u),gid=$(id -g) \
-  -e NODE_OPTIONS="${NODE_OPTIONS}" \
   -e '*' \
-  -e "HOME=/home/node" \
-  -e "PATH=/home/node/.corepack/bin:/usr/local/lib/node_modules/.bin:/usr/local/lib/node_modules/corepack/shims:/home/node/.rbenv/shims:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin" \
   -v "${SRC_DIR}:${SRC_DIR}" -v "${SRC_DIR}:/src" -w "${PWD}" \
   ${RUNNER_OPTS} \
   --entrypoint "${COMMAND}" -- $RUNNER_IMAGE ${ARGS}
