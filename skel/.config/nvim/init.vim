@@ -3,7 +3,7 @@ let g:python3_host_prog = '/usr/bin/python3'
 " user preferences. some of these are subjective
 set nocompatible
 set encoding=utf-8
-set mouse=
+" set mouse=
 set tabstop=2 softtabstop=2 shiftwidth=2 expandtab smarttab autoindent
 set incsearch smartcase nogdefault showmatch
 set autochdir
