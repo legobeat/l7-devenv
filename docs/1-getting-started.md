@@ -86,6 +86,22 @@ $ ln -s "$(realpath devenv.sh)" ~/.bin/de
 $ sudo ln -s ${SRC_DIR}/devenv.sh /usr/local/bin/de
 ```
 
+`make install` will also add a `derun` command that can be used to shell into an existing session:
+
+```
+$ derun
+
+# Or run a specific command
+$ derun nvim /etc/hosts
+```
+
+You probably also want to set your default `SRC_DIR` pointing to your development root directory. For example:
+
+```
+$ echo 'export SRC_DIR=${HOME}/development/repos' >> ~/.bashrc
+$ echo 'export SRC_DIR=${HOME}/development/repos' >> ~/.zshrc
+```
+
 ## Using
 
 Let's run the IDE container! First, let's try browsing this very repository and learn how changes are persisted when restarting. This will open a shell in your current working directory where subsequent commands will be run:
