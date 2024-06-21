@@ -1,0 +1,27 @@
+ARG GO_VERSION=1.20
+FROM golang:${GO_VERSION}-bookworm
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends \
+    git curl ca-certificates gnupg ssh-client less psmisc jq time zsh \
+    fakeroot \
+    build-essential ccache cmake cmake-format distcc zlib1g-dev libzlcore-dev libffi-dev libssl-dev libyaml-dev \
+  && rm -rf /var/{cache,lib}/apt
+
+ENV CGO_ENABLED=0
+ENV GOOS=linux
+ENV GOPATH=/home/user/go
+ENV GOPROXY="https://goproxy.io,https://proxy.golang.org,direct"
+
+ARG UID=1000
+ARG GID=1000
+ARG SHELL=/usr/bin/zsh
+# create user entry and GOPATH
+RUN bash -c "groupadd -g ${GID} userz || true" \
+  && bash -c "useradd -u ${UID} -g ${GID} -d /home/user -m user -s "${SHELL}" && chown -R ${UID}:${GID} /home/user || true" \
+  && mkdir -p /home/user/go \
+  && chown -R "${UID}:${GID}" /home/user/go
+
+USER ${UID}:${GID}
+ENV HOME=/home/user
+
+# go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.54.2 # supports 1.20 + 1.21

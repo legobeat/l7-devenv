@@ -6,6 +6,8 @@ GPG_IMAGE_NAME := localhost/l7/gpg-vault
 GPG_IMAGE_TAG  := pk
 RUNNER_IMAGE_NAME := localhost/l7/node
 RUNNER_IMAGE_TAG  := bookworm
+GO_RUNNER_IMAGE_NAME := localhost/l7/go
+GO_RUNNER_IMAGE_TAG  := bookworm
 USER_SHELL ?= /usr/bin/zsh
 BUILD_OPTIONS :=
 EXTRA_PKGS := zsh podman
@@ -44,6 +46,26 @@ image_nvim : submodules
 		-t "${IMAGE_NAME}:${IMAGE_TAG}" \
 		-f './Containerfile' \
 		.
+### GOLANG RUNNERS
+image_runner_go_1.20 : IMAGE_NAME = ${GO_RUNNER_IMAGE_NAME}
+image_runner_go_1.20 : IMAGE_TAG = ${GO_RUNNER_IMAGE_TAG}
+image_runner_go_1.20: submodules
+	${CMD} buildx build \
+		${BUILD_OPTIONS} \
+		--build-arg "SHELL=${USER_SHELL}" \
+		--build-arg "UID=${UID}" \
+		--build-arg "GID=${GID}" \
+		--build-arg "GO_VERSION=1.20" \
+		-t "${IMAGE_NAME}:1.20-${IMAGE_TAG}" \
+		-f './sidecars/go-runner/Containerfile' \
+
+image_runner_go_1.20 : IMAGE_NAME = ${GO_RUNNER_IMAGE_NAME}
+image_runner_go_1.20 : IMAGE_TAG = ${GO_RUNNER_IMAGE_TAG}
+image_runner_go: image_runner_go_1.20 # image_runner_node_16 image_runner_node_18 image_runner_node_22
+	${CMD tag \
+		"${IMAGE_NAME}:1.20-${IMAGE_TAG} \
+	    "${IMAGE_NAME}:${IMAGE_TAG}"
+
 
 ### NODE RUNNERS
 
