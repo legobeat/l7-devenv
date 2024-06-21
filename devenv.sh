@@ -25,7 +25,7 @@ CONTAINER_SOCKET="${XDG_RUNTIME_DIR}/podman/podman.sock"
 mkdir -p "${CONF_DIR}/ssh.d" "${LOCAL_DIR}/ssh" "${CONF_DIR}/git"
 touch "${CONF_DIR}/git/config"
 # for node modules cache mounts
-mkdir -p ${HOME}/.local/share/l7ide/node-runner/{yarn/cache/classic,yarn/cache/berry,npm/cache,node/cache}
+mkdir -p "${HOME}"/.local/share/l7ide/node-runner/{yarn/cache/classic,yarn/cache/berry,npm/cache,node/cache}
 mkdir -p ~/.local/share/l7ide/gh && touch ~/.local/share/l7ide/gh/hosts.yml && chmod 0600 ~/.local/share/l7ide/gh/hosts.yml
 
 
