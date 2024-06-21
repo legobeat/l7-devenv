@@ -39,6 +39,15 @@ require('lspconfig')['rnix'].setup{
 require('lspconfig')['gopls'].setup{
     on_attach = on_attach,
     flags = lsp_flags,
+    settings = {
+      gopls = {
+        analyses = {
+          unusedparams = true,
+        },
+        staticcheck = true,
+      },
+      ["logVerbosity"] = 'verbose'
+    }
 }
 -- typescript
 -- require('lspconfig')['denols'].setup{
