@@ -26,7 +26,7 @@ fi
 
 # remove any GITHUB_TOKEN, NPM_TOKEN, etc from env vars automatically propagated
 for tokenvar in $(env | cut -d= -f1 | grep -i _token); do
-  echo "Removing potentially sensitive env var ${tokenvar} from process. You can set it explicitly via RUNNER_ENV".
+  [[ -n "${DEBUG}" ]] && echo "Removing potentially sensitive env var ${tokenvar} from process. You can set it explicitly via RUNNER_ENV".
   unset "${tokenvar}";
 done
 
