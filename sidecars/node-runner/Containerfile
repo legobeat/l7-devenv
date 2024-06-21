@@ -32,9 +32,11 @@ ENV HOME=/home/node
 ENV NODE_OPTIONS="--no-network-family-autoselection --trace-warnings"
 ENV NPM_CONFIG_PREFIX=/home/node/.npm-global
 
-RUN corepack install -g yarn@1.22.22 \
-  && corepack install -g yarn@3 \
-  && corepack install -g yarn@4 \
+WORKDIR /tmp
+
+COPY sidecars/node-runner/install-package-managers.sh .
+ARG COREPACK_PMS='yarn@1.22.22 yarn@3 yarn@4 npm@7 npm@9 npm@10 pnpm@9'
+RUN ./install-package-managers.sh \
   && mkdir -p /home/node/.corepack/bin \
   # `corepack enable` determines shim installation path based on `which corepack` directory
   && ln -s /usr/local/bin/corepack /home/node/.corepack/bin/ \
@@ -47,7 +49,6 @@ RUN corepack install -g yarn@1.22.22 \
 # RUBY_BUILD_VERSION=v20240501
 ARG RBENV_COMMIT=c3ba994ec2daccf4d160aea7f55dd5cc6fc873ef
 ARG RUBY_BUILD_COMMIT=263640c9fe1d44e6fc8f86fc56a67ee58e7b22f7
-WORKDIR /tmp
 RUN (mkdir /home/node/.rbenv \
     && curl -sL https://github.com/rbenv/rbenv/archive/${RBENV_COMMIT}.tar.gz \
     | tar --strip-components=1 -C /home/node/.rbenv/ -xzf - \
