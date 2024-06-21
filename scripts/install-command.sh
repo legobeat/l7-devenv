@@ -23,7 +23,7 @@ bindirs=(
 # see if any user installation dir already available
 available_install_dirs() {
   for bindir in "${bindirs[@]}"; do
-    echo $PATH | tr -d '[:space:]' | xargs -d: -I{} bash -c "[[ ${bindir} = {} ]] && [[ -d ${bindir} ]] && echo '${bindir}'"
+    echo $PATH | tr -d '[:space:]' | xargs -d: -I{} bash -c "[[ ${bindir} = {} ]] && [[ -d ${bindir} ]] && echo '${bindir}' || true"
   done
 }
 
