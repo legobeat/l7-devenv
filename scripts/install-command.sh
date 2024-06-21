@@ -47,3 +47,13 @@ dest="${install_dir}/${L7_NVIM_CMD}"
 
 echo "Installing symlink ${entrypoint} -> ${dest}"
 ln -s "${entrypoint}" "${dest}"
+
+runshim="${dest}run"
+echo "Installing shim ${runshim}"
+cmd=$(which podman || which docker)
+cat <<EOT > "${runshim}"
+#!/bin/bash
+entrypoint=\${1:-\$SHELL}
+$cmd exec -it l7-nvim \$entrypoint "\${@:2}"
+EOT
+chmod +x "${runshim}"
