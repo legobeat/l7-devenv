@@ -54,6 +54,6 @@ cmd=$(which podman || which docker)
 cat <<EOT > "${runshim}"
 #!/bin/bash
 entrypoint=\${1:-\$SHELL}
-$cmd exec -it l7-nvim \$entrypoint "\${@:2}"
+$cmd exec -it -w "\${pwd}" l7-nvim \$entrypoint "\${@:2}"
 EOT
 chmod +x "${runshim}"
