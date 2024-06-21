@@ -31,7 +31,7 @@ jobs:
           submodules: true
 
       - name: Build and load nvim image
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: .
           file: Containerfile
@@ -44,7 +44,7 @@ jobs:
           cache-to: type=gha,mode=max
 
       - name: Build and load node-runner image
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: .
           file: sidecars/node-runner/Containerfile
@@ -56,7 +56,7 @@ jobs:
           cache-to: type=gha,mode=max
 
       - name: Build and load gpg-vault-pk image
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: .
           file: sidecars/gpg-vault-pk/Containerfile
