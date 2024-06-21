@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# https://stackoverflow.com/questions/59895/how-do-i-get-the-directory-where-a-bash-script-is-located-from-within-the-script/1482133#1482133
+ROOT_DIR=$(dirname -- "$( readlink -f -- "$0"; )")
+
+. ${ROOT_DIR}/.env
+
 if [[ -n "${DEBUG}" ]]; then
   set -x
 fi
@@ -47,6 +52,10 @@ fi
 
 if [[ -n "${1}" ]]; then
   RUN_ARGS="${RUN_ARGS} --entrypoint ${1}"
+fi
+
+if [[ -f "${ROOT_DIR}/.env" ]]; then
+  RUN_ARGS="${RUN_ARGS} --env-file ${ROOT_DIR}/.env"
 fi
 
 # uid mapping wip, sudo not working yet
