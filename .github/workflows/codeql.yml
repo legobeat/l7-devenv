@@ -17,8 +17,7 @@ on:
   pull_request:
     branches: [ "main" ]
   schedule:
-    - cron: '59 11 * * *'
-#    - cron: '41 18 * * 2'
+    - cron: '41 18 * * 2'
 
 jobs:
   analyze:
@@ -36,10 +35,8 @@ jobs:
       matrix:
         include:
           - language: javascript-typescript
-            build-mode: autobuild
+            build-mode: none
           # - language: bash
-          - language: go
-            build-mode: autobuild
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
