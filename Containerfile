@@ -101,7 +101,7 @@ FROM base
 ## ARG EXTRA_PKGS='tree-sitter-cli' # repo version errors right now? try again later
 ## ARG EXTRA_PKGS='podman docker-compose' # TODO: wire up docker socket
 
-ARG EXTRA_PKGS='bat docker-compose zsh'
+ARG EXTRA_PKGS='bat'
 
 ARG HOME=/home/user
 ENV HOME=${HOME}
@@ -121,6 +121,7 @@ RUN microdnf -y install --setopt=install_weak_deps=False \
     screen \
     w3m \
     which procps-ng \
+    zsh \
     ${EXTRA_PKGS} \
   && ln -sf nvim /usr/bin/vim \
 
