@@ -83,7 +83,7 @@ jobs:
         image:
           - gpg_pk
           - nvim
-          - runner
+          - runner_node
     steps:
       - uses: actions/checkout@v4
         with:
