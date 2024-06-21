@@ -1,0 +1,11 @@
+#!/bin/bash
+
+RUNNER_IMAGE="${RUNNER_IMAGE:-${NODE_RUNNER_IMAGE}}"
+
+RUNNER_ENV="${RUNNER_ENV}
+NODE_OPTIONS=${NODE_OPTIONS}
+HOME=/home/node
+PATH=/home/node/.corepack/bin:/usr/local/lib/node_modules/.bin:/usr/local/lib/node_modules/corepack/shims:/home/node/.rbenv/shims:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+"
+
+exec l7-cnt-run "${@}"

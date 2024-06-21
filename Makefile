@@ -111,9 +111,16 @@ image_runner_node_ios: submodules
 		-f './sidecars/node-runner/Containerfile.ios' \
 		.
 
+image_runner_node_all: IMAGE_NAME = ${RUNNER_IMAGE_NAME}
+image_runner_node_all: IMAGE_TAG = ${RUNNER_IMAGE_TAG}
+image_runner_node_all: image_runner_node_20 image_runner_node_16 image_runner_node_18 image_runner_node_22 # image_runner_node_ios
+	${CMD} tag \
+		"${IMAGE_NAME}:20-${IMAGE_TAG}" \
+	    "${IMAGE_NAME}:${IMAGE_TAG}"
+
 image_runner_node: IMAGE_NAME = ${RUNNER_IMAGE_NAME}
 image_runner_node: IMAGE_TAG = ${RUNNER_IMAGE_TAG}
-image_runner_node: image_runner_node_20 # image_runner_node_16 image_runner_node_18 image_runner_node_22
+image_runner_node: image_runner_node_20 # image_runner_node_16 image_runner_node_18 image_runner_node_22 image_runner_node_ios
 	${CMD} tag \
 		"${IMAGE_NAME}:20-${IMAGE_TAG}" \
 	    "${IMAGE_NAME}:${IMAGE_TAG}"
