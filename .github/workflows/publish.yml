@@ -1,0 +1,75 @@
+name: 'publish-image'
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  publish-image:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      attestations: write
+      id-token: write
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - name: nvim
+            file: Containerfile
+            tags: |
+              ghcr.io/legobeat/l7-devenv/nvim:latest
+              ghcr.io/legobeat/l7-devenv/nvim:${{ github.ref_name }}
+          - name: node
+            file: sidecars/node-runner/Containerfile
+            tags: |
+              ghcr.io/legobeat/l7-devenv/node:latest
+              ghcr.io/legobeat/l7-devenv/node:20-bookworm
+              ghcr.io/legobeat/l7-devenv/node:20-${{ github.ref_name }}
+          - name: gpg-vault
+            file: sidecars/gpg-vault-pk/Containerfile
+            tags: |
+              ghcr.io/legobeat/l7-devenv/gpg-vault:latest
+              ghcr.io/legobeat/l7-devenv/gpg-vault:alpine
+              ghcr.io/legobeat/l7-devenv/gpg-vault:${{ github.ref_name }}
+              ghcr.io/legobeat/l7-devenv/gpg-vault:alpine-${{ github.ref_name }}
+    steps:
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@0d4c9c5ea7693da7b068278f7b52bda2a190a446 #v3.2.0
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@8e5442c4ef9f78752691e2d8f8d19755c6f78e81 #v5.5.1
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/${{ matrix.name }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Build and publish ${{ matrix.name }} image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ${{ matrix.file }}
+          build-args: ${{ matrix.build-args }}
+          tags:  ${{ matrix.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          load: true
+          push: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
