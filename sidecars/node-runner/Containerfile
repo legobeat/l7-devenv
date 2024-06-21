@@ -8,7 +8,7 @@ RUN apt-get update \
     build-essential ccache cmake cmake-format distcc zlib1g-dev libzlcore-dev libffi-dev libssl-dev libyaml-dev \
   && sed -i '/en_US.UTF-8/s/^# //' /etc/locale.gen \
   && locale-gen \
-  && echo 'export PATH=$HOME/.npm-global/bin:$PATH' > /etc/profile.d/global-npm-bins-path \
+  && echo 'export PATH="${HOME}/.npm-global/bin:${PATH}"' > /etc/profile.d/global-npm-bins-path \
   && rm -rf /var/{cache,lib}/apt
 
 
@@ -24,11 +24,12 @@ RUN  bash -c "[ ${GID} != \"1000\" ] && groupadd -g ${GID} -U node userz || true
   && usermod -G sudo -a $(id -un ${UID}) \
   && echo '%sudo ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers
 
-WORKDIR /usr/local/lib/
+WORKDIR /tmp/
 COPY sidecars/node-runner/package.json \
      sidecars/node-runner/package-lock.json \
      .
-RUN npm install --omit=dev --ignore-scripts
+RUN npm ci --omit=dev --ignore-scripts \
+  && mv node_modules/* node_modules/.bin /usr/local/lib/node_modules/
 
 ####
 USER ${UID}:${GID}
