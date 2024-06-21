@@ -1,0 +1,20 @@
+{
+  "name": "node-runner",
+  "version": "0.0.3",
+  "description": "global packages for node-runner",
+  "main": "index.js",
+  "author": "legobeat",
+  "license": "AGPL-3.0",
+  "dependencies": {
+    "@lavamoat/allow-scripts": ">=3.0.4",
+    "@lavamoat/preinstall-always-fail": ">=2.0.0",
+    "semver": "^7.6.2",
+    "yarn-deduplicate": "^6.0.2"
+  },
+  "private": false,
+  "packageManager": "npm@10",
+  "engines": {
+    "node": ">=14",
+    "npm": ">=6"
+  }
+}
