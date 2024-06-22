@@ -34,6 +34,8 @@
   bD   = branch -D
   ba   = branch -av
   br   = branch -avr
+  bm   = branch -m
+  bM   = branch -M
   cl   = clone
   co   = checkout
   cm   = !git commit --date="$(date --utc +%Y-%m-%dT%H:%M:%S%z)"
@@ -43,6 +45,8 @@
   cpc  = cherry-pick --continue
   d    = diff
   dc   = diff --cached
+  dno  = diff --name-only
+  dns  = diff --name-status
   f    = fetch
   wt   = worktree
   wta  = worktree add
@@ -50,9 +54,11 @@
   wtp  = worktree prune
   wtr  = worktree remove
   l    = log
+  lol  = log --oneline
   m    = merge
   ma   = merge --abort
   mc   = merge --continue
+  mffo = merge --ff-only
   p    = push
   ph   = push
   phf  = push --force-with-lease
@@ -68,6 +74,8 @@
   ru   = remote -v update
   rr   = remote remove
   rv   = remote -v
+  rt   = reset
+  rth  = reset --hard
   sh   = show
   sm   = submodule
   sma  = submodule add
@@ -81,5 +89,8 @@
   tf   = tag -f
   tv   = tag -v
   tree = log --graph --decorate --oneline
+  rs      = restore
+  rss     = restore --staged
   unstage = restore --staged
   us      = unstage
+  wipe    = checkout HEAD  # use with path to clean file
