@@ -1,9 +1,18 @@
 #!/bin/bash
 
+CONF_DIR="${CONF_DIR:-${HOME}/.config/l7ide/config}"
+LOCAL_DIR="${LOCAL_DIR:-${HOME}/.local/share/l7ide/local}"
+SRC_DIR="${SRC_DIR:-$(pwd)}"
 # https://stackoverflow.com/questions/59895/how-do-i-get-the-directory-where-a-bash-script-is-located-from-within-the-script/1482133#1482133
-ROOT_DIR=$(dirname -- "$( readlink -f -- "$0"; )")
+ROOT_DIR="${ROOT_DIR:-$(dirname -- "$( readlink -f -- "$0"; )")}"
 
-. ${ROOT_DIR}/.env
+if [[ -f "${ROOT_DIR}/.env" ]]; then
+  . "${ROOT_DIR}/.env"
+fi
+if [[ -f "${CONF_DIR}/.env" ]]; then
+  . "${CONF_DIR}/.env"
+fi
+
 
 if [[ -n "${DEBUG}" ]]; then
   set -x
@@ -14,9 +23,6 @@ IMAGE_NAME=${IMAGE_NAME:-localhost/l7/nvim}
 IMAGE=${IMAGE:-$IMAGE_NAME:$IMAGE_TAG}
 NAME="${NAME:-l7-nvim}"
 
-CONF_DIR="${CONF_DIR:-${HOME}/.config/l7ide/config}"
-LOCAL_DIR="${LOCAL_DIR:-${HOME}/.local/share/l7ide/local}"
-SRC_DIR="${SRC_DIR:-$(pwd)}"
 # default workdir to pwd if within SRC_DIR or /src; otherwise SRC_DIR
 if [ -z "${CWD}" ]; then
   case $PWD/ in
