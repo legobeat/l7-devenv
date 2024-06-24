@@ -7,6 +7,11 @@ on:
 jobs:
   docker-buildx:
     runs-on: ubuntu-latest
+    services:
+      registry:
+        image: registry:2
+        ports:
+          - 80:5000
     strategy:
       fail-fast: false
       matrix:
@@ -25,6 +30,9 @@ jobs:
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
+        with:
+          #driver: docker
+          driver-opts: network=host
 
       - uses: actions/checkout@v4
         with:
@@ -35,10 +43,9 @@ jobs:
         with:
           context: sidecars/caddy
           file: sidecars/caddy/Containerfile
-          build-args: ${{ matrix.build-args }}
           load: true
           tags: localhost/l7/caddy:latest
-          push: false
+          push: true
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -100,14 +107,63 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: true
-      - run: make IMAGE_NAME=localhost/foo-${{ matrix.image }} IMAGE_TAG=bar CMD=${{ matrix.cmd }} image_${{ matrix.image }}
+      - run: |
+          echo '{"insecure-registries" : [ "localhost" ]}' | sudo tee /etc/docker/daemon.json
+          sudo apt-get install -y podman-compose --no-install-recommends # podman-remote
+          systemctl --user restart podman
+          podman compose build http-proxy
+          podman save localhost/l7/caddy:latest | docker load
+        name: docker build caddy image
+        if: ${{ matrix.cmd == 'docker' }}
+        env:
+          DOCKER_OPTS: "--insecure-registry=localhost"
+#      - run: |
+#          export CONTAINER_HOST="unix://${XDG_RUNTIME_DIR}/podman/podman.sock"
+#          sudo apt-get install -y podman-compose --no-install-recommends # podman-remote
+#          systemctl --user restart podman
+#          podman compose build http-proxy
+#        name: podman build caddy image
+#        if: ${{ matrix.cmd != 'docker' }}
+#        env:
+#          DOCKER_OPTS: "--insecure-registry=localhost"
+      - run: |
+          sudo apt-get install -y podman-compose --no-install-recommends # podman-remote
+          systemctl --user restart podman
+          podman compose build http-proxy
+        name: podman build caddy image
+        if: ${{ matrix.cmd != 'docker' }}
+        env:
+          DOCKER_OPTS: "--insecure-registry=localhost"
+      - run: |
+          make IMAGE_NAME=localhost/foo-${{ matrix.image }} IMAGE_TAG=bar CMD=${{ matrix.cmd }} image_${{ matrix.image }}
         if: ${{ matrix.cmd != '' }}
+        name: build ${{ matrix.image }} image
         env:
           CMD: ${{ matrix.cmd }}
-      - run: make IMAGE_NAME=localhost/foo-${{ matrix.image }} IMAGE_TAG=bar image_${{ matrix.image }}
+          DOCKER_OPTS: "--insecure-registry=localhost"
+      - run: |
+          make IMAGE_NAME=localhost/foo-${{ matrix.image }} IMAGE_TAG=bar image_${{ matrix.image }}
         if: ${{ matrix.cmd == '' }}
-      - run: ${{ matrix.cmd }} image inspect localhost/foo-${{ matrix.image }}:bar
+        name: build ${{ matrix.image }} image
+        env:
+          DOCKER_OPTS: "--insecure-registry=localhost"
+      - run: |
+          ${{ matrix.cmd }} image inspect localhost/foo-${{ matrix.image }}:bar
         if: ${{ matrix.cmd != '' }}
-      - run: podman image inspect localhost/foo-${{ matrix.image }}:bar
+        name: inspect ${{ matrix.image }} image
+        env:
+          CMD: ${{ matrix.cmd }}
+          DOCKER_OPTS: "--insecure-registry=localhost"
+      - run: |
+          export CONTAINER_HOST="unix://${XDG_RUNTIME_DIR}/podman/podman.sock"
+          podman image inspect localhost/foo-${{ matrix.image }}:bar
         if: ${{ matrix.cmd == '' }}
-      - run: make test
+        name: inspect ${{ matrix.image }} image
+        env:
+          DOCKER_OPTS: "--insecure-registry=localhost"
+      - run: |
+          export CONTAINER_HOST="unix://${XDG_RUNTIME_DIR}/podman/podman.sock"
+          make test
+        name: make test
+        env:
+          DOCKER_OPTS: "--insecure-registry=localhost"
