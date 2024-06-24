@@ -31,7 +31,6 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
         with:
-          #driver: docker
           driver-opts: network=host
 
       - uses: actions/checkout@v4
@@ -96,8 +95,8 @@ jobs:
           - docker
           - podman
         os:
-          - ubuntu-20.04
-          - ubuntu-22.04
+          # todo: make ci work with docker-compose
+          # - ubuntu-22.04
           - ubuntu-24.04
         image:
           - gpg_pk
@@ -117,15 +116,6 @@ jobs:
         if: ${{ matrix.cmd == 'docker' }}
         env:
           DOCKER_OPTS: "--insecure-registry=localhost"
-#      - run: |
-#          export CONTAINER_HOST="unix://${XDG_RUNTIME_DIR}/podman/podman.sock"
-#          sudo apt-get install -y podman-compose --no-install-recommends # podman-remote
-#          systemctl --user restart podman
-#          podman compose build http-proxy
-#        name: podman build caddy image
-#        if: ${{ matrix.cmd != 'docker' }}
-#        env:
-#          DOCKER_OPTS: "--insecure-registry=localhost"
       - run: |
           sudo apt-get install -y podman-compose --no-install-recommends # podman-remote
           systemctl --user restart podman
