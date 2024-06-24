@@ -1,0 +1,30 @@
+FROM docker.io/library/caddy:2.8-builder-alpine AS builder
+
+RUN xcaddy build \
+    #--with github.com/mholt/caddy-l4=github.com/unwebio/caddy-l4@bdc5d0e \
+    --with github.com/mholt/caddy-l4 \
+    --with github.com/abiosoft/caddy-yaml
+
+FROM docker.io/library/caddy:2.8-alpine
+
+COPY --from=builder /usr/bin/caddy /usr/bin/caddy
+RUN apk add --no-cache \
+  ca-certificates \
+  curl \
+  nss-tools
+
+ADD *.yml /etc/caddy/
+
+RUN caddy start --config "/etc/caddy/setup.yml" --adapter yaml \
+  && sleep 3 \
+  && curl --http2 https://github.com --connect-to github.com:443:127.0.0.1:10443  >/dev/null \
+  && curl --http1.1 https://www.github.com --connect-to www.github.com:443:127.0.0.1:10443 >/dev/null \
+  && curl --http2 https://api.github.com --connect-to api.github.com:443:127.0.0.1:10443  >/dev/null \
+  && curl --http2 https://codeload.github.com --connect-to codeload.github.com:443:127.0.0.1:10443 >/dev/null \
+  && caddy trust \
+  && caddy stop
+
+ENV CADDY_CONFIG=/etc/caddy/default.yml
+#ENV CADDY_CONFIG=/config/default.yml
+
+CMD caddy run --config "${CADDY_CONFIG}" --adapter yaml
