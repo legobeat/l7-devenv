@@ -61,7 +61,7 @@ image_runner_go_1.20: submodules
 
 image_runner_go_1.20 : IMAGE_NAME = ${GO_RUNNER_IMAGE_NAME}
 image_runner_go_1.20 : IMAGE_TAG = ${GO_RUNNER_IMAGE_TAG}
-image_runner_go: image_runner_go_1.20 # image_runner_node_16 image_runner_node_18 image_runner_node_22
+image_runner_go: image_runner_go_1.20
 	${CMD tag \
 		"${IMAGE_NAME}:1.20-${IMAGE_TAG} \
 	    "${IMAGE_NAME}:${IMAGE_TAG}"
@@ -69,19 +69,6 @@ image_runner_go: image_runner_go_1.20 # image_runner_node_16 image_runner_node_1
 
 ### NODE RUNNERS
 
-image_runner_node_16 : IMAGE_NAME = ${RUNNER_IMAGE_NAME}
-image_runner_node_16 : IMAGE_TAG = ${RUNNER_IMAGE_TAG}
-image_runner_node_16: submodules
-	${CMD} buildx build \
-		${BUILD_OPTIONS} \
-		--build-arg "SHELL=${USER_SHELL}" \
-		--build-arg "UID=${UID}" \
-		--build-arg "GID=${GID}" \
-		--build-arg "NODE_VERSION=16" \
-		--build-arg "NODE_OPTIONS='--trace-warnings'" \
-		-t "${IMAGE_NAME}:16-${IMAGE_TAG}" \
-		-f './sidecars/node-runner/Containerfile' \
-		.
 image_runner_node_18 : IMAGE_NAME = ${RUNNER_IMAGE_NAME}
 image_runner_node_18 : IMAGE_TAG = ${RUNNER_IMAGE_TAG}
 image_runner_node_18: submodules
@@ -135,14 +122,14 @@ image_runner_node_ios: submodules
 
 image_runner_node_all: IMAGE_NAME = ${RUNNER_IMAGE_NAME}
 image_runner_node_all: IMAGE_TAG = ${RUNNER_IMAGE_TAG}
-image_runner_node_all: image_runner_node_20 image_runner_node_16 image_runner_node_18 image_runner_node_22 # image_runner_node_ios
+image_runner_node_all: image_runner_node_20 image_runner_node_18 image_runner_node_22 # image_runner_node_ios
 	${CMD} tag \
 		"${IMAGE_NAME}:20-${IMAGE_TAG}" \
 	    "${IMAGE_NAME}:${IMAGE_TAG}"
 
 image_runner_node: IMAGE_NAME = ${RUNNER_IMAGE_NAME}
 image_runner_node: IMAGE_TAG = ${RUNNER_IMAGE_TAG}
-image_runner_node: image_runner_node_20 # image_runner_node_16 image_runner_node_18 image_runner_node_22 image_runner_node_ios
+image_runner_node: image_runner_node_20 # image_runner_node_18 image_runner_node_22 image_runner_node_ios
 	${CMD} tag \
 		"${IMAGE_NAME}:20-${IMAGE_TAG}" \
 	    "${IMAGE_NAME}:${IMAGE_TAG}"
