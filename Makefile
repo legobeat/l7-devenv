@@ -8,6 +8,10 @@ RUNNER_IMAGE_NAME := localhost/l7/node
 RUNNER_IMAGE_TAG  := bookworm
 AUTH_PROXY_IMAGE_NAME := localhost/l7/auth-proxy
 AUTH_PROXY_IMAGE_TAG  := latest
+CADDY_IMAGE_NAME := localhost/l7/caddy
+CADDY_IMAGE_TAG  := latest
+DNSMASQ_IMAGE_NAME := localhost/l7/dnsmasq
+DNSMASQ_IMAGE_TAG  := latest
 GO_RUNNER_IMAGE_NAME := localhost/l7/go
 GO_RUNNER_IMAGE_TAG  := bookworm
 USER_SHELL ?= /usr/bin/zsh
@@ -26,9 +30,26 @@ image_auth_proxy:
 	${CMD} buildx build \
 		${BUILD_OPTIONS} \
 		-t "${IMAGE_NAME}:${IMAGE_TAG}" \
-		-t "${IMAGE_NAME}:${IMAGE_TAG}" \
 		-f './sidecars/git-auth-proxy/Dockerfile' \
 		./sidecars/git-auth-proxy
+
+image_caddy : IMAGE_NAME = ${CADDY_IMAGE_NAME}
+image_caddy : IMAGE_TAG = ${CADDY_IMAGE_TAG}
+image_caddy:
+	${CMD} buildx build \
+		${BUILD_OPTIONS} \
+		-t "${IMAGE_NAME}:${IMAGE_TAG}" \
+		-f './sidecars/caddy/Containerfile' \
+		./sidecars/caddy
+
+image_dnsmasq: IMAGE_NAME = ${DNSMASQ_IMAGE_NAME}
+image_dnsmasq: IMAGE_TAG = ${DNSMASQ_IMAGE_TAG}
+image_dnsmasq:
+	${CMD} buildx build \
+		${BUILD_OPTIONS} \
+		-t "${IMAGE_NAME}:${IMAGE_TAG}" \
+		-f './sidecars/dnsmasq/Containerfile' \
+		./sidecars/dnsmasq
 
 image_gpg_pk : IMAGE_NAME = ${GPG_IMAGE_NAME}
 image_gpg_pk : IMAGE_TAG = ${GPG_IMAGE_TAG}
@@ -48,7 +69,7 @@ image_gpg_pk:
 
 image_nvim : IMAGE_NAME = ${NVIM_IMAGE_NAME}
 image_nvim : IMAGE_TAG = ${NVIM_IMAGE_TAG}
-image_nvim : submodules
+image_nvim : submodules image_caddy
 	${CMD} buildx build \
 		${BUILD_OPTIONS} \
 		--build-arg "EXTRA_PKGS=${EXTRA_PKGS}" \
@@ -83,7 +104,7 @@ image_runner_go: image_runner_go_1.20
 
 image_runner_node_18 : IMAGE_NAME = ${RUNNER_IMAGE_NAME}
 image_runner_node_18 : IMAGE_TAG = ${RUNNER_IMAGE_TAG}
-image_runner_node_18: submodules
+image_runner_node_18: submodules image_caddy
 	${CMD} buildx build \
 		${BUILD_OPTIONS} \
 		--build-arg "SHELL=${USER_SHELL}" \
@@ -96,7 +117,7 @@ image_runner_node_18: submodules
 		.
 image_runner_node_20 : IMAGE_NAME = ${RUNNER_IMAGE_NAME}
 image_runner_node_20 : IMAGE_TAG = ${RUNNER_IMAGE_TAG}
-image_runner_node_20: submodules
+image_runner_node_20: submodules image_caddy
 	${CMD} buildx build \
 		${BUILD_OPTIONS} \
 		--build-arg "SHELL=${USER_SHELL}" \
@@ -108,7 +129,7 @@ image_runner_node_20: submodules
 		.
 image_runner_node_22 : IMAGE_NAME = ${RUNNER_IMAGE_NAME}
 image_runner_node_22 : IMAGE_TAG = ${RUNNER_IMAGE_TAG}
-image_runner_node_22: submodules
+image_runner_node_22: submodules image_caddy
 	${CMD} buildx build \
 		${BUILD_OPTIONS} \
 		--build-arg "SHELL=${USER_SHELL}" \
@@ -122,7 +143,7 @@ image_runner_node_22: submodules
 # with CocoaPods for iOS React Native dev
 image_runner_node_ios : IMAGE_NAME = ${RUNNER_IMAGE_NAME}
 image_runner_node_ios : IMAGE_TAG = ${RUNNER_IMAGE_TAG}
-image_runner_node_ios: submodules
+image_runner_node_ios: submodules image_caddy
 	${CMD} buildx build \
 		${BUILD_OPTIONS} \
 		--build-arg "SHELL=${USER_SHELL}" \
@@ -192,6 +213,6 @@ inspect_runner_node: # image_runner_node
 submodules:
 	@git submodule update --checkout --init --recursive --rebase
 
-images: image_gpg_pk image_runner_node image_nvim
+images: image_caddy image_dnsmasq image_nvim image_runner_node image_gpg_pk
 
 test: test_nvim test_runner_node test_gpg_pk
