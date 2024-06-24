@@ -6,6 +6,7 @@ SRC_DIR="${SRC_DIR:-$(pwd)}"
 # https://stackoverflow.com/questions/59895/how-do-i-get-the-directory-where-a-bash-script-is-located-from-within-the-script/1482133#1482133
 ROOT_DIR="${ROOT_DIR:-$(dirname -- "$( readlink -f -- "$0"; )")}"
 
+# .env is for current running environment; env gets loaded in container
 if [[ -f "${ROOT_DIR}/.env" ]]; then
   . "${ROOT_DIR}/.env"
 fi
@@ -17,6 +18,22 @@ fi
 if [[ -n "${DEBUG}" ]]; then
   set -x
 fi
+
+get_compose_name() {
+  basename "${ROOT_DIR}"
+}
+
+get_compose_network_name() {
+  name="$1"
+  cn="$(get_compose_name)"
+  echo -n "${cn}_${name}"
+}
+
+get_compose_container_name() {
+  name="$1"
+  cn="$(get_compose_name)"
+  echo -n "${cn}-${name}-1"
+}
 
 IMAGE_TAG=${IMAGE_TAG:-latest}
 IMAGE_NAME=${IMAGE_NAME:-localhost/l7/nvim}
@@ -31,7 +48,12 @@ if [ -z "${CWD}" ]; then
     *)            export CWD="${SRC_DIR}";;
   esac
 fi
-CONTAINER_SOCKET="${XDG_RUNTIME_DIR}/podman/podman.sock"
+
+export XDG_RUNTIME_DIR="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"
+# compose, used for sidecars and leaked into de
+CONTAINER_SOCKET="${CONTAINER_SOCKET:-${XDG_RUNTIME_DIR}/podman/podman.sock}"
+# used to run de itself. could be separate
+export DOCKER_HOST="${DOCKER_HOST:-unix://${XDG_RUNTIME_DIR}/podman/podman.sock}"
 
 mkdir -p "${CONF_DIR}/ssh.d" "${LOCAL_DIR}/ssh" "${CONF_DIR}/git"
 touch "${CONF_DIR}/git/config"
@@ -43,8 +65,13 @@ mkdir -p ~/.local/share/l7ide/go-runner/go
 
 # note: docker is not tested, let me know if you insist and get it working
 cmd=$(which podman || which docker)
+composecmd=$(which podman-compose || which docker-compose)
+
+(cd "${ROOTDIR}" \
+  && DOCKER_HOST="unix://${CONTAINER_SOCKET}" "${composecmd}" up -d)
 
 SSH_SOCKET="${SSH_SOCKET:-${SSH_AUTH_SOCK}}"
+
 if [[ -n "${SSH_SOCKET}" ]]; then
   RUN_ARGS="${RUN_ARGS} -v ${SSH_SOCKET}:${HOME}/.ssh/SSH_AUTH_SOCK -e SSH_AUTH_SOCK=${HOME}/.ssh/SSH_AUTH_SOCK"
 fi
@@ -61,14 +88,14 @@ if [[ -n "${1}" ]]; then
   RUN_ARGS="${RUN_ARGS} --entrypoint ${1}"
 fi
 
-if [[ -f "${ROOT_DIR}/.env" ]]; then
-  RUN_ARGS="${RUN_ARGS} --env-file ${ROOT_DIR}/.env"
+if [[ -f "${ROOT_DIR}/env" ]]; then
+  RUN_ARGS="${RUN_ARGS} --env-file ${ROOT_DIR}/env"
+fi
+if [[ -f "${CONF_DIR}/env" ]]; then
+  RUN_ARGS="${RUN_ARGS} --env-file ${CONF_DIR}/env"
 fi
 
-# uid mapping wip, sudo not working yet
-# https://github.com/containers/podman/discussions/22444
-  #--user "$(id -u):$(id -g)" --uidmap "$(id -u):0:1" --uidmap '0:1:1' --sysctl "net.ipv4.ping_group_range=1000 1000" \
-  # --sysctl "net.ipv4.ping_group_range=1000 1000" \
+# TODO: check presence of compose network
 ${cmd} run --rm -it \
   --user "$(id -u):$(id -g)" --userns=keep-id:uid=$(id -u),gid=$(id -g) \
   --mount type=bind,source="${LOCAL_DIR},target=/home/user/.local" \
@@ -85,6 +112,10 @@ ${cmd} run --rm -it \
   -e GPG_IMAGE=localhost/l7/gpg-vault:pk \
   -e HOME=/home/user \
   -e "SRC_DIR=${SRC_DIR}" \
+  --network "$(get_compose_network_name 'git-auth')" \
   ${RUN_ARGS} \
   "${IMAGE}" \
   ${@:2}
+
+###
+# --sysctl "net.ipv4.ping_group_range=1000 1000" \

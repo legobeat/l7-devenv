@@ -6,6 +6,8 @@ GPG_IMAGE_NAME := localhost/l7/gpg-vault
 GPG_IMAGE_TAG  := pk
 RUNNER_IMAGE_NAME := localhost/l7/node
 RUNNER_IMAGE_TAG  := bookworm
+AUTH_PROXY_IMAGE_NAME := localhost/l7/auth-proxy
+AUTH_PROXY_IMAGE_TAG  := latest
 GO_RUNNER_IMAGE_NAME := localhost/l7/go
 GO_RUNNER_IMAGE_TAG  := bookworm
 USER_SHELL ?= /usr/bin/zsh
@@ -17,6 +19,16 @@ CMD:=$(shell which podman || which docker)
 
 install:
 	./scripts/install-command.sh
+
+image_auth_proxy : IMAGE_NAME = ${AUTH_PROXY_IMAGE_NAME}
+image_auth_proxy : IMAGE_TAG = ${AUTH_PROXY_IMAGE_TAG}
+image_auth_proxy:
+	${CMD} buildx build \
+		${BUILD_OPTIONS} \
+		-t "${IMAGE_NAME}:${IMAGE_TAG}" \
+		-t "${IMAGE_NAME}:${IMAGE_TAG}" \
+		-f './sidecars/git-auth-proxy/Dockerfile' \
+		./sidecars/git-auth-proxy
 
 image_gpg_pk : IMAGE_NAME = ${GPG_IMAGE_NAME}
 image_gpg_pk : IMAGE_TAG = ${GPG_IMAGE_TAG}
