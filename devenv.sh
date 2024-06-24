@@ -102,6 +102,7 @@ ${cmd} run --rm -it \
   -e HOME=/home/user \
   -e "SRC_DIR=${SRC_DIR}" \
   --network "$(get_compose_network_name 'git-auth')" \
+  --dns '10.7.7.103' \
   ${RUN_ARGS} \
   "${IMAGE}" \
   ${@:2}
