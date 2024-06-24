@@ -7,6 +7,7 @@ services:
     networks:
       git-auth:
         ipv4_address: 10.7.7.105
+      public:
     ports:
       - 18774:8080
     volumes:
@@ -31,6 +32,7 @@ services:
     networks:
       git-auth:
         ipv4_address: 10.7.7.103
+      public:
 
   http-proxy:
     build:
@@ -43,6 +45,7 @@ services:
     networks:
       git-auth:
         ipv4_address: 10.7.7.102
+      public:
     ports:
       - 18780:80
       - 18743:443
@@ -55,4 +58,5 @@ networks:
     ipam:
       config:
         - subnet: 10.7.7.0/24
-          gateway: 10.7.7.1
+  # has external network gateway = internat access
+  public:
