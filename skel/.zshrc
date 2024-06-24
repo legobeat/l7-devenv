@@ -14,6 +14,8 @@ autoload -Uz compinit promptinit
 compinit
 promptinit
 prompt pure
+# prevent git auto fetch from prompt
+export PURE_GIT_PULL=0
 zstyle :prompt:pure:git:fetch only_upstream yes
 
 # sudo autocomplete
