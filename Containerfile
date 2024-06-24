@@ -78,6 +78,10 @@ RUN \
   && microdnf clean all \
   && rm -rf /tmp/1002-home /build/typescript-language-server/*.t*gz
 
+# this assumes we already have a locally built caddy image
+# the image contains a pregenerated ca root cert for mitm, which we copy here
+# TODO: provide a nicer way to manage the rootcert
+FROM localhost/l7/caddy:latest AS fwdproxy
 #######################
 ##### FINAL IMAGE #####
 FROM base
@@ -176,6 +180,12 @@ RUN cat /home/user/.env >> /etc/profile \
   && ln -sf \
     /usr/lib/node_modules/typescript-language-server/lib/cli.mjs \
     /usr/lib/node_modules/.bin/typescript-language-server
+
+# https://docs.fedoraproject.org/en-US/quick-docs/using-shared-system-certificates/
+COPY --from=fwdproxy \
+  /data/caddy/pki/authorities/local/root.crt \
+  /etc/pki/ca-trust/source/anchors/l7-fwd-proxy.crt
+RUN update-ca-trust
 
 USER ${UID}
 WORKDIR /src

@@ -30,6 +30,18 @@ jobs:
         with:
           submodules: true
 
+      - name: Build and load caddy image
+        uses: docker/build-push-action@v6
+        with:
+          context: sidecars/caddy
+          file: sidecars/caddy/Containerfile
+          build-args: ${{ matrix.build-args }}
+          load: true
+          tags: localhost/l7/caddy:latest
+          push: false
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
       - name: Build and load nvim image
         uses: docker/build-push-action@v6
         with:
