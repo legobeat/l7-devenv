@@ -30,6 +30,10 @@ For a guided tutorial, see [`docs/1-getting-started.md`](docs/1-getting-started.
   - We will be using rootless podman to minimize privileges but Docker or any other compatible engine should work.
 - An SSH agent socket
   - Typically provided by running `ssh-agent`
+- (Optional) [Nerd Fonts](https://github.com/ryanoasis/nerd-fonts?tab=readme-ov-file#font-installation) enabled in your [terminal](docs/terminals.md)
+  - For proper display of icons and font rendering
+- (Optional) [Sixel](https://www.arewesixelyet.com/) support in your terminal
+  - For rendering of images
 - (Optional) A GPG agent socket
   - For signing git commits. Typically provided by running `gpg-agent` on the host.
 
