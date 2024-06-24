@@ -4,7 +4,7 @@ export RUNNER_IMAGE="${RUNNER_IMAGE:-${GO_RUNNER_IMAGE}}"
 
 export RUNNER_ENV="${RUNNER_ENV}
 HOME=/home/user
-PATH=/go/bin:/home/user/.go/bin:/home/user/go/bin/usr/local/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+PATH=/go/bin:/home/user/.go/bin:/home/user/go/bin:/usr/local/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 GOPATH=/home/user/.go
 "
 export RUNNER_VOLS="${RUNNER_VOLS} ${HOME}/.local/share/l7ide/go-runner/go:/home/user/.go"
