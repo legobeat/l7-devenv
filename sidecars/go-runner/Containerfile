@@ -1,5 +1,5 @@
 ARG GO_VERSION=1.20
-FROM golang:${GO_VERSION}-bookworm
+FROM docker.io/golang:${GO_VERSION}-bookworm
 RUN apt-get update \
   && apt-get install -y --no-install-recommends \
     git curl ca-certificates gnupg ssh-client less psmisc jq time zsh \
