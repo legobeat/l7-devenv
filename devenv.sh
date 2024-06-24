@@ -112,7 +112,8 @@ ${cmd} run --rm -it \
   -e GPG_IMAGE=localhost/l7/gpg-vault:pk \
   -e HOME=/home/user \
   -e "SRC_DIR=${SRC_DIR}" \
-  --network "$(get_compose_network_name 'git-auth')" \
+  --network "$(get_compose_network_name 'internal')" \
+  --dns '10.7.8.133' \
   ${RUN_ARGS} \
   "${IMAGE}" \
   ${@:2}
