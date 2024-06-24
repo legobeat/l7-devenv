@@ -116,11 +116,12 @@ RUN microdnf -y install --setopt=install_weak_deps=False \
     sshpass \
     hub gh tig \
     libnotify \
+    ip openssl procps-ng psmisc \
     man-db \
     podman sudo containers-common \
     screen \
     w3m \
-    which procps-ng \
+    which \
     zsh \
     ${EXTRA_PKGS} \
   && ln -sf nvim /usr/bin/vim \
