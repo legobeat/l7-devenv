@@ -1,0 +1,25 @@
+---
+services:
+  auth-proxy:
+    build:
+      context: sidecars/git-auth-proxy
+      dockerfile: Dockerfile
+    networks:
+      git-auth:
+        ipv4_address: 10.7.7.105
+    ports:
+      - 18774:8080
+    volumes:
+      - ${HOME}/.config/l7ide/config/git-auth-proxy:/etc/git-auth-proxy
+    command:
+      - --config
+      - /etc/git-auth-proxy/config.json
+      - --addr
+      - 0.0.0.0:8080
+
+networks:
+  git-auth:
+    ipam:
+      config:
+        - subnet: 10.7.7.0/24
+          gateway: 10.7.7.1

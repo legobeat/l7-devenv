@@ -18,6 +18,24 @@ if [[ -n "${DEBUG}" ]]; then
   set -x
 fi
 
+get_compose_name() {
+  basename "${ROOT_DIR}"
+}
+
+get_compose_network_name() {
+  name="$1"
+  cn="$(get_compose_name)"
+  echo -n "${cn}_${name}"
+}
+
+get_compose_container_name() {
+  name="$1"
+  cn="$(get_compose_name)"
+  echo -n "${cn}-${name}-1"
+}
+
+AUTH_PROXY_ADDR="$(podman inspect $(get_compose_container_name auth-proxy)| jq -r '.[0].NetworkSettings.Networks|map(.IPAddress)|.[]'):8080"
+
 IMAGE_TAG=${IMAGE_TAG:-latest}
 IMAGE_NAME=${IMAGE_NAME:-localhost/l7/nvim}
 IMAGE=${IMAGE:-$IMAGE_NAME:$IMAGE_TAG}
@@ -65,10 +83,7 @@ if [[ -f "${ROOT_DIR}/.env" ]]; then
   RUN_ARGS="${RUN_ARGS} --env-file ${ROOT_DIR}/.env"
 fi
 
-# uid mapping wip, sudo not working yet
-# https://github.com/containers/podman/discussions/22444
-  #--user "$(id -u):$(id -g)" --uidmap "$(id -u):0:1" --uidmap '0:1:1' --sysctl "net.ipv4.ping_group_range=1000 1000" \
-  # --sysctl "net.ipv4.ping_group_range=1000 1000" \
+# TODO: check presence of compose network
 ${cmd} run --rm -it \
   --user "$(id -u):$(id -g)" --userns=keep-id:uid=$(id -u),gid=$(id -g) \
   --mount type=bind,source="${LOCAL_DIR},target=/home/user/.local" \
@@ -83,8 +98,13 @@ ${cmd} run --rm -it \
   -e GO_RUNNER_IMAGE=localhost/l7/go:1.20-bookworm \
   -e NODE_RUNNER_IMAGE=localhost/l7/node:20-bookworm \
   -e GPG_IMAGE=localhost/l7/gpg-vault:pk \
+  -e GITHUB_HOST="${AUTH_PROXY_ADDR}" \
   -e HOME=/home/user \
   -e "SRC_DIR=${SRC_DIR}" \
+  --network "$(get_compose_network_name 'git-auth')" \
   ${RUN_ARGS} \
   "${IMAGE}" \
   ${@:2}
+
+###
+# --sysctl "net.ipv4.ping_group_range=1000 1000" \
