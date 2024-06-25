@@ -62,6 +62,24 @@ mkdir -p "${HOME}"/.local/share/l7ide/node-runner/{yarn/cache/classic,yarn/cache
 mkdir -p ~/.local/share/l7ide/gh && touch ~/.local/share/l7ide/gh/hosts.yml && chmod 0600 ~/.local/share/l7ide/gh/hosts.yml
 mkdir -p ~/.local/share/l7ide/go-runner/go
 
+configure_gh_token() {
+  mkdir -p "${HOME}/.config/l7ide/config/git-auth-proxy"
+  local cfg="${HOME}/.config/l7ide/config/git-auth-proxy/config.json"
+  if [[ ! -f "${cfg}" ]]; then
+    cp sidecars/git-auth-proxy/examples/default.json "${cfg}"
+  fi
+  # simple templating
+  # todo: use podman secrets or sth
+  if [[ -f "${cfg}.tmpl" ]]; then
+    # allow supplying secret via stdout of command to avoid leaking
+    if [[ -n "${L7_GITHUB_TOKEN_CMD}" ]] ; then
+      local L7_GITHUB_TOKEN=$(L7_GITHUB_TOKEN_CMD)
+    fi
+    envsubst L7_GITHUB_TOKEN < "${cfg}.tmpl" > "${cfg}"
+  fi
+}
+
+configure_gh_token
 
 # note: docker is not tested, let me know if you insist and get it working
 cmd="${CONTAINER_CMD:-$(which podman || which docker)}"
