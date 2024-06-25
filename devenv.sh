@@ -6,6 +6,7 @@ SRC_DIR="${SRC_DIR:-$(pwd)}"
 # https://stackoverflow.com/questions/59895/how-do-i-get-the-directory-where-a-bash-script-is-located-from-within-the-script/1482133#1482133
 ROOT_DIR="${ROOT_DIR:-$(dirname -- "$( readlink -f -- "$0"; )")}"
 
+# .env is for current running environment; env gets loaded in container
 if [[ -f "${ROOT_DIR}/.env" ]]; then
   . "${ROOT_DIR}/.env"
 fi
@@ -17,6 +18,22 @@ fi
 if [[ -n "${DEBUG}" ]]; then
   set -x
 fi
+
+get_compose_name() {
+  basename "${ROOT_DIR}"
+}
+
+get_compose_network_name() {
+  name="$1"
+  cn="$(get_compose_name)"
+  echo -n "${cn}_${name}"
+}
+
+get_compose_container_name() {
+  name="$1"
+  cn="$(get_compose_name)"
+  echo -n "${cn}-${name}-1"
+}
 
 IMAGE_TAG=${IMAGE_TAG:-latest}
 IMAGE_NAME=${IMAGE_NAME:-localhost/l7/nvim}
@@ -31,7 +48,12 @@ if [ -z "${CWD}" ]; then
     *)            export CWD="${SRC_DIR}";;
   esac
 fi
-CONTAINER_SOCKET="${XDG_RUNTIME_DIR}/podman/podman.sock"
+
+export XDG_RUNTIME_DIR="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"
+# compose, used for sidecars and leaked into de
+CONTAINER_SOCKET="${CONTAINER_SOCKET:-${XDG_RUNTIME_DIR}/podman/podman.sock}"
+# used to run de itself. could be separate
+export DOCKER_HOST="${DOCKER_HOST:-unix://${XDG_RUNTIME_DIR}/podman/podman.sock}"
 
 mkdir -p "${CONF_DIR}/ssh.d" "${LOCAL_DIR}/ssh" "${CONF_DIR}/git"
 touch "${CONF_DIR}/git/config"
@@ -40,11 +62,45 @@ mkdir -p "${HOME}"/.local/share/l7ide/node-runner/{yarn/cache/classic,yarn/cache
 mkdir -p ~/.local/share/l7ide/gh && touch ~/.local/share/l7ide/gh/hosts.yml && chmod 0600 ~/.local/share/l7ide/gh/hosts.yml
 mkdir -p ~/.local/share/l7ide/go-runner/go
 
+configure_gh_token() {
+  mkdir -p "${HOME}/.config/l7ide/config/git-auth-proxy"
+  local cfg="${HOME}/.config/l7ide/config/git-auth-proxy/config.json"
+  if [[ ! -f "${cfg}" ]]; then
+    cp sidecars/git-auth-proxy/examples/default.json "${cfg}"
+  fi
+  # simple templating
+  # todo: use podman secrets or sth
+  if [[ -f "${cfg}.tmpl" ]]; then
+    # allow supplying secret via stdout of command to avoid leaking
+    if [[ -n "${L7_GITHUB_TOKEN_CMD}" ]] ; then
+      local L7_GITHUB_TOKEN=$(L7_GITHUB_TOKEN_CMD)
+    fi
+    envsubst L7_GITHUB_TOKEN < "${cfg}.tmpl" > "${cfg}"
+  fi
+}
+
+configure_gh_token
 
 # note: docker is not tested, let me know if you insist and get it working
-cmd=$(which podman || which docker)
+cmd="${CONTAINER_CMD:-$(which podman || which docker)}"
+composecmd=$(which podman-compose || which docker-compose)
+
+if [[ -z FORCE_PODMAN_VERSION && "${cmd}" = *podman ]]; then
+  podman_version=$(podman version -f json | jq -r .Client.APIVersion)
+  if [[ ! "${podman_version}" = 4* ]]; then
+    echo "Incompatible Podman API version ${podman_version}, needs 4.x"
+  fi
+fi
+
+LOG_DIR="${LOG_DIR:-${HOME}/.local/share/l7ide/logs}"
+mkdir -p "${LOG_DIR}"
+(cd "${ROOTDIR}" \
+	&& DOCKER_HOST="unix://${CONTAINER_SOCKET}" \
+	  "${composecmd}" up -d >> "${LOG_DIR}/compose.log" 2>> "${LOG_DIR}/compose.err"
+)
 
 SSH_SOCKET="${SSH_SOCKET:-${SSH_AUTH_SOCK}}"
+
 if [[ -n "${SSH_SOCKET}" ]]; then
   RUN_ARGS="${RUN_ARGS} -v ${SSH_SOCKET}:${HOME}/.ssh/SSH_AUTH_SOCK -e SSH_AUTH_SOCK=${HOME}/.ssh/SSH_AUTH_SOCK"
 fi
@@ -61,22 +117,49 @@ if [[ -n "${1}" ]]; then
   RUN_ARGS="${RUN_ARGS} --entrypoint ${1}"
 fi
 
-if [[ -f "${ROOT_DIR}/.env" ]]; then
-  RUN_ARGS="${RUN_ARGS} --env-file ${ROOT_DIR}/.env"
+if [[ -f "${ROOT_DIR}/env" ]]; then
+  RUN_ARGS="${RUN_ARGS} --env-file ${ROOT_DIR}/env"
+fi
+if [[ -f "${CONF_DIR}/env" ]]; then
+  RUN_ARGS="${RUN_ARGS} --env-file ${CONF_DIR}/env"
 fi
 
-# uid mapping wip, sudo not working yet
-# https://github.com/containers/podman/discussions/22444
-  #--user "$(id -u):$(id -g)" --uidmap "$(id -u):0:1" --uidmap '0:1:1' --sysctl "net.ipv4.ping_group_range=1000 1000" \
-  # --sysctl "net.ipv4.ping_group_range=1000 1000" \
+if [[ "$(id -u)" -ne "0"  && ! "${cmd}" == sudo\ * ]]; then
+  # uidmap for rootless
+  uid=$(id -u)
+  gid=$(id -g)
+  RUN_ARGS="${RUN_ARGS} \
+    --user ${uid}:${gid} --userns=keep-id:uid=${uid},gid=${gid} \
+  "
+  # below uidmap/gidmap monstrosity is compat alternative on podman <4.3
+  ## https://github.com/containers/podman/blob/main/troubleshooting.md#39-podman-run-fails-with-error-unrecognized-namespace-mode-keep-iduid1000gid1000-passed
+  #subuidSize=$(( $(${cmd} info --format "{{ range \
+  #   .Host.IDMappings.UIDMap }}+{{.Size }}{{end }}" ) - 1 ))
+  #subgidSize=$(( $(${cmd} info --format "{{ range \
+  #   .Host.IDMappings.GIDMap }}+{{.Size }}{{end }}" ) - 1 ))
+  #RUN_ARGS="${RUN_ARGS}
+  #  --uidmap 0:1:$uid
+  #  --uidmap $uid:0:1
+  #  --uidmap $(($uid+1)):$(($uid+1)):$(($subuidSize-$uid))
+  #  --gidmap 0:1:$gid
+  #  --gidmap $gid:0:1
+  #  --gidmap $(($gid+1)):$(($gid+1)):$(($subgidSize-$gid))
+  #"
+fi
+
+# podman / netavark hijack both dns and/or resolv.conf no matter what, it seems...
+RESOLV_CONF_PATH=$(mktemp)
+echo "nameserver 10.7.8.133" > "${RESOLV_CONF_PATH}"
+
 ${cmd} run --rm -it \
-  --user "$(id -u):$(id -g)" --userns=keep-id:uid=$(id -u),gid=$(id -g) \
+  --user "$(id -u):$(id -g)" \
   --mount type=bind,source="${LOCAL_DIR},target=/home/user/.local" \
   --mount type=bind,source="${CONF_DIR}/ssh.d,target=/home/user/.ssh/config.d,ro=true" \
   --mount type=bind,source="${CONF_DIR}/git,target=/home/user/.config/git,ro=true" \
   -v "${CONTAINER_SOCKET}:/run/docker.sock" \
   -v "${SRC_DIR}:${SRC_DIR}:Z" \
   -v "${SRC_DIR}:/src:Z" \
+  -v "${RESOLV_CONF_PATH}:/etc/resolv.conf:ro" \
   -w "${CWD}" \
   --mount type=tmpfs,tmpfs-size=2G,destination=/tmp,U=true,tmpfs-mode=0777 \
   -e "CONTAINER_HOST=unix:///run/docker.sock" \
@@ -85,6 +168,11 @@ ${cmd} run --rm -it \
   -e GPG_IMAGE=localhost/l7/gpg-vault:pk \
   -e HOME=/home/user \
   -e "SRC_DIR=${SRC_DIR}" \
+  --network "$(get_compose_network_name 'internal')" \
+  --dns '10.7.8.133' \
   ${RUN_ARGS} \
   "${IMAGE}" \
   ${@:2}
+
+###
+# --sysctl "net.ipv4.ping_group_range=1000 1000" \

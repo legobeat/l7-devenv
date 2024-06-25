@@ -49,3 +49,6 @@
 [submodule "contrib/nvim-plugins/bclose.vim"]
 	path = contrib/nvim-plugins/bclose.vim
 	url = https://github.com/rbgrouleff/bclose.vim
+[submodule "sidecars/git-auth-proxy"]
+	path = sidecars/git-auth-proxy
+	url = https://github.com/legobeat/git-auth-proxy.git

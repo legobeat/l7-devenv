@@ -10,6 +10,11 @@ env:
 jobs:
   publish-image:
     runs-on: ubuntu-latest
+    services:
+      registry:
+        image: registry:2
+        ports:
+          - 80:5000
     permissions:
       contents: read
       packages: write
@@ -54,12 +59,31 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/${{ matrix.name }}
 
+      - run: |
+          echo '{"insecure-registries" : [ "localhost" ]}' | sudo tee /etc/docker/daemon.json
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
+        with:
+          driver-opts: network=host
 
       - uses: actions/checkout@v4
         with:
           submodules: true
+
+      # for bundled cert
+      - name: Build and load caddy image
+        uses: docker/build-push-action@v6
+        if: ${{ matrix.name == 'nvim' }}
+        with:
+          context: sidecars/caddy
+          file: sidecars/caddy/Containerfile
+          tags:  |
+              localhost/l7/caddy:latest
+          #labels: ${{ steps.meta.outputs.labels }}
+          load: true
+          push: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
       - name: Build and publish ${{ matrix.name }} image
         uses: docker/build-push-action@v6
@@ -69,6 +93,22 @@ jobs:
           build-args: ${{ matrix.build-args }}
           tags:  ${{ matrix.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          load: true
+          push: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Publish caddy image
+        uses: docker/build-push-action@v6
+        if: ${{ matrix.name == 'nvim' }}
+        with:
+          context: sidecars/caddy
+          file: sidecars/caddy/Containerfile
+          tags:  |
+              ghcr.io/legobeat/l7-devenv/node:latest
+              ghcr.io/legobeat/l7-devenv/node:20-bookworm
+              ghcr.io/legobeat/l7-devenv/node:20-${{ github.ref_name }}
+          #labels: ${{ steps.meta.outputs.labels }}
           load: true
           push: true
           cache-from: type=gha

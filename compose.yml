@@ -1,0 +1,84 @@
+---
+services:
+  auth-proxy:
+    build:
+      context: sidecars/git-auth-proxy
+      dockerfile: Dockerfile
+    image: localhost/l7/git-auth-proxy:latest
+    networks:
+      svcs:
+        ipv4_address: 10.7.7.135
+      public:
+    ports:
+      - 18774:8080
+    volumes:
+      - ${HOME}/.config/l7ide/config/git-auth-proxy:/etc/git-auth-proxy
+    command:
+      - --config
+      - /etc/git-auth-proxy/config.json
+      - --addr
+      - 0.0.0.0:8080
+  dns:
+    build:
+      context: sidecars/dnsmasq
+      dockerfile: Containerfile
+    image: localhost/l7/dnsmasq:latest
+    ports:
+      - "18753:53/tcp"
+      - "18753:53/udp"
+      #- "18767:67/udp"
+      #- "18769:69/udp"
+    cap_add:
+      - NET_ADMIN
+    # todo: dynamic for subnets
+    command: --address="/#/10.7.8.2"
+    networks:
+      internal:
+        ipv4_address: 10.7.8.133
+      svcs:
+        ipv4_address: 10.7.7.133
+      public:
+
+  http-proxy:
+    build:
+      context: sidecars/caddy
+      dockerfile: Containerfile
+    image: localhost/l7/caddy
+    environment:
+      GITHUB_PROXY_HOST: 10.7.7.135
+      GITHUB_PROXY_PORT: '8080'
+    networks:
+      internal:
+        ipv4_address: 10.7.8.2
+      svcs:
+        ipv4_address: 10.7.7.2
+      public:
+    ports:
+      - 18780:80
+      - 18743:443
+    volumes:
+      - ${HOME}/.config/l7ide/config/caddy:/config
+      #- ${HOME}/.local/share/l7ide/caddy/data:/data
+
+networks:
+  svcs:
+    attachable: false
+    ipam:
+      config:
+        - subnet: 10.7.7.0/24
+    driver: bridge
+    driver_opts:
+      inhibit_ipv4: 1
+  internal:
+    attachable: true
+    ipam:
+      config:
+        - subnet: 10.7.8.0/24
+    driver: bridge
+    driver_opts:
+      inhibit_ipv4: 1
+      disable_dns: 1
+  # has external network gateway = internet access
+  public:
+    attachable: false
+    driver: bridge
