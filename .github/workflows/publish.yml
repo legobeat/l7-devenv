@@ -25,8 +25,8 @@ jobs:
       matrix:
         include:
           - name: caddy
-            file: Containerfile
-            context: "{{defaultContext}}:sidecars/caddy"
+            file: '{{context}}/Containerfile'
+            context: "sidecars/caddy"
             tags:  |
               localhost/l7/caddy:latest
               ghcr.io/legobeat/l7-devenv/caddy:latest
@@ -68,7 +68,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: ${{ matrix.context }}
-          file: ${{ matrix.file }}
+          file: '{{context}}/${{ matrix.file }}'
           build-args: ${{ matrix.build-args }}
           tags:  ${{ matrix.tags }}
           labels: ${{ steps.meta.outputs.labels }}
@@ -95,28 +95,28 @@ jobs:
       matrix:
         include:
           - name: dnsmasq
-            file: sidecars/gpg-vault-pk/Containerfile
-            context: "{{defaultContext}}:sidecars/caddy"
+            file: "{{context}}/Containerfile"
+            context: sidecars/dnsmasq
             tags: |
               ghcr.io/legobeat/l7-devenv/gpg-vault:latest
               ghcr.io/legobeat/l7-devenv/gpg-vault:alpine
               ghcr.io/legobeat/l7-devenv/gpg-vault:${{ github.ref_name }}
               ghcr.io/legobeat/l7-devenv/gpg-vault:alpine-${{ github.ref_name }}
           - name: nvim
-            file: Containerfile
+            file: "{{context}}/Containerfile"
             context: .
             tags: |
               ghcr.io/legobeat/l7-devenv/nvim:latest
               ghcr.io/legobeat/l7-devenv/nvim:${{ github.ref_name }}
           - name: node
-            file: sidecars/node-runner/Containerfile
+            file: "{{context}}/sidecars/node-runner/Containerfile"
             context: .
             tags: |
               ghcr.io/legobeat/l7-devenv/node:latest
               ghcr.io/legobeat/l7-devenv/node:20-bookworm
               ghcr.io/legobeat/l7-devenv/node:20-${{ github.ref_name }}
           - name: gpg-vault
-            file: sidecars/gpg-vault-pk/Containerfile
+            file: "{{context}}/sidecars/gpg-vault-pk/Containerfile"
             context: .
             tags: |
               ghcr.io/legobeat/l7-devenv/gpg-vault:latest
@@ -157,7 +157,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: ${{ matrix.context }}
-          file: ${{ matrix.file }}
+          file: '{{context}}/${{ matrix.file }}'
           build-args: ${{ matrix.build-args }}
           tags:  ${{ matrix.tags }}
           labels: ${{ steps.meta.outputs.labels }}
