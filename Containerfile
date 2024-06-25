@@ -1,4 +1,5 @@
 # syntax=docker/dockerfile:1.4-labs
+ARG CADDY_IMAGE=localhost/l7/caddy:latest
 FROM registry.fedoraproject.org/fedora-minimal:40 AS base
 
 
@@ -81,7 +82,7 @@ RUN \
 # this assumes we already have a locally built caddy image
 # the image contains a pregenerated ca root cert for mitm, which we copy here
 # TODO: provide a nicer way to manage the rootcert
-FROM localhost/l7/caddy:latest AS fwdproxy
+FROM ${CADDY_IMAGE} AS fwdproxy
 #######################
 ##### FINAL IMAGE #####
 FROM base

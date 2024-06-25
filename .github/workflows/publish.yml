@@ -69,7 +69,9 @@ jobs:
         with:
           context: ${{ matrix.context }}
           file: '${{ matrix.file }}'
-          build-args: ${{ matrix.build-args }}
+          build-args: |
+            ${{ matrix.build-args }}
+            CADDY_IMAGE=ghcr.io/legobeat/l7-devenv/caddy:${{ github.ref_name }}
           tags:  ${{ matrix.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           load: true
