@@ -16,4 +16,4 @@ RUN apk upgrade --no-cache \
 COPY sidecars/gpg-vault-pk/gpg*.conf /root/.gnupg/
 COPY sidecars/gpg-vault-pk/*.sh /usr/local/bin/
 
-ENV GPG_TTY /dev/gpgtty
+ENV GPG_TTY=/dev/gpgtty
