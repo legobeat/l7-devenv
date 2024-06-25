@@ -92,8 +92,12 @@ if [[ -z FORCE_PODMAN_VERSION && "${cmd}" = *podman ]]; then
   fi
 fi
 
+LOG_DIR="${LOG_DIR:-${HOME}/.local/share/l7ide/logs}"
+mkdir -p "${LOG_DIR}"
 (cd "${ROOTDIR}" \
-  && DOCKER_HOST="unix://${CONTAINER_SOCKET}" "${composecmd}" up -d)
+	&& DOCKER_HOST="unix://${CONTAINER_SOCKET}" \
+	  "${composecmd}" up -d >> "${LOG_DIR}/compose.log" 2>> "${LOG_DIR}/compose.err"
+)
 
 SSH_SOCKET="${SSH_SOCKET:-${SSH_AUTH_SOCK}}"
 
