@@ -147,6 +147,9 @@ if [[ "$(id -u)" -ne "0"  && ! "${cmd}" == sudo\ * ]]; then
   #"
 fi
 
+# podman / netavark hijack both dns and/or resolv.conf no matter what, it seems...
+RESOLV_CONF_PATH=$(mktemp)
+echo "nameserver 10.7.8.133" > "${RESOLV_CONF_PATH}"
 
 ${cmd} run --rm -it \
   --user "$(id -u):$(id -g)" \
@@ -156,6 +159,7 @@ ${cmd} run --rm -it \
   -v "${CONTAINER_SOCKET}:/run/docker.sock" \
   -v "${SRC_DIR}:${SRC_DIR}:Z" \
   -v "${SRC_DIR}:/src:Z" \
+  -v "${RESOLV_CONF_PATH}:/etc/resolv.conf:ro" \
   -w "${CWD}" \
   --mount type=tmpfs,tmpfs-size=2G,destination=/tmp,U=true,tmpfs-mode=0777 \
   -e "CONTAINER_HOST=unix:///run/docker.sock" \
