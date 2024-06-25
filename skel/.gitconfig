@@ -81,8 +81,10 @@
   sma  = submodule add
   sml  = submodule list
   smu  = submodule update
-  smui = submodule update --init --recursive
-  smuir = submodule update --init --recursive
+  smuc   = submodule update --checkout
+  smuic  = submodule update --init --checkout
+  smuir  = submodule update --init --recursive
+  smuirc = submodule update --init --checkout --recursive
   st   = status
   t    = tag
   td   = tag -d
