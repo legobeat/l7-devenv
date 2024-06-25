@@ -8,15 +8,32 @@ The container comes with a default `.gitconfig`:
 > cat ~/.gitconfig
 ```
 
-Like other files in the home directory, changes here will be reset after a restart. We can add our custom gitconfig to mounted `~/.config/gitconfig` by editing it on the host:
+Changes made here will be effective only for the lifetime of the current container. Modifying the default user configuration can be useful for experimentation and one-offs. To make changes stick across restarts and reboots, we can utilize container environment variables by running on the host:
 
 ```
-$ cat <<EOT | tee ~/.config/l7ide/config/gitconfig
+$ cat <<EOT | tee -a ~/.config/l7ide/config/env
+GIT_AUTHOR_EMAIL=you@example.com
+GIT_AUTHOR_NAME=your name
+GIT_COMMITTER_EMAIL=you@example.com
+GIT_COMMITTER_NAME=your name
+EOT
+```
+
+<details><summary>Overriding user configuration files</summary>
+
+As an alternative to configuring using environment variables like above, we could also modify a persistent (mounted) configuration file `~/.config/git/config` with custom gitconfig by editing it on the host:
+
+```
+$ cat <<EOT | tee -a ~/.config/l7ide/config/git/config
   [user]
     email = you@example.com
     name = you
 EOT
 ```
+
+Any application reading configuration from `${HOME}/.config` can be configured in a similar way.
+
+</details>
 
 If you were following on from [`1-getting-started.md`](1-getting-started.md), you can now make a commit:
 
