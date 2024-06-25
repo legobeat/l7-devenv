@@ -64,8 +64,15 @@ mkdir -p ~/.local/share/l7ide/go-runner/go
 
 
 # note: docker is not tested, let me know if you insist and get it working
-cmd=$(which podman || which docker)
+cmd="${CONTAINER_CMD:-$(which podman || which docker)}"
 composecmd=$(which podman-compose || which docker-compose)
+
+if [[ -z FORCE_PODMAN_VERSION && "${cmd}" = *podman ]]; then
+  podman_version=$(podman version -f json | jq -r .Client.APIVersion)
+  if [[ ! "${podman_version}" = 4* ]]; then
+    echo "Incompatible Podman API version ${podman_version}, needs 4.x"
+  fi
+fi
 
 (cd "${ROOTDIR}" \
   && DOCKER_HOST="unix://${CONTAINER_SOCKET}" "${composecmd}" up -d)
@@ -95,9 +102,32 @@ if [[ -f "${CONF_DIR}/env" ]]; then
   RUN_ARGS="${RUN_ARGS} --env-file ${CONF_DIR}/env"
 fi
 
-# TODO: check presence of compose network
+if [[ "$(id -u)" -ne "0"  && ! "${cmd}" == sudo\ * ]]; then
+  # uidmap for rootless
+  uid=$(id -u)
+  gid=$(id -g)
+  RUN_ARGS="${RUN_ARGS} \
+    --user ${uid}:${gid} --userns=keep-id:uid=${uid},gid=${gid} \
+  "
+  # below uidmap/gidmap monstrosity is compat alternative on podman <4.3
+  ## https://github.com/containers/podman/blob/main/troubleshooting.md#39-podman-run-fails-with-error-unrecognized-namespace-mode-keep-iduid1000gid1000-passed
+  #subuidSize=$(( $(${cmd} info --format "{{ range \
+  #   .Host.IDMappings.UIDMap }}+{{.Size }}{{end }}" ) - 1 ))
+  #subgidSize=$(( $(${cmd} info --format "{{ range \
+  #   .Host.IDMappings.GIDMap }}+{{.Size }}{{end }}" ) - 1 ))
+  #RUN_ARGS="${RUN_ARGS}
+  #  --uidmap 0:1:$uid
+  #  --uidmap $uid:0:1
+  #  --uidmap $(($uid+1)):$(($uid+1)):$(($subuidSize-$uid))
+  #  --gidmap 0:1:$gid
+  #  --gidmap $gid:0:1
+  #  --gidmap $(($gid+1)):$(($gid+1)):$(($subgidSize-$gid))
+  #"
+fi
+
+
 ${cmd} run --rm -it \
-  --user "$(id -u):$(id -g)" --userns=keep-id:uid=$(id -u),gid=$(id -g) \
+  --user "$(id -u):$(id -g)" \
   --mount type=bind,source="${LOCAL_DIR},target=/home/user/.local" \
   --mount type=bind,source="${CONF_DIR}/ssh.d,target=/home/user/.ssh/config.d,ro=true" \
   --mount type=bind,source="${CONF_DIR}/git,target=/home/user/.config/git,ro=true" \
