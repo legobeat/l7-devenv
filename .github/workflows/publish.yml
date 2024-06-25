@@ -26,7 +26,7 @@ jobs:
         include:
           - name: caddy
             file: sidecars/caddy/Containerfile
-            context: sidecars/caddy
+            context: "{{defaultContext}}:sidecars/caddy"
             tags:  |
               localhost/l7/caddy:latest
               ghcr.io/legobeat/l7-devenv/caddy:latest
@@ -67,7 +67,7 @@ jobs:
       - name: Build and publish ${{ matrix.name }} image
         uses: docker/build-push-action@v6
         with:
-          context: .
+          context: ${{ matrix.context }}
           file: ${{ matrix.file }}
           build-args: ${{ matrix.build-args }}
           tags:  ${{ matrix.tags }}
@@ -96,7 +96,7 @@ jobs:
         include:
           - name: dnsmasq
             file: sidecars/gpg-vault-pk/Containerfile
-            context: sidecars/dnsmasq
+            context: "{{defaultContext}}:sidecars/caddy"
             tags: |
               ghcr.io/legobeat/l7-devenv/gpg-vault:latest
               ghcr.io/legobeat/l7-devenv/gpg-vault:alpine
