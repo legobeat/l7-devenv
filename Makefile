@@ -135,15 +135,51 @@ image_runner_node: image_runner_node_20 # image_runner_node_18 image_runner_node
 		"${IMAGE_NAME}:20-${IMAGE_TAG}" \
 	    "${IMAGE_NAME}:${IMAGE_TAG}"
 
+test_nvim : IMAGE_NAME = ${NVIM_IMAGE_NAME}
+test_nvim : IMAGE_TAG = ${NVIM_IMAGE_TAG}
+test_nvim: # image_nvim
+	${CMD} run --rm -it \
+		--entrypoint sh \
+		"${IMAGE_NAME}:${IMAGE_TAG}" \
+		-c 'nvim --version'
+
+test_gpg_pk: IMAGE_NAME = ${GPG_IMAGE_NAME}
+test_gpg_pk: IMAGE_TAG = ${GPG_IMAGE_TAG}
+test_gpg_pk: # image_gpg_pk
+	${CMD} run --rm -it \
+		"${IMAGE_NAME}:${IMAGE_TAG}" \
+		gpg --version
+
+test_runner_node: IMAGE_NAME = ${RUNNER_IMAGE_NAME}
+test_runner_node: IMAGE_TAG = ${RUNNER_IMAGE_TAG}
+test_runner_node: # image_runner_node
+	${CMD} run --rm -it \
+		"${IMAGE_NAME}:${IMAGE_TAG}" \
+		-c 'node --version'
+
+# inspect jobs here just for ci, not really useful otherwise
+
+inspect_nvim : IMAGE_NAME = ${NVIM_IMAGE_NAME}
+inspect_nvim : IMAGE_TAG = ${NVIM_IMAGE_TAG}
+inspect_nvim: # image_nvim
+	@${CMD} inspect \
+		"${IMAGE_NAME}:${IMAGE_TAG}"
+
+inspect_gpg_pk: IMAGE_NAME = ${GPG_IMAGE_NAME}
+inspect_gpg_pk: IMAGE_TAG = ${GPG_IMAGE_TAG}
+inspect_gpg_pk: # image_gpg_pk
+	@${CMD} inspect \
+		"${IMAGE_NAME}:${IMAGE_TAG}"
+
+inspect_runner_node: IMAGE_NAME = ${RUNNER_IMAGE_NAME}
+inspect_runner_node: IMAGE_TAG = ${RUNNER_IMAGE_TAG}
+inspect_runner_node: # image_runner_node
+	@${CMD} inspect \
+		"${IMAGE_NAME}:${IMAGE_TAG}"
+
 submodules:
 	@git submodule update --checkout --init --recursive --rebase
 
-test: test_nvim test_runner
-
-test_nvim:
-	@echo TODO: nvim image tests
-
-test_runner:
-	@echo TODO: node-runner image tests
-
 images: image_gpg_pk image_runner_node image_nvim
+
+test: test_nvim test_runner_node test_gpg_pk
