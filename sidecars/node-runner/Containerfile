@@ -61,4 +61,4 @@ COPY --chown=${UID}:${GID} skel/ /home/node/
 ENV PATH=/home/node/.corepack/bin:${PATH}
 
 WORKDIR /src
-ENTRYPOINT ${SHELL}
+ENTRYPOINT ["${SHELL}]"]
