@@ -168,6 +168,16 @@ image_runner_node: image_runner_node_20 # image_runner_node_18 image_runner_node
 		"${IMAGE_NAME}:20-${IMAGE_TAG}" \
 	    "${IMAGE_NAME}:${IMAGE_TAG}"
 
+#### Tests
+
+test_auth_proxy: IMAGE_NAME = ${AUTH_PROXY_IMAGE_NAME}
+test_auth_proxy: IMAGE_TAG = ${AUTH_PROXY_IMAGE_TAG}
+test_auth_proxy: # image_auth_proxy
+	${CMD} run --rm -it \
+		"${IMAGE_NAME}:${IMAGE_TAG}" \
+		--help
+
+
 test_nvim : IMAGE_NAME = ${NVIM_IMAGE_NAME}
 test_nvim : IMAGE_TAG = ${NVIM_IMAGE_TAG}
 test_nvim: # image_nvim
@@ -195,6 +205,12 @@ test_runner_node: # image_runner_node
 inspect_nvim : IMAGE_NAME = ${NVIM_IMAGE_NAME}
 inspect_nvim : IMAGE_TAG = ${NVIM_IMAGE_TAG}
 inspect_nvim: # image_nvim
+	@${CMD} inspect \
+		"${IMAGE_NAME}:${IMAGE_TAG}"
+
+inspect_auth_proxy: IMAGE_NAME = ${AUTH_PROXY_IMAGE_NAME}
+inspect_auth_proxy: IMAGE_TAG = ${AUTH_PROXY_IMAGE_TAG}
+inspect_auth_proxy: # image_auth_proxy
 	@${CMD} inspect \
 		"${IMAGE_NAME}:${IMAGE_TAG}"
 
