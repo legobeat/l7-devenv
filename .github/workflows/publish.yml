@@ -69,9 +69,7 @@ jobs:
         with:
           context: ${{ matrix.context }}
           file: '${{ matrix.file }}'
-          build-args: |
-            ${{ matrix.build-args }}
-            CADDY_IMAGE=ghcr.io/legobeat/l7-devenv/caddy:${{ github.ref_name }}
+          build-args: ${{ matrix.build-args }}
           tags:  ${{ matrix.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           load: true
@@ -110,6 +108,8 @@ jobs:
             tags: |
               ghcr.io/legobeat/l7-devenv/nvim:latest
               ghcr.io/legobeat/l7-devenv/nvim:${{ github.ref_name }}
+            build-args: |
+              CADDY_IMAGE=ghcr.io/legobeat/l7-devenv/caddy:${{ github.ref_name }}
           - name: node
             file: sidecars/node-runner/Containerfile
             context: .
@@ -117,6 +117,8 @@ jobs:
               ghcr.io/legobeat/l7-devenv/node:latest
               ghcr.io/legobeat/l7-devenv/node:20-bookworm
               ghcr.io/legobeat/l7-devenv/node:20-${{ github.ref_name }}
+            build-args: |
+              CADDY_IMAGE=ghcr.io/legobeat/l7-devenv/caddy:${{ github.ref_name }}
           - name: gpg-vault
             file: sidecars/gpg-vault-pk/Containerfile
             context: .
