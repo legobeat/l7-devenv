@@ -105,10 +105,9 @@ jobs:
           context: sidecars/caddy
           file: sidecars/caddy/Containerfile
           tags:  |
-              ghcr.io/legobeat/l7-devenv/node:latest
-              ghcr.io/legobeat/l7-devenv/node:20-bookworm
-              ghcr.io/legobeat/l7-devenv/node:20-${{ github.ref_name }}
-          #labels: ${{ steps.meta.outputs.labels }}
+              ghcr.io/legobeat/l7-devenv/caddy:latest
+              ghcr.io/legobeat/l7-devenv/caddy:alpine
+              ghcr.io/legobeat/l7-devenv/caddy:${{ github.ref_name }}
           load: true
           push: true
           cache-from: type=gha
