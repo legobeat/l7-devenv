@@ -88,14 +88,8 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: true
-      - run: make IMAGE_NAME=localhost/foo-${{ matrix.image }} IMAGE_TAG=bar CMD=${{ matrix.cmd }} image_${{ matrix.image }}
-        if: ${{ matrix.cmd != '' }}
-        env:
-          CMD: ${{ matrix.cmd }}
-      - run: make IMAGE_NAME=localhost/foo-${{ matrix.image }} IMAGE_TAG=bar image_${{ matrix.image }}
-        if: ${{ matrix.cmd == '' }}
-      - run: ${{ matrix.cmd }} image inspect localhost/foo-${{ matrix.image }}:bar
-        if: ${{ matrix.cmd != '' }}
-      - run: podman image inspect localhost/foo-${{ matrix.image }}:bar
-        if: ${{ matrix.cmd == '' }}
-      - run: make test
+      - run: make image_${{ matrix.image }}
+      - run: make inspect_${{ matrix.image }}
+      - run: make test_${{ matrix.image }}
+    env:
+      CMD: ${{ matrix.cmd }}
