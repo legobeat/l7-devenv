@@ -8,7 +8,77 @@ env:
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
+  # runs first because it generates tls root cert. rest run in parallel
+  publish-image-caddy:
+    runs-on: ubuntu-latest
+    services:
+      registry:
+        image: registry:2
+        ports:
+          - 80:5000
+    permissions:
+      contents: read
+      packages: write
+      attestations: write
+      id-token: write
+    strategy:
+      matrix:
+        include:
+          - name: caddy
+            file: 'sidecars/caddy/Containerfile'
+            context: "sidecars/caddy"
+            tags:  |
+              localhost/l7/caddy:latest
+              ghcr.io/legobeat/l7-devenv/caddy:latest
+              ghcr.io/legobeat/l7-devenv/caddy:alpine
+              ghcr.io/legobeat/l7-devenv/caddy:alpine-${{ github.ref_name }}
+              ghcr.io/legobeat/l7-devenv/caddy:${{ github.ref_name }}
+    # exact duplicate of publish steps for other images. yaml anchors not supported in gha
+    steps:
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@0d4c9c5ea7693da7b068278f7b52bda2a190a446 #v3.2.0
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@8e5442c4ef9f78752691e2d8f8d19755c6f78e81 #v5.5.1
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/${{ matrix.name }}
+
+      - name: allow cleartext http to localhost container registry
+        run: |
+          echo '{"insecure-registries" : [ "localhost" ]}' | sudo tee /etc/docker/daemon.json
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        with:
+          driver-opts: network=host
+
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Build and publish ${{ matrix.name }} image
+        uses: docker/build-push-action@v6
+        with:
+          context: ${{ matrix.context }}
+          file: '${{ matrix.file }}'
+          build-args: ${{ matrix.build-args }}
+          tags:  ${{ matrix.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          load: true
+          push: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
   publish-image:
+    needs: publish-image-caddy
     runs-on: ubuntu-latest
     services:
       registry:
@@ -24,19 +94,34 @@ jobs:
       fail-fast: true
       matrix:
         include:
+          - name: dnsmasq
+            file: sidecars/dnsmasq/Containerfile
+            context: sidecars/dnsmasq
+            tags: |
+              ghcr.io/legobeat/l7-devenv/gpg-vault:latest
+              ghcr.io/legobeat/l7-devenv/gpg-vault:alpine
+              ghcr.io/legobeat/l7-devenv/gpg-vault:${{ github.ref_name }}
+              ghcr.io/legobeat/l7-devenv/gpg-vault:alpine-${{ github.ref_name }}
           - name: nvim
             file: Containerfile
+            context: .
             tags: |
               ghcr.io/legobeat/l7-devenv/nvim:latest
               ghcr.io/legobeat/l7-devenv/nvim:${{ github.ref_name }}
+            build-args: |
+              CADDY_IMAGE=ghcr.io/legobeat/l7-devenv/caddy:${{ github.ref_name }}
           - name: node
             file: sidecars/node-runner/Containerfile
+            context: .
             tags: |
               ghcr.io/legobeat/l7-devenv/node:latest
               ghcr.io/legobeat/l7-devenv/node:20-bookworm
               ghcr.io/legobeat/l7-devenv/node:20-${{ github.ref_name }}
+            build-args: |
+              CADDY_IMAGE=ghcr.io/legobeat/l7-devenv/caddy:${{ github.ref_name }}
           - name: gpg-vault
             file: sidecars/gpg-vault-pk/Containerfile
+            context: .
             tags: |
               ghcr.io/legobeat/l7-devenv/gpg-vault:latest
               ghcr.io/legobeat/l7-devenv/gpg-vault:alpine
@@ -59,8 +144,10 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/${{ matrix.name }}
 
-      - run: |
+      - name: allow cleartext http to localhost container registry
+        run: |
           echo '{"insecure-registries" : [ "localhost" ]}' | sudo tee /etc/docker/daemon.json
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
         with:
@@ -70,44 +157,14 @@ jobs:
         with:
           submodules: true
 
-      # for bundled cert
-      - name: Build and load caddy image
-        uses: docker/build-push-action@v6
-        if: ${{ matrix.name == 'nvim' }}
-        with:
-          context: sidecars/caddy
-          file: sidecars/caddy/Containerfile
-          tags:  |
-              localhost/l7/caddy:latest
-          #labels: ${{ steps.meta.outputs.labels }}
-          load: true
-          push: true
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
       - name: Build and publish ${{ matrix.name }} image
         uses: docker/build-push-action@v6
         with:
-          context: .
+          context: ${{ matrix.context }}
           file: ${{ matrix.file }}
           build-args: ${{ matrix.build-args }}
           tags:  ${{ matrix.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          load: true
-          push: true
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
-      - name: Publish caddy image
-        uses: docker/build-push-action@v6
-        if: ${{ matrix.name == 'nvim' }}
-        with:
-          context: sidecars/caddy
-          file: sidecars/caddy/Containerfile
-          tags:  |
-              ghcr.io/legobeat/l7-devenv/caddy:latest
-              ghcr.io/legobeat/l7-devenv/caddy:alpine
-              ghcr.io/legobeat/l7-devenv/caddy:${{ github.ref_name }}
           load: true
           push: true
           cache-from: type=gha
