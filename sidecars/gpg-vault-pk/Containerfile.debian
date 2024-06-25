@@ -13,4 +13,4 @@ COPY sidecars/gpg-vault-pk/*.sh /usr/local/bin/
 #    scdaemon
 
 # https://imil.net/blog/posts/2020/testing-gpg-keys-with-docker/
-ENV GPG_TTY /dev/gpgtty
+ENV GPG_TTY=/dev/gpgtty
