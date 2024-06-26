@@ -1,6 +1,7 @@
 # syntax=docker/dockerfile:1
+ARG CADDY_IMAGE=localhost/l7/caddy:latest
 ARG NODE_VERSION=20
-FROM localhost/l7/caddy:latest AS fwdproxy
+FROM ${CADDY_IMAGE} AS fwdproxy
 FROM docker.io/node:${NODE_VERSION}-bookworm-slim
 
 RUN apt-get update \
