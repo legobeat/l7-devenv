@@ -6,6 +6,77 @@ logging:
 # root cert is generated in image build
 #auto_https: disable_certs
 apps:
+  http:
+    servers:
+      acngs:
+        listen:
+          - ":3143"
+        automatic_https:
+          disable: false
+        routes:
+          - match:
+            - host:
+              - 'registry.npmjs.org'
+              - 'registry.yarnpkg.com'
+              - 'registry.npmmirror.com'
+              #- 'replicate.npmjs.com'
+            handle:
+              - handler: rewrite
+                uri: '{http.request.host}/{http.request.uri}/'
+              - handler: rewrite
+                path_regexp:
+                  - find: '[^/]$'
+                    replace: '$0/'
+                  - find: '(\.t?gz)/$'
+                    replace: '$1'
+              - handler: reverse_proxy
+                upstreams:
+                  - dial: '{env.PKG_PROXY_HOST}:{env.PKG_PROXY_PORT}'
+                  #transport:
+                    #protocol: http
+                    #versions: ['1.1']
+                    #terminal: true
+      http:
+        listen:
+          - ":80"
+        automatic_https:
+          disable: true
+        routes:
+          - match:
+              - host:
+                - 'registry.npmjs.org'
+                - 'registry.yarnpkg.com'
+                - 'registry.npmmirror.com'
+            handle:
+              - handler: reverse_proxy
+                upstreams:
+                  - dial: '{env.PKG_PROXY_HOST}:{env.PKG_PROXY_PORT}'
+                transport:
+                  protocol: http
+                  versions: ['1.1']
+            terminal: true
+          - match:
+              - host:
+                  - 'github.com'
+                  - '*.github.com'
+                  - 'ghcr.io'
+                  - '*.ghcr.io'
+            handle:
+              - handler: reverse_proxy
+                # proxy_protocol: v2
+                upstreams:
+                  - dial: '{env.GITHUB_PROXY_HOST}:{env.GITHUB_PROXY_PORT}'
+            terminal: true
+          - match: []
+            handle:
+              - handler: reverse_proxy
+                upstreams:
+                  - dial: '{http.request.host}:80'
+                transport:
+                  protocol: http
+                  versions: ['1.1']
+            terminal: true
+
   layer4:
     servers:
       ssh:
@@ -19,17 +90,6 @@ apps:
                 upstreams:
                   - dial:
                       - "github.com:22"
-      http:
-        listen:
-          - ":80"
-        routes:
-          - match:
-              - http: []
-            handle:
-              - handler: proxy
-                upstreams:
-                  - dial:
-                      - "{l4.http.host}:80"
 
       https:
         listen:
@@ -56,6 +116,41 @@ apps:
                 upstreams:
                   - dial:
                     - "#{ $GITHUB_PROXY_HOST }:#{ $GITHUB_PROXY_PORT }"
+                    #tls:
+                    #  renegotiation: once
+          - match:
+             - tls:
+                  sni:
+                    - deb.debian.org
+                    - dl-cdn.alpinelinux.org
+                    - mirrors.fedoraproject.org
+                    - registry.npmjs.org
+                    - registry.yarnpkg.com
+                    - registry.npmmirror.com
+                    - archive.ubuntu.com
+                    - security.ubuntu.com
+            handle:
+              - handler: tls
+                connection_policies:
+                  - alpn:
+                    - http/1.0
+                    - http/1.1
+                    #- http/2
+              # todo: implement invoke in layer4, or figure why dial to acng isn't working directly here
+              # https://caddyserver.com/docs/json/apps/http/servers/routes/handle/invoke/
+              #- handler: invoke
+              #  name: something-acng
+              - handler: proxy
+              #  # proxy_protocol: v2
+                upstreams:
+                  - dial:
+                    - 127.0.0.1:3143
+                    tls:
+                      renegotiation: once
+                    #  use_client_config: false
+                    ##- 127.0.0.1:3142
+                    # working except url part
+                    #- "#{ $PKG_PROXY_HOST }:#{ $PKG_PROXY_PORT }"
           - match:
              - tls:
                   alpn:
@@ -73,7 +168,11 @@ apps:
                 upstreams:
                   - dial:
                       - "{l4.tls.server_name}:443"
-                    tls: {}
+                    tls:
+                      renegotiation: once
+                      use_client_config: false
+                      #next_protos:
+                      #  - http/1.1
   tls:
     certificates:
       automate:

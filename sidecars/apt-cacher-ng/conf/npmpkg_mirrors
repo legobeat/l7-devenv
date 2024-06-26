@@ -1,2 +1,4 @@
-registry.npmjs.org
-registry.yarnpkg.com
+https://registry.npmjs.org/
+https://registry.yarnpkg.com/
+http://registry.npmjs.org/
+http://registry.yarnpkg.com/

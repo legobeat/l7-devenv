@@ -31,7 +31,7 @@ services:
     cap_add:
       - NET_ADMIN
     # todo: dynamic for subnets
-    command: --address="/#/10.7.8.2"
+    command: --address="/#/10.7.8.132"
     networks:
       internal:
         ipv4_address: 10.7.8.133
@@ -44,9 +44,11 @@ services:
     build:
       context: sidecars/apt-cacher-ng
       dockerfile: Containerfile
-    image: localhost/l7/acng
+    image: localhost/l7/apt-cacher-ng
     restart: always
     init: true
+    #cap_drop:
+    #  - all
     networks:
       svcs:
         ipv4_address: 10.7.7.136
@@ -54,6 +56,7 @@ services:
     - "13142:13142"
     volumes:
     - ${HOME}/.local/share/l7ide/apt-cacher-ng/cache:/var/cache/apt-cacher-ng
+    - ${HOME}/.local/share/l7ide/apt-cacher-ng/log:/var/log/apt-cacher-ng
 
   http-proxy:
     build:
@@ -63,11 +66,13 @@ services:
     environment:
       GITHUB_PROXY_HOST: 10.7.7.135
       GITHUB_PROXY_PORT: '8080'
+      PKG_PROXY_HOST: 10.7.7.136
+      PKG_PROXY_PORT: '13142'
     networks:
       internal:
-        ipv4_address: 10.7.8.2
+        ipv4_address: 10.7.8.132
       svcs:
-        ipv4_address: 10.7.7.2
+        ipv4_address: 10.7.7.132
       public:
     ports:
       - 18780:80
