@@ -83,7 +83,12 @@ configure_gh_token
 
 # note: docker is not tested, let me know if you insist and get it working
 cmd="${CONTAINER_CMD:-$(which podman || which docker)}"
-composecmd=$(which podman-compose || which docker-compose)
+if [[ "$(basename "${cmd}")" == "podman" ]]; then
+  # could do backwards compat here by falling back to podman-compose
+  composecmd='podman compose'
+else
+  cmd='docker-compose'
+fi
 
 if [[ -z FORCE_PODMAN_VERSION && "${cmd}" = *podman ]]; then
   podman_version=$(podman version -f json | jq -r .Client.APIVersion)
@@ -96,7 +101,7 @@ LOG_DIR="${LOG_DIR:-${HOME}/.local/share/l7ide/logs}"
 mkdir -p "${LOG_DIR}"
 (cd "${ROOTDIR}" \
 	&& DOCKER_HOST="unix://${CONTAINER_SOCKET}" \
-	  "${composecmd}" up -d >> "${LOG_DIR}/compose.log" 2>> "${LOG_DIR}/compose.err"
+	  ${composecmd} up -d >> "${LOG_DIR}/compose.log" 2>> "${LOG_DIR}/compose.err"
 )
 
 SSH_SOCKET="${SSH_SOCKET:-${SSH_AUTH_SOCK}}"
