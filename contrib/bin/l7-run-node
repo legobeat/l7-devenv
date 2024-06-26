@@ -8,4 +8,12 @@ HOME=/home/node
 PATH=/home/node/.corepack/bin:/usr/local/lib/node_modules/.bin:/usr/local/lib/node_modules/corepack/shims:/home/node/.rbenv/shims:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 "
 
-exec l7-cnt-run "${@}"
+if [[ "$(basename $0)" = "l7-run-node" ]]; then
+  COMMAND="$1"
+  ARGS="${@:2}"
+else
+  COMMAND="$(basename $0)"
+  ARGS="${@}"
+fi
+
+exec l7-cnt-run "${COMMAND}" ${ARGS}

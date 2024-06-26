@@ -2,6 +2,8 @@
 # proxy command to run in ephemeral sibling container
 # expects a container engine socket on $CONTAINER_HOST
 
+[[ -n "$DEBUG" ]] && set -x
+
 if [[ "$(basename $0)" = "l7-cnt-run" ]]; then
   COMMAND="$1"
   ARGS="${@:2}"
@@ -9,8 +11,6 @@ else
   COMMAND="$(basename $0)"
   ARGS="${@}"
 fi
-
-[[ -n "$DEBUG" ]] && set -x
 
 if [ -n "${RUNNER_ENV}"  ]; then
   for e in ${RUNNER_ENV}; do

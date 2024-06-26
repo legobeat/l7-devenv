@@ -165,7 +165,7 @@ COPY --from=nvim-builder     --chown=2:2 /out/plugins /etc/xdg/nvim/pack/l7ide/s
 COPY --from=tsserver-builder --chown=2:2 /out/node_modules/ /usr/lib/node_modules/
 COPY contrib/bin/* contrib/*/bin/*       /usr/local/bin/
 ARG NODE_BINS='allow-scripts  corepack glob  lavamoat-ls mkdirp node-gyp node-which nopt npx pnpx resolve semver yarn-deduplicate'
-RUN bash -c 'for bin in ${NODE_BINS}; do ln -s l7-cnt-run "/usr/local/bin/${bin}"; done'
+RUN bash -c 'for bin in ${NODE_BINS}; do ln -s l7-run-node "/usr/local/bin/${bin}"; done'
 
 COPY skel/.config/containers/containers.conf /etc/containers/containers.conf
 COPY --chown=${UID}:${GID} skel/ /home/user/
