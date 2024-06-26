@@ -137,6 +137,7 @@ jobs:
       fail-fast: false
       matrix:
         image:
+          - acng
           - auth_proxy
           - caddy
           - dnsmasq

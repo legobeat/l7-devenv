@@ -55,8 +55,10 @@ mkdir -p "${CONF_DIR}/ssh.d" "${LOCAL_DIR}/ssh" "${CONF_DIR}/git"
 touch "${CONF_DIR}/git/config"
 # for node modules cache mounts
 mkdir -p "${HOME}"/.local/share/l7ide/node-runner/{yarn/cache/classic,yarn/cache/berry,npm/cache,node/cache}
+# todo: $HOME in container makes it try mapping to /home/user regardless
 mkdir -p ~/.local/share/l7ide/gh && touch ~/.local/share/l7ide/gh/hosts.yml && chmod 0600 ~/.local/share/l7ide/gh/hosts.yml
 mkdir -p ~/.local/share/l7ide/go-runner/go
+mkdir -p ~/.local/share/l7ide/apt-cacher-ng/cache
 
 configure_gh_token() {
   mkdir -p "${CONF_DIR}/git-auth-proxy"

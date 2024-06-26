@@ -13,6 +13,8 @@ CADDY_IMAGE_NAME := localhost/l7/caddy
 CADDY_IMAGE_TAG  := latest
 DNSMASQ_IMAGE_NAME := localhost/l7/dnsmasq
 DNSMASQ_IMAGE_TAG  := latest
+ACNG_IMAGE_NAME := localhost/l7/apt-cacher-ng
+ACNG_IMAGE_TAG  := latest
 GO_RUNNER_IMAGE_NAME := localhost/l7/go
 GO_RUNNER_IMAGE_TAG  := bookworm
 USER_SHELL ?= /usr/bin/zsh
@@ -67,6 +69,14 @@ image_gpg_pk:
 		-t "${IMAGE_NAME}:${IMAGE_TAG}-debian" \
 		-f './sidecars/gpg-vault-pk/Containerfile.debian' \
 		.
+image_acng: IMAGE_NAME = ${ACNG_IMAGE_NAME}
+image_acng: IMAGE_TAG = ${ACNG_IMAGE_TAG}
+image_acng:
+	${CMD} buildx build \
+		${BUILD_OPTIONS} \
+		-t "${IMAGE_NAME}:${IMAGE_TAG}" \
+		-f './sidecars/apt-cacher-ng/Containerfile' \
+		./sidecars/apt-cacher-ng
 
 image_nvim : IMAGE_NAME = ${NVIM_IMAGE_NAME}
 image_nvim : IMAGE_TAG = ${NVIM_IMAGE_TAG}
@@ -217,6 +227,13 @@ test_dnsmasq: # image_dnsmasq
 		"${IMAGE_NAME}:${IMAGE_TAG}" \
 		dnsmasq --version
 
+test_acng: IMAGE_NAME = ${ACNG_IMAGE_NAME}
+test_acng: IMAGE_TAG = ${ACNG_IMAGE_TAG}
+test_acng: # image_acng
+	${CMD} run --rm \
+		"${IMAGE_NAME}:${IMAGE_TAG}" \
+		apt-cacher-ng -h
+
 test_gpg_pk: IMAGE_NAME = ${GPG_IMAGE_NAME}
 test_gpg_pk: IMAGE_TAG = ${GPG_IMAGE_TAG}
 test_gpg_pk: # image_gpg_pk
@@ -261,6 +278,12 @@ inspect_dnsmasq: IMAGE_NAME = ${DNSMASQ_IMAGE_NAME}
 inspect_dnsmasq: IMAGE_TAG = ${DNSMASQ_IMAGE_TAG}
 inspect_dnsmasq: # image_dnsmasq
 	${CMD} inspect \
+		"${IMAGE_NAME}:${IMAGE_TAG}"
+
+inspect_acng: IMAGE_NAME = ${ACNG_IMAGE_NAME}
+inspect_acng: IMAGE_TAG = ${ACNG_IMAGE_TAG}
+inspect_acng: # image_acng
+	@${CMD} inspect \
 		"${IMAGE_NAME}:${IMAGE_TAG}"
 
 inspect_runner_node: IMAGE_NAME = ${RUNNER_IMAGE_NAME}
@@ -312,7 +335,7 @@ export_runner_node: # image_runner_node
 submodules:
 	@git submodule update --checkout --init --recursive --rebase
 
-images: image_caddy image_dnsmasq image_nvim image_runner_node image_gpg_pk
+images: image_caddy image_dnsmasq image_nvim image_runner_node image_gpg_pk image_acng
 
 test: test_nvim test_runner_node test_gpg_pk
 

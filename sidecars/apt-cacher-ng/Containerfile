@@ -1,0 +1,31 @@
+FROM ubuntu:noble-20240605
+
+ENV APT_CACHER_NG_VERSION=3.7.4
+ARG UID=100
+ARG GID=101
+
+RUN apt-get update \
+ && DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y \
+      apt-cacher-ng=${APT_CACHER_NG_VERSION}* ca-certificates wget \
+ && rm -rf \
+      /var/lib/apt/* /var/cache/apt/* \
+      /usr/share/doc /usr/share/doc-base /usr/share/man \
+      /usr/share/locale /usr/share/zoneinfo \
+ && mkdir -p \
+  /var/cache/apt-cacher-ng \
+  /var/log/apt-cacher-ng \
+  /var/run/apt-cacher-ng \
+ && chown -R "${UID}:${GID}" \
+  /var/cache/apt-cacher-ng \
+  /var/log/apt-cacher-ng \
+  /var/run/apt-cacher-ng
+
+COPY conf/* /etc/apt-cacher-ng/
+
+COPY entrypoint.sh /sbin/entrypoint.sh
+
+RUN chmod 755 /sbin/entrypoint.sh
+
+USER ${UID}:${GID}
+
+ENTRYPOINT ["/sbin/entrypoint.sh"]
