@@ -8,7 +8,7 @@ env:
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
-  # runs first because it generates tls root cert. rest run in parallel
+  # build caddy first because it generates tls root cert. rest run in parallel
   publish-image-caddy:
     runs-on: ubuntu-latest
     services:

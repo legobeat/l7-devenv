@@ -18,15 +18,41 @@ jobs:
         # test with nonstandard uid and gid
         build-args:
           - |
+            CADDY_IMAGE=localhost/l7/caddy:latest
             UID=1234
             GID=1235
           - |
-            UID=1000
-            GID=1000
-          - ''
+            CADDY_IMAGE=localhost/l7/caddy:latest
+        include:
+          - name: auth-proxy
+            file: sidecars/git-auth-proxy/Dockerfile
+            context: sidecars/git-auth-proxy
+            tags: localhost/l7/auth-proxy:latest
+          - name: dnsmasq
+            file: sidecars/dnsmasq/Containerfile
+            context: sidecars/dnsmasq
+            tags: localhost/l7/dnsmasq:latest
+          - name: gpg-vault
+            file: sidecars/gpg-vault-pk/Containerfile
+            context: .
+            tags: localhost/l7/gpg-vault:latest
+          - name: node
+            file: sidecars/node-runner/Containerfile
+            context: .
+            tags: |
+              localhost/l7/node:latest
+              localhost/l7/node:20-bookworm
+          - name: nvim
+            file: Containerfile
+            context: .
+            tags: localhost/l7/nvim:latest
     steps:
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
+
+      - name: allow cleartext http to localhost container registry
+        run: |
+          echo '{"insecure-registries" : [ "localhost" ]}' | sudo tee /etc/docker/daemon.json
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -38,50 +64,26 @@ jobs:
           submodules: true
 
       - name: Build and load caddy image
+        if: ${{ matrix.name == 'nvim' || matrix.name == 'node' }}
         uses: docker/build-push-action@v6
         with:
           context: sidecars/caddy
           file: sidecars/caddy/Containerfile
-          load: true
           tags: localhost/l7/caddy:latest
+          load: true
           push: true
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      - name: Build and load nvim image
+      - name: Build and load ${{ matrix.name }} image
         uses: docker/build-push-action@v6
         with:
-          context: .
-          file: Containerfile
+          context: ${{ matrix.context }}
+          file: ${{ matrix.file }}
           build-args: ${{ matrix.build-args }}
+          tags:  ${{ matrix.tags }}
           load: true
-          tags: l7/nvim:latest
-          # could enable push to gh registry
-          push: false
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
-      - name: Build and load node-runner image
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          file: sidecars/node-runner/Containerfile
-          build-args: ${{ matrix.build-args }}
-          load: true
-          tags: l7/node:20-bookworm
-          push: false
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
-      - name: Build and load gpg-vault-pk image
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          file: sidecars/gpg-vault-pk/Containerfile
-          build-args: ${{ matrix.build-args }}
-          load: true
-          tags: l7/gpg-vault:pk
-          push: false
+          push: true
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
