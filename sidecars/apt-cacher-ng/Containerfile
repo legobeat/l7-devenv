@@ -26,6 +26,5 @@ COPY entrypoint.sh /sbin/entrypoint.sh
 
 RUN chmod 755 /sbin/entrypoint.sh
 
-USER ${UID}:${GID}
 
 ENTRYPOINT ["/sbin/entrypoint.sh"]
