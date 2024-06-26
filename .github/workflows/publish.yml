@@ -98,10 +98,10 @@ jobs:
             file: sidecars/dnsmasq/Containerfile
             context: sidecars/dnsmasq
             tags: |
-              ghcr.io/legobeat/l7-devenv/gpg-vault:latest
-              ghcr.io/legobeat/l7-devenv/gpg-vault:alpine
-              ghcr.io/legobeat/l7-devenv/gpg-vault:${{ github.ref_name }}
-              ghcr.io/legobeat/l7-devenv/gpg-vault:alpine-${{ github.ref_name }}
+              ghcr.io/legobeat/l7-devenv/dnsmasq:latest
+              ghcr.io/legobeat/l7-devenv/dnsmasq:alpine
+              ghcr.io/legobeat/l7-devenv/dnsmasq:${{ github.ref_name }}
+              ghcr.io/legobeat/l7-devenv/dnsmasq:alpine-${{ github.ref_name }}
           - name: nvim
             file: Containerfile
             context: .
