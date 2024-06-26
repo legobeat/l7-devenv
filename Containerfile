@@ -184,6 +184,7 @@ RUN cat /home/user/.env >> /etc/profile \
 
 # https://docs.fedoraproject.org/en-US/quick-docs/using-shared-system-certificates/
 COPY --from=fwdproxy \
+  --chmod=444 \
   /data/caddy/pki/authorities/local/root.crt \
   /etc/pki/ca-trust/source/anchors/l7-fwd-proxy.crt
 RUN update-ca-trust
