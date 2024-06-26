@@ -92,6 +92,8 @@ jobs:
       matrix:
         image:
           - auth_proxy
+          - caddy
+          - dnsmasq
           - gpg_pk
           - nvim
           - runner_node

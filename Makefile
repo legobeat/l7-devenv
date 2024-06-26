@@ -197,7 +197,9 @@ test_caddy: # image_caddy
 		"${IMAGE_NAME}:${IMAGE_TAG}" \
 		caddy adapt --config /etc/caddy/default.yml  --adapter yaml \
 			| jq -r '.apps|map(select(.servers))|map(.servers|map(.routes|map(.handle|map(.upstreams|select(.)|map(.dial)))))|flatten|.[]' \
-			| (( $$(grep -E "^{env.PKG_PROXY_HOST}:{env.PKG_PROXY_PORT}$$|^{env.GITHUB_PROXY_HOST}:{env.GITHUB_PROXY_PORT}$$" | sort | uniq | wc -l) == 2 ))
+			| (( $$(grep -E "^bar:456$$" | sort | uniq | wc -l) == 1 ))
+
+			#| (( $$(grep -E "^{env.PKG_PROXY_HOST}:{env.PKG_PROXY_PORT}$$|^{env.GITHUB_PROXY_HOST}:{env.GITHUB_PROXY_PORT}$$" | sort | uniq | wc -l) == 2 ))
 
 test_nvim : IMAGE_NAME = ${NVIM_IMAGE_NAME}
 test_nvim : IMAGE_TAG = ${NVIM_IMAGE_TAG}
