@@ -58,7 +58,7 @@ image_gpg_pk:
 	${CMD} buildx build \
 		${BUILD_OPTIONS} \
 		-t "${IMAGE_NAME}:${IMAGE_TAG}" \
-		-t "${IMAGE_NAME}:${IMAGE_TAG}" \
+		-t "${IMAGE_NAME}:latest" \
 		-f './sidecars/gpg-vault-pk/Containerfile' \
 		.
 	${CMD} buildx build \
