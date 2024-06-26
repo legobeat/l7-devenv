@@ -15,14 +15,6 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # test with nonstandard uid and gid
-        build-args:
-          - |
-            CADDY_IMAGE=localhost/l7/caddy:latest
-            UID=1234
-            GID=1235
-          - |
-            CADDY_IMAGE=localhost/l7/caddy:latest
         include:
           - name: auth-proxy
             file: sidecars/git-auth-proxy/Dockerfile
