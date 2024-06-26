@@ -2,7 +2,7 @@ FROM docker.io/library/caddy:2.8-builder-alpine AS builder
 
 RUN xcaddy build \
     #--with github.com/mholt/caddy-l4=github.com/unwebio/caddy-l4@bdc5d0e \
-    --with github.com/mholt/caddy-l4 \
+    --with github.com/mholt/caddy-l4=github.com/legobeat/caddy-l4@59c2e01 \
     --with github.com/abiosoft/caddy-yaml
 
 FROM docker.io/library/caddy:2.8-alpine
