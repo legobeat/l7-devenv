@@ -39,6 +39,22 @@ services:
         ipv4_address: 10.7.7.133
       public:
 
+  # package cache
+  apt-cacher-ng:
+    build:
+      context: sidecars/apt-cacher-ng
+      dockerfile: Containerfile
+    image: localhost/l7/acng
+    restart: always
+    init: true
+    networks:
+      svcs:
+        ipv4_address: 10.7.7.136
+    ports:
+    - "13142:13142"
+    volumes:
+    - ${HOME}/.local/share/l7ide/apt-cacher-ng/cache:/var/cache/apt-cacher-ng
+
   http-proxy:
     build:
       context: sidecars/caddy

@@ -94,6 +94,14 @@ jobs:
       fail-fast: true
       matrix:
         include:
+          - name: apt-cacher-ng
+            file: sidecars/apt-cacher-ng/Containerfile
+            context: sidecars/apt-cacher-ng
+            tags: |
+              ghcr.io/legobeat/l7-devenv/apt-cacher-ng:latest
+              ghcr.io/legobeat/l7-devenv/apt-cacher-ng:bookworm
+              ghcr.io/legobeat/l7-devenv/apt-cacher-ng:${{ github.ref_name }}
+              ghcr.io/legobeat/l7-devenv/apt-cacher-ng:bookworm-${{ github.ref_name }}
           - name: auth-proxy
             file: sidecars/git-auth-proxy/Dockerfile
             context: sidecars/git-auth-proxy
