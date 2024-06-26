@@ -162,6 +162,8 @@ ${cmd} run --rm -it \
   -v "${RESOLV_CONF_PATH}:/etc/resolv.conf:ro" \
   -w "${CWD}" \
   --mount type=tmpfs,tmpfs-size=2G,destination=/tmp,U=true,tmpfs-mode=0777 \
+  -e "L7_COMPOSE_NETWORK_NAME_INTERNAL=$(get_compose_network_name 'internal')" \
+  -e "L7_RESOLV_CONF_PATH=${RESOLV_CONF_PATH}" \
   -e "CONTAINER_HOST=unix:///run/docker.sock" \
   -e GO_RUNNER_IMAGE=localhost/l7/go:1.20-bookworm \
   -e NODE_RUNNER_IMAGE=localhost/l7/node:20-bookworm \

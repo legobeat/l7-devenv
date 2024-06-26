@@ -1,5 +1,6 @@
 # syntax=docker/dockerfile:1
 ARG NODE_VERSION=20
+FROM localhost/l7/caddy:latest AS fwdproxy
 FROM docker.io/node:${NODE_VERSION}-bookworm-slim
 
 RUN apt-get update \
@@ -32,7 +33,15 @@ COPY sidecars/node-runner/package.json \
 RUN npm ci --omit=dev --ignore-scripts \
   && mv node_modules/* node_modules/.bin /usr/local/lib/node_modules/
 
+COPY --from=fwdproxy \
+  /data/caddy/pki/authorities/local/root.crt \
+  # note: the .crt ending is important
+  /usr/local/share/ca-certificates/l7-fwd-proxy.crt
+
+RUN DEBIAN_FRONTEND=noninteractive dpkg-reconfigure ca-certificates
+
 ####
+
 USER ${UID}:${GID}
 ENV HOME=/home/node
 # fix broken ipv6 on nodejs v20
@@ -54,8 +63,7 @@ RUN ./install-package-managers.sh \
 
 ENV SHELL=${SHELL}
 
-COPY contrib/l*-scripts/bin/*      /usr/local/bin/
-
+COPY contrib/l*-scripts/bin/*    /usr/local/bin/
 COPY --chown=${UID}:${GID} skel/ /home/node/
 
 ENV PATH=/home/node/.corepack/bin:${PATH}
