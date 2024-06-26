@@ -1,7 +1,7 @@
 logging:
   logs:
     default:
-      level: DEBUG
+      level: INFO
 
 # root cert is generated in image build
 #auto_https: disable_certs
