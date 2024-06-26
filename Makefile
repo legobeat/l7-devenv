@@ -375,3 +375,7 @@ test_e2e_node_corepack: # image_nvim
 test_e2e_ghauth:
 	set -e
 	./devenv.sh gh auth status
+
+test_e2e_lsp_typescript:
+	set -e
+	IMAGE=localhost/l7-test/nvim-ht:latest ./devenv.sh bash -l -Ec test/lsp-js/ht-test-1-1.sh
