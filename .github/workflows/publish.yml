@@ -94,6 +94,12 @@ jobs:
       fail-fast: true
       matrix:
         include:
+          - name: auth-proxy
+            file: sidecars/git-auth-proxy/Dockerfile
+            context: sidecars/git-auth-proxy
+            tags: |
+              ghcr.io/legobeat/l7-devenv/auth-proxy:latest
+              ghcr.io/legobeat/l7-devenv/auth-proxy:${{ github.ref_name }}
           - name: dnsmasq
             file: sidecars/dnsmasq/Containerfile
             context: sidecars/dnsmasq
@@ -102,14 +108,14 @@ jobs:
               ghcr.io/legobeat/l7-devenv/dnsmasq:alpine
               ghcr.io/legobeat/l7-devenv/dnsmasq:${{ github.ref_name }}
               ghcr.io/legobeat/l7-devenv/dnsmasq:alpine-${{ github.ref_name }}
-          - name: nvim
-            file: Containerfile
+          - name: gpg-vault
+            file: sidecars/gpg-vault-pk/Containerfile
             context: .
             tags: |
-              ghcr.io/legobeat/l7-devenv/nvim:latest
-              ghcr.io/legobeat/l7-devenv/nvim:${{ github.ref_name }}
-            build-args: |
-              CADDY_IMAGE=ghcr.io/legobeat/l7-devenv/caddy:${{ github.ref_name }}
+              ghcr.io/legobeat/l7-devenv/gpg-vault:latest
+              ghcr.io/legobeat/l7-devenv/gpg-vault:alpine
+              ghcr.io/legobeat/l7-devenv/gpg-vault:${{ github.ref_name }}
+              ghcr.io/legobeat/l7-devenv/gpg-vault:alpine-${{ github.ref_name }}
           - name: node
             file: sidecars/node-runner/Containerfile
             context: .
@@ -119,14 +125,14 @@ jobs:
               ghcr.io/legobeat/l7-devenv/node:20-${{ github.ref_name }}
             build-args: |
               CADDY_IMAGE=ghcr.io/legobeat/l7-devenv/caddy:${{ github.ref_name }}
-          - name: gpg-vault
-            file: sidecars/gpg-vault-pk/Containerfile
+          - name: nvim
+            file: Containerfile
             context: .
             tags: |
-              ghcr.io/legobeat/l7-devenv/gpg-vault:latest
-              ghcr.io/legobeat/l7-devenv/gpg-vault:alpine
-              ghcr.io/legobeat/l7-devenv/gpg-vault:${{ github.ref_name }}
-              ghcr.io/legobeat/l7-devenv/gpg-vault:alpine-${{ github.ref_name }}
+              ghcr.io/legobeat/l7-devenv/nvim:latest
+              ghcr.io/legobeat/l7-devenv/nvim:${{ github.ref_name }}
+            build-args: |
+              CADDY_IMAGE=ghcr.io/legobeat/l7-devenv/caddy:${{ github.ref_name }}
     steps:
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
