@@ -50,10 +50,6 @@ if [ -z "${CWD}" ]; then
 fi
 
 export XDG_RUNTIME_DIR="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"
-# compose, used for sidecars and leaked into de
-CONTAINER_SOCKET="${CONTAINER_SOCKET:-${XDG_RUNTIME_DIR}/podman/podman.sock}"
-# used to run de itself. could be separate
-export DOCKER_HOST="${DOCKER_HOST:-unix://${XDG_RUNTIME_DIR}/podman/podman.sock}"
 
 mkdir -p "${CONF_DIR}/ssh.d" "${LOCAL_DIR}/ssh" "${CONF_DIR}/git"
 touch "${CONF_DIR}/git/config"
@@ -85,16 +81,19 @@ configure_gh_token
 cmd="${CONTAINER_CMD:-$(which podman || which docker)}"
 if [[ "$(basename "${cmd}")" == "podman" ]]; then
   # could do backwards compat here by falling back to podman-compose
-  composecmd='podman compose'
+  composecmd="${cmd} compose"
+  # compose, used for sidecars and leaked into de
+  CONTAINER_SOCKET="${CONTAINER_SOCKET:-${XDG_RUNTIME_DIR}/podman/podman.sock}"
+  # used to run de itself. could be separate
+  export DOCKER_HOST="${DOCKER_HOST:-unix://${XDG_RUNTIME_DIR}/podman/podman.sock}"
+  if [[ -z FORCE_PODMAN_VERSION ]]; then
+    podman_version=$(${cmd} version -f json | jq -r .Client.APIVersion)
+    if [[ ! "${podman_version}" = [45]* ]]; then
+      echo "Incompatible Podman API version ${podman_version}, needs 4.x"
+    fi
+  fi
 else
   composecmd='docker-compose'
-fi
-
-if [[ -z FORCE_PODMAN_VERSION && "${cmd}" = *podman ]]; then
-  podman_version=$(podman version -f json | jq -r .Client.APIVersion)
-  if [[ ! "${podman_version}" = 4* ]]; then
-    echo "Incompatible Podman API version ${podman_version}, needs 4.x"
-  fi
 fi
 
 LOG_DIR="${LOG_DIR:-${HOME}/.local/share/l7ide/logs}"
