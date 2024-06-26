@@ -1,3 +1,4 @@
+SHELL := /bin/bash
 IMAGE_NAME :=
 IMAGE_TAG  :=
 NVIM_IMAGE_NAME := localhost/l7/nvim
