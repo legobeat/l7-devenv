@@ -177,6 +177,27 @@ test_auth_proxy: # image_auth_proxy
 		"${IMAGE_NAME}:${IMAGE_TAG}" \
 		--help
 
+test_caddy: IMAGE_NAME = ${CADDY_IMAGE_NAME}
+test_caddy: IMAGE_TAG = ${CADDY_IMAGE_TAG}
+test_caddy: # image_caddy
+	${CMD} run --rm -it \
+		-e GITHUB_PROXY_HOST=bar \
+		-e GITHUB_PROXY_PORT=456 \
+		-e PKG_PROXY_HOST=foo \
+		-e PKG_PROXY_PORT=1234 \
+		"${IMAGE_NAME}:${IMAGE_TAG}" \
+		caddy validate --config /etc/caddy/default.yml  --adapter yaml
+	# simply test that expected hostport placeholders appear in config output
+	# does not actually test the config consistency
+	${CMD} run --rm -it \
+		-e GITHUB_PROXY_HOST=bar \
+		-e GITHUB_PROXY_PORT=456 \
+		-e PKG_PROXY_HOST=foo \
+		-e PKG_PROXY_PORT=1234 \
+		"${IMAGE_NAME}:${IMAGE_TAG}" \
+		caddy adapt --config /etc/caddy/default.yml  --adapter yaml \
+			| jq -r '.apps|map(select(.servers))|map(.servers|map(.routes|map(.handle|map(.upstreams|select(.)|map(.dial)))))|flatten|.[]' \
+			| (( $$(grep -E "^{env.PKG_PROXY_HOST}:{env.PKG_PROXY_PORT}$$|^{env.GITHUB_PROXY_HOST}:{env.GITHUB_PROXY_PORT}$$" | sort | uniq | wc -l) == 2 ))
 
 test_nvim : IMAGE_NAME = ${NVIM_IMAGE_NAME}
 test_nvim : IMAGE_TAG = ${NVIM_IMAGE_TAG}
@@ -185,6 +206,13 @@ test_nvim: # image_nvim
 		--entrypoint sh \
 		"${IMAGE_NAME}:${IMAGE_TAG}" \
 		-c 'nvim --version'
+
+test_dnsmasq: IMAGE_NAME = ${DNSMASQ_IMAGE_NAME}
+test_dnsmasq: IMAGE_TAG = ${DNSMASQ_IMAGE_TAG}
+test_dnsmasq: # image_dnsmasq
+	${CMD} run --rm -it \
+		"${IMAGE_NAME}:${IMAGE_TAG}" \
+		dnsmasq --version
 
 test_gpg_pk: IMAGE_NAME = ${GPG_IMAGE_NAME}
 test_gpg_pk: IMAGE_TAG = ${GPG_IMAGE_TAG}
@@ -217,6 +245,18 @@ inspect_auth_proxy: # image_auth_proxy
 inspect_gpg_pk: IMAGE_NAME = ${GPG_IMAGE_NAME}
 inspect_gpg_pk: IMAGE_TAG = ${GPG_IMAGE_TAG}
 inspect_gpg_pk: # image_gpg_pk
+	@${CMD} inspect \
+		"${IMAGE_NAME}:${IMAGE_TAG}"
+
+inspect_caddy: IMAGE_NAME = ${CADDY_IMAGE_NAME}
+inspect_caddy: IMAGE_TAG = ${CADDY_IMAGE_TAG}
+inspect_caddy: # image_caddy
+	@${CMD} inspect \
+		"${IMAGE_NAME}:${IMAGE_TAG}"
+
+inspect_dnsmasq: IMAGE_NAME = ${DNSMASQ_IMAGE_NAME}
+inspect_dnsmasq: IMAGE_TAG = ${DNSMASQ_IMAGE_TAG}
+inspect_dnsmasq: # image_dnsmasq
 	@${CMD} inspect \
 		"${IMAGE_NAME}:${IMAGE_TAG}"
 
