@@ -87,7 +87,7 @@ if [[ "$(basename "${cmd}")" == "podman" ]]; then
   # could do backwards compat here by falling back to podman-compose
   composecmd='podman compose'
 else
-  cmd='docker-compose'
+  composecmd='docker-compose'
 fi
 
 if [[ -z FORCE_PODMAN_VERSION && "${cmd}" = *podman ]]; then
