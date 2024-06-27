@@ -20,7 +20,7 @@ BUILD_OPTIONS :=
 EXTRA_PKGS := zsh podman-remote
 UID:=$(shell id -u)
 GID:=$(shell id -g)
-CMD:=$(shell which podman || which docker)
+CMD := $(shell which podman || which docker)
 
 install:
 	./scripts/install-command.sh
@@ -174,14 +174,14 @@ image_runner_node: image_runner_node_20 # image_runner_node_18 image_runner_node
 test_auth_proxy: IMAGE_NAME = ${AUTH_PROXY_IMAGE_NAME}
 test_auth_proxy: IMAGE_TAG = ${AUTH_PROXY_IMAGE_TAG}
 test_auth_proxy: # image_auth_proxy
-	${CMD} run --rm -it \
+	${CMD} run --rm \
 		"${IMAGE_NAME}:${IMAGE_TAG}" \
 		--help
 
 test_caddy: IMAGE_NAME = ${CADDY_IMAGE_NAME}
 test_caddy: IMAGE_TAG = ${CADDY_IMAGE_TAG}
 test_caddy: # image_caddy
-	${CMD} run --rm -it \
+	${CMD} run --rm \
 		-e GITHUB_PROXY_HOST=bar \
 		-e GITHUB_PROXY_PORT=456 \
 		-e PKG_PROXY_HOST=foo \
@@ -190,7 +190,7 @@ test_caddy: # image_caddy
 		caddy validate --config /etc/caddy/default.yml  --adapter yaml
 	# simply test that expected hostport placeholders appear in config output
 	# does not actually test the config consistency
-	${CMD} run --rm -it \
+	${CMD} run --rm \
 		-e GITHUB_PROXY_HOST=bar \
 		-e GITHUB_PROXY_PORT=456 \
 		-e PKG_PROXY_HOST=foo \
@@ -205,7 +205,7 @@ test_caddy: # image_caddy
 test_nvim : IMAGE_NAME = ${NVIM_IMAGE_NAME}
 test_nvim : IMAGE_TAG = ${NVIM_IMAGE_TAG}
 test_nvim: # image_nvim
-	${CMD} run --rm -it \
+	${CMD} run --rm \
 		--entrypoint sh \
 		"${IMAGE_NAME}:${IMAGE_TAG}" \
 		-c 'nvim --version'
@@ -213,21 +213,21 @@ test_nvim: # image_nvim
 test_dnsmasq: IMAGE_NAME = ${DNSMASQ_IMAGE_NAME}
 test_dnsmasq: IMAGE_TAG = ${DNSMASQ_IMAGE_TAG}
 test_dnsmasq: # image_dnsmasq
-	${CMD} run --rm -it \
+	${CMD} run --rm \
 		"${IMAGE_NAME}:${IMAGE_TAG}" \
 		dnsmasq --version
 
 test_gpg_pk: IMAGE_NAME = ${GPG_IMAGE_NAME}
 test_gpg_pk: IMAGE_TAG = ${GPG_IMAGE_TAG}
 test_gpg_pk: # image_gpg_pk
-	${CMD} run --rm -it \
+	${CMD} run --rm \
 		"${IMAGE_NAME}:${IMAGE_TAG}" \
 		gpg --version
 
 test_runner_node: IMAGE_NAME = ${RUNNER_IMAGE_NAME}
 test_runner_node: IMAGE_TAG = ${RUNNER_IMAGE_TAG}
 test_runner_node: # image_runner_node
-	${CMD} run --rm -it \
+	${CMD} run --rm \
 		"${IMAGE_NAME}:${IMAGE_TAG}" \
 		-c 'node --version'
 
@@ -236,7 +236,7 @@ test_runner_node: # image_runner_node
 inspect_nvim : IMAGE_NAME = ${NVIM_IMAGE_NAME}
 inspect_nvim : IMAGE_TAG = ${NVIM_IMAGE_TAG}
 inspect_nvim: # image_nvim
-	@${CMD} inspect \
+	${CMD} inspect \
 		"${IMAGE_NAME}:${IMAGE_TAG}"
 
 inspect_auth_proxy: IMAGE_NAME = ${AUTH_PROXY_IMAGE_NAME}
@@ -260,7 +260,7 @@ inspect_caddy: # image_caddy
 inspect_dnsmasq: IMAGE_NAME = ${DNSMASQ_IMAGE_NAME}
 inspect_dnsmasq: IMAGE_TAG = ${DNSMASQ_IMAGE_TAG}
 inspect_dnsmasq: # image_dnsmasq
-	@${CMD} inspect \
+	${CMD} inspect \
 		"${IMAGE_NAME}:${IMAGE_TAG}"
 
 inspect_runner_node: IMAGE_NAME = ${RUNNER_IMAGE_NAME}
@@ -269,9 +269,69 @@ inspect_runner_node: # image_runner_node
 	@${CMD} inspect \
 		"${IMAGE_NAME}:${IMAGE_TAG}"
 
+
+# save jobs - it's really about time to template this makefile
+export_nvim : IMAGE_NAME = ${NVIM_IMAGE_NAME}
+export_nvim : IMAGE_TAG = ${NVIM_IMAGE_TAG}
+export_nvim: # image_nvim
+	@${CMD} save \
+		"${IMAGE_NAME}:${IMAGE_TAG}"
+
+export_auth_proxy: IMAGE_NAME = ${AUTH_PROXY_IMAGE_NAME}
+export_auth_proxy: IMAGE_TAG = ${AUTH_PROXY_IMAGE_TAG}
+export_auth_proxy: # image_auth_proxy
+	@@${CMD} save \
+		"${IMAGE_NAME}:${IMAGE_TAG}"
+
+export_gpg_pk: IMAGE_NAME = ${GPG_IMAGE_NAME}
+export_gpg_pk: IMAGE_TAG = ${GPG_IMAGE_TAG}
+export_gpg_pk: # image_gpg_pk
+	@@${CMD} save \
+		"${IMAGE_NAME}:${IMAGE_TAG}"
+
+export_caddy: IMAGE_NAME = ${CADDY_IMAGE_NAME}
+export_caddy: IMAGE_TAG = ${CADDY_IMAGE_TAG}
+export_caddy: # image_caddy
+	@@${CMD} save \
+		"${IMAGE_NAME}:${IMAGE_TAG}"
+
+export_dnsmasq: IMAGE_NAME = ${DNSMASQ_IMAGE_NAME}
+export_dnsmasq: IMAGE_TAG = ${DNSMASQ_IMAGE_TAG}
+export_dnsmasq: # image_dnsmasq
+	@${CMD} save \
+		"${IMAGE_NAME}:${IMAGE_TAG}"
+
+export_runner_node: IMAGE_NAME = ${RUNNER_IMAGE_NAME}
+export_runner_node: IMAGE_TAG = ${RUNNER_IMAGE_TAG}
+export_runner_node: # image_runner_node
+	@@${CMD} save \
+		"${IMAGE_NAME}:${IMAGE_TAG}"
+
+####
+
 submodules:
 	@git submodule update --checkout --init --recursive --rebase
 
 images: image_caddy image_dnsmasq image_nvim image_runner_node image_gpg_pk
 
 test: test_nvim test_runner_node test_gpg_pk
+
+test_e2e_curl:
+	set -e
+	@for url in \
+		"https://github.com/" \
+		"https://github.com/actions/example-services/pulls" \
+	; do \
+		result=$$(./devenv.sh \
+			curl -f -sSL --tlsv1.2 "$${url}" -o/dev/null \
+			-w '%{exitcode}:%{response_code}:%{ssl_verify_result}___%{certs}' \
+			| head -n4 \
+		); \
+		echo "$$result" | grep -Ez --quiet "^0:200:0___.*Issuer:.*Caddy" \
+			&& echo "pass $$url" \
+			|| echo "fail $$url $$(echo "$$result" | head -n3)"; \
+	done
+
+test_e2e_ghauth:
+	set -e
+	./devenv.sh gh auth status
