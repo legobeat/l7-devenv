@@ -67,7 +67,7 @@ ENV SHELL=${SHELL}
 COPY contrib/l*-scripts/bin/*    /usr/local/bin/
 COPY --chown=${UID}:${GID} skel/ /home/node/
 
-ENV PATH=/home/node/.corepack/bin:/usr/local/lib/node_modules/.bin:/usr/lib/node_modules/.bin:${PATH}
+ENV PATH=/home/node/.corepack/bin:/usr/local/lib/node_modules/.bin:${PATH}
 
 WORKDIR /src
 ENTRYPOINT ["/bin/bash"]

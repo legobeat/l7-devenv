@@ -9,7 +9,7 @@ env:
 
 jobs:
   # build caddy first because it generates tls root cert. rest run in parallel
-  publish-image-caddy:
+  publish-image-pre:
     runs-on: ubuntu-latest
     services:
       registry:
@@ -78,7 +78,7 @@ jobs:
           cache-to: type=gha,mode=max
 
   publish-image:
-    needs: publish-image-caddy
+    needs: publish-image-pre
     runs-on: ubuntu-latest
     services:
       registry:
@@ -158,26 +158,88 @@ jobs:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Extract metadata (tags, labels) for Docker
         id: meta
         uses: docker/metadata-action@8e5442c4ef9f78752691e2d8f8d19755c6f78e81 #v5.5.1
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/${{ matrix.name }}
-
       - name: allow cleartext http to localhost container registry
         run: |
           echo '{"insecure-registries" : [ "localhost" ]}' | sudo tee /etc/docker/daemon.json
-
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
         with:
           driver-opts: network=host
-
       - uses: actions/checkout@v4
         with:
           submodules: true
+      - name: Build and publish ${{ matrix.name }} image
+        uses: docker/build-push-action@v6
+        with:
+          context: ${{ matrix.context }}
+          file: ${{ matrix.file }}
+          build-args: ${{ matrix.build-args }}
+          tags:  ${{ matrix.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          load: true
+          push: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
+  # node-runner is used as base for lsp
+  publish-image-post:
+    needs: publish-image
+    runs-on: ubuntu-latest
+    services:
+      registry:
+        image: registry:2
+        ports:
+          - 80:5000
+    permissions:
+      contents: read
+      packages: write
+      attestations: write
+      id-token: write
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - name: lsp-typescript
+            file: sidecars/node-runner/Containerfile.lsp
+            context: .
+            tags: |
+              ghcr.io/legobeat/l7-devenv/lsp/typescript:latest
+              ghcr.io/legobeat/l7-devenv/lsp/typescript:${{ github.ref_name }}
+              ghcr.io/legobeat/l7-devenv/node:lsp-latest
+              ghcr.io/legobeat/l7-devenv/node:lsp-20-bookworm
+              ghcr.io/legobeat/l7-devenv/node:lsp-20-${{ github.ref_name }}
+            build-args: |
+              CADDY_IMAGE=ghcr.io/legobeat/l7-devenv/caddy:${{ github.ref_name }}
+              BASE_IMAGE=ghcr.io/legobeat/l7-devenv/node:20-${{ github.ref_name }}
+    steps:
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      - name: Log in to the Container registry
+        uses: docker/login-action@0d4c9c5ea7693da7b068278f7b52bda2a190a446 #v3.2.0
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@8e5442c4ef9f78752691e2d8f8d19755c6f78e81 #v5.5.1
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/${{ matrix.name }}
+      - name: allow cleartext http to localhost container registry
+        run: |
+          echo '{"insecure-registries" : [ "localhost" ]}' | sudo tee /etc/docker/daemon.json
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        with:
+          driver-opts: network=host
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
       - name: Build and publish ${{ matrix.name }} image
         uses: docker/build-push-action@v6
         with:
