@@ -363,6 +363,12 @@ test_e2e_curl:
 			|| echo "fail $$url $$(echo "$$result" | head -n3)"; \
 	done
 
+test_e2e_node_corepack: IMAGE_NAME = ${RUNNER_IMAGE_NAME}
+test_e2e_node_corepack: IMAGE_TAG = ${RUNNER_IMAGE_TAG}
+test_e2e_node_corepack: # image_nvim
+	set -e
+	./test/runner-node/test-corepack-pms.sh
+
 test_e2e_ghauth:
 	set -e
 	./devenv.sh gh auth status
