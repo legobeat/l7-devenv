@@ -30,7 +30,7 @@ install:
 image_auth_proxy : IMAGE_NAME = ${AUTH_PROXY_IMAGE_NAME}
 image_auth_proxy : IMAGE_TAG = ${AUTH_PROXY_IMAGE_TAG}
 image_auth_proxy:
-	${CMD} buildx build \
+	${CMD} build \
 		${BUILD_OPTIONS} \
 		-t "${IMAGE_NAME}:${IMAGE_TAG}" \
 		-f './sidecars/git-auth-proxy/Dockerfile' \
@@ -39,7 +39,7 @@ image_auth_proxy:
 image_caddy : IMAGE_NAME = ${CADDY_IMAGE_NAME}
 image_caddy : IMAGE_TAG = ${CADDY_IMAGE_TAG}
 image_caddy:
-	${CMD} buildx build \
+	${CMD} build \
 		${BUILD_OPTIONS} \
 		-t "${IMAGE_NAME}:${IMAGE_TAG}" \
 		-f './sidecars/caddy/Containerfile' \
@@ -48,7 +48,7 @@ image_caddy:
 image_dnsmasq: IMAGE_NAME = ${DNSMASQ_IMAGE_NAME}
 image_dnsmasq: IMAGE_TAG = ${DNSMASQ_IMAGE_TAG}
 image_dnsmasq:
-	${CMD} buildx build \
+	${CMD} build \
 		${BUILD_OPTIONS} \
 		-t "${IMAGE_NAME}:${IMAGE_TAG}" \
 		-f './sidecars/dnsmasq/Containerfile' \
@@ -57,13 +57,13 @@ image_dnsmasq:
 image_gpg_pk : IMAGE_NAME = ${GPG_IMAGE_NAME}
 image_gpg_pk : IMAGE_TAG = ${GPG_IMAGE_TAG}
 image_gpg_pk:
-	${CMD} buildx build \
+	${CMD} build \
 		${BUILD_OPTIONS} \
 		-t "${IMAGE_NAME}:${IMAGE_TAG}" \
 		-t "${IMAGE_NAME}:latest" \
 		-f './sidecars/gpg-vault-pk/Containerfile' \
 		.
-	${CMD} buildx build \
+	${CMD} build \
 		${BUILD_OPTIONS} \
 		-t "${IMAGE_NAME}:${IMAGE_TAG}" \
 		-t "${IMAGE_NAME}:${IMAGE_TAG}-debian" \
@@ -72,7 +72,7 @@ image_gpg_pk:
 image_acng: IMAGE_NAME = ${ACNG_IMAGE_NAME}
 image_acng: IMAGE_TAG = ${ACNG_IMAGE_TAG}
 image_acng:
-	${CMD} buildx build \
+	${CMD} build \
 		${BUILD_OPTIONS} \
 		-t "${IMAGE_NAME}:${IMAGE_TAG}" \
 		-f './sidecars/apt-cacher-ng/Containerfile' \
@@ -81,7 +81,7 @@ image_acng:
 image_nvim : IMAGE_NAME = ${NVIM_IMAGE_NAME}
 image_nvim : IMAGE_TAG = ${NVIM_IMAGE_TAG}
 image_nvim : submodules image_caddy
-	${CMD} buildx build \
+	${CMD} build \
 		${BUILD_OPTIONS} \
 		--build-arg "EXTRA_PKGS=${EXTRA_PKGS}" \
 		--build-arg "SHELL=${USER_SHELL}" \
@@ -94,7 +94,7 @@ image_nvim : submodules image_caddy
 image_runner_go_1.20 : IMAGE_NAME = ${GO_RUNNER_IMAGE_NAME}
 image_runner_go_1.20 : IMAGE_TAG = ${GO_RUNNER_IMAGE_TAG}
 image_runner_go_1.20: submodules
-	${CMD} buildx build \
+	${CMD} build \
 		${BUILD_OPTIONS} \
 		--build-arg "SHELL=${USER_SHELL}" \
 		--build-arg "UID=${UID}" \
@@ -116,7 +116,7 @@ image_runner_go: image_runner_go_1.20
 image_runner_node_18 : IMAGE_NAME = ${RUNNER_IMAGE_NAME}
 image_runner_node_18 : IMAGE_TAG = ${RUNNER_IMAGE_TAG}
 image_runner_node_18: submodules image_caddy
-	${CMD} buildx build \
+	${CMD} build \
 		${BUILD_OPTIONS} \
 		--build-arg "SHELL=${USER_SHELL}" \
 		--build-arg "UID=${UID}" \
@@ -129,7 +129,7 @@ image_runner_node_18: submodules image_caddy
 image_runner_node_20 : IMAGE_NAME = ${RUNNER_IMAGE_NAME}
 image_runner_node_20 : IMAGE_TAG = ${RUNNER_IMAGE_TAG}
 image_runner_node_20: submodules image_caddy
-	${CMD} buildx build \
+	${CMD} build \
 		${BUILD_OPTIONS} \
 		--build-arg "SHELL=${USER_SHELL}" \
 		--build-arg "UID=${UID}" \
@@ -141,7 +141,7 @@ image_runner_node_20: submodules image_caddy
 image_runner_node_22 : IMAGE_NAME = ${RUNNER_IMAGE_NAME}
 image_runner_node_22 : IMAGE_TAG = ${RUNNER_IMAGE_TAG}
 image_runner_node_22: submodules image_caddy
-	${CMD} buildx build \
+	${CMD} build \
 		${BUILD_OPTIONS} \
 		--build-arg "SHELL=${USER_SHELL}" \
 		--build-arg "UID=${UID}" \
@@ -155,7 +155,7 @@ image_runner_node_22: submodules image_caddy
 image_runner_node_ios : IMAGE_NAME = ${RUNNER_IMAGE_NAME}
 image_runner_node_ios : IMAGE_TAG = ${RUNNER_IMAGE_TAG}
 image_runner_node_ios: submodules image_caddy
-	${CMD} buildx build \
+	${CMD} build \
 		${BUILD_OPTIONS} \
 		--build-arg "SHELL=${USER_SHELL}" \
 		--build-arg "UID=${UID}" \
