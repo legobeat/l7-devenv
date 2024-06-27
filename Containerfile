@@ -102,9 +102,7 @@ FROM base
 ### monitoring etc, probably more useful on host
 ## ARG EXTRA_PKGS='htop sysstat ncdu net-tools'
 ### wip / not working / notes
-## ARG EXTRA_PKGS='sudo' # TODO: needs some more fiddling with uidmap to work with rootless podman
 ## ARG EXTRA_PKGS='tree-sitter-cli' # repo version errors right now? try again later
-## ARG EXTRA_PKGS='podman docker-compose' # TODO: wire up docker socket
 
 ARG EXTRA_PKGS='bat'
 
@@ -123,7 +121,7 @@ RUN microdnf -y install --setopt=install_weak_deps=False \
     libnotify \
     ip openssl procps-ng psmisc \
     man-db \
-    podman sudo containers-common \
+    podman-remote sudo containers-common \
     screen \
     w3m \
     which \
@@ -156,7 +154,7 @@ RUN microdnf -y install --setopt=install_weak_deps=False \
          -e 's|^runroot|#runroot|g' \
          /etc/containers/storage.conf > .config/containers/storage.conf \
   && rpm --setcaps shadow-utils 2>/dev/null \
-  && microdnf -y install podman fuse-overlayfs openssh-clients --exclude container-selinux \
+  && microdnf -y install podman-remote fuse-overlayfs openssh-clients --exclude container-selinux \
   # explicitly remove providers for commands proxied to sibling containers
   && microdnf remove npm yarnpkg \
   && microdnf clean all
