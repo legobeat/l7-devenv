@@ -1,0 +1,21 @@
+{
+  "policies": [
+    {
+      "id": "default",
+      "provider": "github",
+      "github": {
+        "token": "${L7_GITHUB_TOKEN}"
+      },
+      "userAuth": {
+        "tokenHash": "${L7_USER_TOKEN_HASH}"
+      },
+      "repositories": [
+        {
+          "owner": "*",
+          "name": "*"
+        }
+      ]
+    }
+  ]
+}
+
