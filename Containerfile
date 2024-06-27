@@ -14,7 +14,6 @@ RUN microdnf -y update \
      curl wget jq yq moreutils tar \
      git gnupg2 \
      neovim lua python3-neovim \
-     nodejs typescript \
      $EXTRA_BASE_PKGS \
   && ln -sf nvim /usr/bin/vim
 
@@ -50,32 +49,6 @@ RUN \
   && microdnf clean all \
   && cp -a /etc/xdg/nvim/pack/build-l7ide/start/* /out/plugins/
 
-
-##############################################
-##### TYPESCRIPT-LANGUAGE-SERVER BUILDER #####
-
-FROM base AS tsserver-builder
-
-ENV NODE_OPTIONS='--no-network-family-autoselection --trace-warnings'
-ENV HOME=/tmp/1002-home
-
-# TODO: not supported on podman ubuntu-22.03
-# RUN --mount=source=contrib/typescript-language-server,target=/build/typescript-language-server,rw=true \
-COPY contrib/typescript-language-server /build/typescript-language-server
-RUN \
-  microdnf -y install --setopt=install_weak_deps=False \
-    npm yarnpkg \
-  && mkdir -p /out /build/typescript-language-server \
-  # build, pack, and install typescript-language-server
-  && cd /build/typescript-language-server  \
-  && yarn install --frozen-lockfile --network-concurrency 10 \
-  && yarn build \
-  && yarn pack \
-  && cd /out \
-  && npm i /build/typescript-language-server/*.t*gz \
-  && microdnf remove -y npm yarnpkg \
-  && microdnf clean all \
-  && rm -rf /tmp/1002-home /build/typescript-language-server/*.t*gz
 
 # this assumes we already have a locally built caddy image
 # the image contains a pregenerated ca root cert for mitm, which we copy here
@@ -148,9 +121,9 @@ RUN microdnf -y install --setopt=install_weak_deps=False \
   && microdnf remove npm yarnpkg \
   && microdnf clean all
 
-COPY --from=nvim-builder     --chown=2:2 /out/plugins /etc/xdg/nvim/pack/l7ide/start
-COPY --from=tsserver-builder --chown=2:2 /out/node_modules/ /usr/lib/node_modules/
-COPY contrib/bin/* contrib/*/bin/*       /usr/local/bin/
+COPY --from=nvim-builder --chown=2:2 \
+  /out/plugins /etc/xdg/nvim/pack/l7ide/start
+COPY --chmod=755 --chown=root contrib/bin/* contrib/*/bin/*       /usr/local/bin/
 ARG NODE_BINS='allow-scripts  corepack glob  lavamoat-ls mkdirp node-gyp node-which nopt npx pnpx resolve semver yarn-deduplicate'
 RUN bash -c 'for bin in ${NODE_BINS}; do ln -s l7-run-node "/usr/local/bin/${bin}"; done'
 
@@ -162,12 +135,6 @@ RUN cat /home/user/.env >> /etc/profile \
     /home/user \
     # treesitter needs write to parsers dirs
     /etc/xdg/nvim/pack/l7ide/start/nvim-treesitter/parser{-info,} \
-  # hardcode node path for lsp to use in-container binary
-  && sed -i 's@^#!/usr/bin/env node@#!/usr/bin/node@' /usr/lib/node_modules/typescript-language-server/lib/cli.mjs \
-  # symlink can get messed up by copy; effective .mjs extension is important for node
-  && ln -sf \
-    /usr/lib/node_modules/typescript-language-server/lib/cli.mjs \
-    /usr/lib/node_modules/.bin/typescript-language-server \
   && ln -s \
     podman-remote /usr/bin/podman
 
