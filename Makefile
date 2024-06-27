@@ -340,8 +340,17 @@ test: test_nvim test_runner_node test_gpg_pk
 test_e2e_curl:
 	set -e
 	@for url in \
+		"https://google.com/" \
+		"https://google.com" \
 		"https://github.com/" \
+		"https://github.com" \
 		"https://github.com/actions/example-services/pulls" \
+		"https://registry.npmjs.org/xtend/" \
+		"https://registry.npmjs.org/xtend" \
+		"https://registry.yarnpkg.com/xtend/" \
+		"https://registry.yarnpkg.com/xtend" \
+		"https://registry.npmjs.org/xtend/-/xtend-2.0.4.tgz" \
+		"https://registry.yarnpkg.com/xtend/-/xtend-2.0.4.tgz" \
 	; do \
 		result=$$(./devenv.sh \
 			curl -f -sSL --tlsv1.2 "$${url}" -o/dev/null \
