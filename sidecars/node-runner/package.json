@@ -9,6 +9,8 @@
     "@lavamoat/allow-scripts": ">=3.0.4",
     "@lavamoat/preinstall-always-fail": ">=2.0.0",
     "semver": "^7.6.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.5.2",
     "yarn-deduplicate": "^6.0.2"
   },
   "private": false,
