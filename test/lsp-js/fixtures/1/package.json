@@ -1,0 +1,7 @@
+{
+  "name": "lsp-js",
+  "packageManager": "yarn@4.2.2",
+  "dependencies": {
+    "@metamask/superstruct": "3.0.0"
+  }
+}
