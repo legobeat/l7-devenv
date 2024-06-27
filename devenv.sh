@@ -75,7 +75,7 @@ configure_gh_token() {
     # todo: use podman secrets or sth
     local L7_USER_TOKEN_HASH="${L7_USER_TOKEN_HASH:-FILL_ME_IN}"
     local L7_GITHUB_TOKEN="${L7_GITHUB_TOKEN:-}"
-    envsubst L7_GITHUB_TOKEN L7_USER_TOKEN_HASH < "${cfg}.tmpl" > "${cfg}"
+    envsubst '${L7_GITHUB_TOKEN},${L7_USER_TOKEN_HASH}' < "${cfg}.tmpl" > "${cfg}"
   fi
 }
 
