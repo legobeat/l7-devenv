@@ -349,6 +349,7 @@ test_e2e_curl:
 		"https://registry.npmjs.org/xtend" \
 		"https://registry.yarnpkg.com/xtend/" \
 		"https://registry.yarnpkg.com/xtend" \
+		"https://registry.npmjs.org/npm/9.9.3" \
 		"https://registry.npmjs.org/xtend/-/xtend-2.0.4.tgz" \
 		"https://registry.yarnpkg.com/xtend/-/xtend-2.0.4.tgz" \
 	; do \
