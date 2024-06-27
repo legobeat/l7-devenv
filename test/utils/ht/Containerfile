@@ -1,0 +1,9 @@
+# This image isn't run directly: The built binary is copied to other images
+FROM rust:1.79-alpine
+
+RUN apk add --no-cache musl-dev \
+  && cargo install --git \
+    https://github.com/andyk/ht \
+    --tag v0.2.0
+
+ENTRYPOINT "/usr/local/cargo/bin/ht"
