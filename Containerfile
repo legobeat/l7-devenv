@@ -180,6 +180,8 @@ RUN cat /home/user/.env >> /etc/profile \
     /usr/lib/node_modules/typescript-language-server/lib/cli.mjs \
     /usr/lib/node_modules/.bin/typescript-language-server
 
+# default trust github.com known ssh key
+COPY contrib/data/ssh_known_hosts /etc/ssh/ssh_known_hosts
 # https://docs.fedoraproject.org/en-US/quick-docs/using-shared-system-certificates/
 COPY --from=fwdproxy \
   --chmod=444 \
