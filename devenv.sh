@@ -84,8 +84,6 @@ if [[ "$(basename "${cmd}")" == "podman" ]]; then
   composecmd="${cmd} compose"
   # compose, used for sidecars and leaked into de
   CONTAINER_SOCKET="${CONTAINER_SOCKET:-${XDG_RUNTIME_DIR}/podman/podman.sock}"
-  # used to run de itself. could be separate
-  export DOCKER_HOST="${DOCKER_HOST:-unix://${XDG_RUNTIME_DIR}/podman/podman.sock}"
   if [[ -z FORCE_PODMAN_VERSION ]]; then
     podman_version=$(${cmd} version -f json | jq -r .Client.APIVersion)
     if [[ ! "${podman_version}" = [45]* ]]; then
@@ -95,6 +93,13 @@ if [[ "$(basename "${cmd}")" == "podman" ]]; then
 else
   composecmd='docker-compose'
 fi
+
+if [[ -z "${CONTAINER_SOCKET}" || ! -f "${CONTAINER_SOCKET}" ]]; then
+  CONTAINER_SOCKET="${CONTAINER_SOCKET:-/var/run/docker.sock}"
+fi
+
+# used to run de itself. could be separate from CONTAINER_SOCKET
+export DOCKER_HOST="${DOCKER_HOST:-unix://${CONTAINER_SOCKET}}"
 
 LOG_DIR="${LOG_DIR:-${HOME}/.local/share/l7ide/logs}"
 mkdir -p "${LOG_DIR}"
