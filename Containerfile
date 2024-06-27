@@ -178,7 +178,10 @@ RUN cat /home/user/.env >> /etc/profile \
   # symlink can get messed up by copy; effective .mjs extension is important for node
   && ln -sf \
     /usr/lib/node_modules/typescript-language-server/lib/cli.mjs \
-    /usr/lib/node_modules/.bin/typescript-language-server
+    /usr/lib/node_modules/.bin/typescript-language-server \
+  && ln -s \
+    podman-remote /usr/bin/podman
+
 
 # default trust github.com known ssh key
 COPY contrib/data/ssh_known_hosts /etc/ssh/ssh_known_hosts
