@@ -179,7 +179,7 @@ image_runner_node_22: submodules image_caddy
 # with CocoaPods for iOS React Native dev
 image_runner_node_ios : IMAGE_NAME = ${RUNNER_IMAGE_NAME}
 image_runner_node_ios : IMAGE_TAG = ${RUNNER_IMAGE_TAG}
-image_runner_node_ios: submodules image_caddy
+image_runner_node_ios: submodules image_runner_node
 	${CMD} buildx build \
 		${BUILD_OPTIONS} \
 		--build-arg "SHELL=${USER_SHELL}" \
@@ -204,6 +204,19 @@ image_runner_node: image_runner_node_20 # image_runner_node_18 image_runner_node
 		"${IMAGE_NAME}:20-${IMAGE_TAG}" \
 	    "${IMAGE_NAME}:${IMAGE_TAG}"
 
+# tsserver typescript-language-server
+image_lsp_node: IMAGE_NAME = ${RUNNER_IMAGE_NAME}
+image_lsp_node: IMAGE_TAG = ${RUNNER_IMAGE_TAG}
+image_lsp_node: image_runner_node_20
+	${CMD} buildx build \
+		${BUILD_OPTIONS} \
+		--build-arg "SHELL=${USER_SHELL}" \
+		--build-arg "UID=${UID}" \
+		--build-arg "GID=${GID}" \
+		--build-arg "NODE_VERSION=20" \
+		-t "${IMAGE_NAME}:lsp-${IMAGE_TAG}" \
+		-f './sidecars/node-runner/Containerfile.lsp' \
+		.
 #### Tests
 
 test_auth_proxy: IMAGE_NAME = ${AUTH_PROXY_IMAGE_NAME}
@@ -278,6 +291,14 @@ test_runner_node: # image_runner_node
 	${CMD} run --rm \
 		"${IMAGE_NAME}:${IMAGE_TAG}" \
 		-c 'node --version'
+
+test_lsp_node: IMAGE_NAME = ${RUNNER_IMAGE_NAME}
+test_lsp_node: IMAGE_TAG = ${RUNNER_IMAGE_TAG}
+test_lsp_node: # image_lsp_node
+	${CMD} run --rm -it \
+		"${IMAGE_NAME}:lsp-${IMAGE_TAG}" \
+		--version
+
 
 # inspect jobs here just for ci, not really useful otherwise
 
@@ -378,7 +399,7 @@ export_runner_node: # image_runner_node
 submodules:
 	@git submodule update --checkout --init --recursive --rebase
 
-images: image_caddy image_dnsmasq image_nvim image_runner_node image_gpg_pk image_acng image_auth_proxy image_container_proxy
+images: image_caddy image_dnsmasq image_nvim image_runner_node image_gpg_pk image_acng image_auth_proxy image_container_proxy image_lsp_node
 
 images_test: images image_nvim_test
 
@@ -391,6 +412,7 @@ test_e2e_curl:
 		"https://google.com" \
 		"https://github.com/" \
 		"https://github.com" \
+		"https://github.com/lspcontainers/lspcontainers.nvim" \
 		"https://github.com/actions/example-services/pulls" \
 		"https://registry.npmjs.org/xtend/" \
 		"https://registry.npmjs.org/xtend" \
@@ -431,6 +453,6 @@ test_e2e_ghauth:
 
 test_e2e_lsp_typescript : IMAGE_NAME = ${NVIM_IMAGE_NAME}
 test_e2e_lsp_typescript : IMAGE_TAG = ${NVIM_IMAGE_TAG}
-test_e2e_lsp_typescript : image_nvim_test
+test_e2e_lsp_typescript : image_nvim_test image_lsp_node
 	set -e
-	IMAGE=${IMAGE_NAME}-ht:${IMAGE_TAG} ./devenv.sh /bin/bash -l -Ec test/lsp-js/ht-test-1-1.sh
+	IMAGE=${IMAGE_NAME}-ht:${IMAGE_TAG} NAME=l7ide-test-runner-lsp ./devenv.sh /bin/bash -l -Ec test/lsp-js/ht-test-1-1.sh

@@ -2,23 +2,36 @@
 # senss keystrokes to neovim (navigate to element and inspect) and screenscrapes for expected output
 result="$(
   (
-    sleep 10
+    sleep 30
+    echo '{ "type": "sendKeys", "keys": ["Escape"] }'
+    sleep 0.5
     echo '{ "type": "sendKeys", "keys": ["w"] }'
-    sleep 0.2
+    sleep 0.5
     echo '{ "type": "sendKeys", "keys": ["w"] }'
-    sleep 0.2
+    sleep 0.5
     echo '{ "type": "sendKeys", "keys": [" "] }'
-    sleep 0.2
+    sleep 0.5
     echo '{ "type": "sendKeys", "keys": ["\""] }'
-    sleep 1
+    sleep 5
     echo '{ "type": "getView" }'
-    echo '{ "type": "sendKeys", "keys": [":LspInfo", "Enter"] }'
+    echo '{ "type": "sendKeys", "keys": ["Escape"] }'
+    sleep 0.5
+    echo '{ "type": "sendKeys", "keys": [":"] }'
+    sleep 0.5
+    echo '{ "type": "sendKeys", "keys": ["LspInfo", "Enter"] }'
     sleep 0.5
     echo '{ "type": "getView" }'
+    echo '{ "type": "sendKeys", "keys": ["Escape"] }'
+    sleep 0.5
+    echo '{ "type": "sendKeys", "keys": [":"] }'
+    sleep 0.5
+    echo '{ "type": "sendKeys", "keys": ["LspLog", "Enter"] }'
+    sleep 1
+    echo '{ "type": "getView" }'
     echo '{ "type": "sendKeys", "keys": [":", "e term://zsh", "Enter"] }'
-    sleep 5
+    sleep 0.5
     echo '{ "type": "sendKeys", "keys": ["A"] }'
-    sleep 2
+    sleep 0.5
     echo '{ "type": "sendKeys", "keys": ["env | sort", "Enter"] }'
     sleep 1
     echo '{ "type": "getView" }'
@@ -28,6 +41,8 @@ result="$(
   ) \
     | ht nvim test/lsp-js/fixtures/1/index.ts
 )"
+
+####
 
 echo "$result" \
   | grep --quiet 'class Struct<Type = unknown, Schema = unknown>.*encapsulate the validation logic.*typescript'

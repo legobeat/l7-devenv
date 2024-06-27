@@ -28,6 +28,7 @@ user_config () {
   mkdir -p ~/.local/share/l7ide/node-runner/{yarn/cache/classic,yarn/cache/berry,npm/cache,node/cache,pnpm/cache}
   mkdir -p ~/.local/share/l7ide/gh && touch ~/.local/share/l7ide/gh/hosts.yml && chmod 0600 ~/.local/share/l7ide/gh/hosts.yml
   mkdir -p ~/.local/share/l7ide/go-runner/go
+  mkdir -p ~/.local/share/l7ide/nvim/state
   mkdir -p ~/.local/share/l7ide/apt-cacher-ng/cache
 }
 
@@ -99,6 +100,7 @@ runtime_config () {
   # podman / netavark hijack both dns and/or resolv.conf no matter what, it seems...
   RESOLV_CONF_PATH="${L7_RESOLV_CONF_PATH:-$(mktemp)}"
   echo "nameserver ${CONTAINER_DNS}" > "${RESOLV_CONF_PATH}"
+  NVIM_STATE_PATH="${L7_NVIM_STATE_PATH:-$(mktemp -d)}"
 
   # detect tty
   if [ -t 1 ] ; then
@@ -298,10 +300,12 @@ else
     --mount type=bind,source="${CONF_DIR}/git,target=/home/user/.config/git,ro=true" \
     -v "${SRC_DIR}:${SRC_DIR}:Z" \
     -v "${SRC_DIR}:/src:Z" \
+    -v "${NVIM_STATE_PATH}:/home/user/.local/state/nvim" \
     -v "${RESOLV_CONF_PATH}:/etc/resolv.conf:ro" \
     -w "${CWD}" \
     --mount type=tmpfs,tmpfs-size=2G,destination=/tmp,tmpfs-mode=0777 \
     -e "L7_COMPOSE_NETWORK_NAME_INTERNAL=${NETWORK_NAME}" \
+    -e "L7_NVIM_STATE_PATH=${NVIM_STATE_PATH}" \
     -e "L7_RESOLV_CONF_PATH=${RESOLV_CONF_PATH}" \
     -e "CONTAINER_HOST=tcp://10.7.9.2:2375" \
     -e "GO_RUNNER_IMAGE=${GO_RUNNER_IMAGE}" \
