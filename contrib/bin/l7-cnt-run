@@ -12,6 +12,10 @@ else
   ARGS="${@}"
 fi
 
+# replace newlines with spaces
+RUNNER_ENV="${RUNNER_ENV//@@ /$'\n'}"
+RUNNER_PORTS="${RUNNER_PORTS//@@ /$'\n'}"
+RUNNER_VOLS="${RUNNER_VOLS//@@ /$'\n'}"
 if [ -n "${RUNNER_ENV}"  ]; then
   for e in ${RUNNER_ENV}; do
     export RUNNER_OPTS="${RUNNER_OPTS} -e ${e}"
