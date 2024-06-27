@@ -103,7 +103,7 @@ jobs:
         with:
           submodules: true
 
-      - run: make -j4 images
+      - run: make -j6 images-test
 
       - name: Export images for cache
         run: |

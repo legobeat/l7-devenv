@@ -349,6 +349,8 @@ submodules:
 
 images: image_caddy image_dnsmasq image_nvim image_runner_node image_gpg_pk image_acng
 
+images_test: images image_nvim_test
+
 test: test_nvim test_runner_node test_gpg_pk
 
 test_e2e_curl:
