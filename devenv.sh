@@ -164,7 +164,11 @@ fi
 RESOLV_CONF_PATH=$(mktemp)
 echo "nameserver 10.7.8.133" > "${RESOLV_CONF_PATH}"
 
-${cmd} run --rm -it \
+if [ -t 1 ] ; then
+  RUN_ARGS="${RUN_ARGS} -t "
+fi
+
+${cmd} run --rm -i \
   --user "$(id -u):$(id -g)" \
   --mount type=bind,source="${LOCAL_DIR},target=/home/user/.local" \
   --mount type=bind,source="${CONF_DIR}/ssh.d,target=/home/user/.ssh/config.d,ro=true" \
