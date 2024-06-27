@@ -179,6 +179,7 @@ jobs:
         test:
           - curl
           - ghauth
+          - node_corepack
         ubuntu-version:
           - 24.04
     steps:
