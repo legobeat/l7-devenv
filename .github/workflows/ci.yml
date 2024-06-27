@@ -103,7 +103,7 @@ jobs:
         with:
           submodules: true
 
-      - run: make -j4 images
+      - run: make -j6 images_test
 
       - name: Export images for cache
         run: |
@@ -180,6 +180,7 @@ jobs:
           - curl
           - ghauth
           - node_corepack
+          - lsp_typescript
         ubuntu-version:
           - 24.04
     steps:

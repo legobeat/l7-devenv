@@ -1,0 +1,6 @@
+ARG BASE_IMAGE=localhost/l7/nvim:latest
+ARG HT_IMAGE=localhost/l7-test/ht:0.2.0
+FROM ${HT_IMAGE} as ht
+FROM ${BASE_IMAGE}
+COPY --from=ht /usr/local/cargo/bin/ht /usr/bin/ht
+ENTRYPOINT ["/usr/bin/ht", "/usr/bin/nvim"]

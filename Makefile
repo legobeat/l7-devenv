@@ -90,6 +90,20 @@ image_nvim : submodules image_caddy
 		-t "${IMAGE_NAME}:${IMAGE_TAG}" \
 		-f './Containerfile' \
 		.
+
+image_nvim_test : IMAGE_NAME = ${NVIM_IMAGE_NAME}
+image_nvim_test : IMAGE_TAG = ${NVIM_IMAGE_TAG}
+image_nvim_test : image_nvim image_bin_ht
+	${CMD} buildx build \
+		${BUILD_OPTIONS} \
+		-t "${IMAGE_NAME}-ht:${IMAGE_TAG}" \
+		-f test/lsp-js/Containerfile \
+		.
+image_bin_ht :
+	${CMD} buildx build \
+		-t localhost/l7-test/ht:0.2.0 \
+		-f test/utils/ht/Containerfile
+
 ### GOLANG RUNNERS
 image_runner_go_1.20 : IMAGE_NAME = ${GO_RUNNER_IMAGE_NAME}
 image_runner_go_1.20 : IMAGE_TAG = ${GO_RUNNER_IMAGE_TAG}
@@ -335,6 +349,8 @@ submodules:
 
 images: image_caddy image_dnsmasq image_nvim image_runner_node image_gpg_pk image_acng
 
+images_test: images image_nvim_test
+
 test: test_nvim test_runner_node test_gpg_pk
 
 test_e2e_curl:
@@ -375,3 +391,9 @@ test_e2e_node_corepack: # image_nvim
 test_e2e_ghauth:
 	set -e
 	./devenv.sh gh auth status
+
+test_e2e_lsp_typescript : IMAGE_NAME = ${NVIM_IMAGE_NAME}
+test_e2e_lsp_typescript : IMAGE_TAG = ${NVIM_IMAGE_TAG}
+test_e2e_lsp_typescript : image_nvim_test
+	set -e
+	IMAGE=${IMAGE_NAME}-ht:${IMAGE_TAG} ./devenv.sh /bin/bash -l -Ec test/lsp-js/ht-test-1-1.sh
