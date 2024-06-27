@@ -36,6 +36,18 @@ apps:
                     #protocol: http
                     #versions: ['1.1']
                     #terminal: true
+          - match:
+            - host:
+              - '*'
+              - '*.*'
+              - '*.*.*'
+              - '*.*.*.*'
+              - '*.*.*.*.*'
+              - '*.*.*.*.*.*'
+            handle:
+              - handler: reverse_proxy
+                upstreams:
+                  - dial: '{env.PKG_PROXY_HOST}:{env.PKG_PROXY_PORT}'
       http:
         listen:
           - ":80"
