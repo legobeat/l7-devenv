@@ -371,6 +371,8 @@ test_e2e_curl:
 		"https://deb.debian.org/debian/dists/bookworm/InRelease" \
 		"http://deb.debian.org/debian/dists/bookworm/InRelease" \
 		"http://archive.ubuntu.com/ubuntu/dists/noble/InRelease" \
+		"http://product-details.mozilla.org/1.0/firefox_versions.json" \
+		"https://product-details.mozilla.org/1.0/firefox_versions.json" \
 	; do \
 		result=$$(./devenv.sh \
 			curl -f -sSL --tlsv1.2 "$${url}" -o/dev/null \
