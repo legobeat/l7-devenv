@@ -355,7 +355,7 @@ test: test_nvim test_runner_node test_gpg_pk
 
 test_e2e_curl:
 	set -e
-	@for url in \
+	for url in \
 		"https://google.com/" \
 		"https://google.com" \
 		"https://github.com/" \
@@ -370,16 +370,16 @@ test_e2e_curl:
 		"https://registry.yarnpkg.com/xtend/-/xtend-2.0.4.tgz" \
 		"https://deb.debian.org/debian/dists/bookworm/InRelease" \
 		"http://deb.debian.org/debian/dists/bookworm/InRelease" \
-		"http://archive.ubuntu.com/ubuntu/dists/noble/InRelease" \
 		"http://product-details.mozilla.org/1.0/firefox_versions.json" \
 		"https://product-details.mozilla.org/1.0/firefox_versions.json" \
+		"http://archive.ubuntu.com/ubuntu/dists/noble/InRelease" \
 	; do \
 		result=$$(export NAME=l7ide-test-runner; ./devenv.sh \
 			curl -f -sSL --tlsv1.2 "$${url}" -o/dev/null \
 			-w '%{exitcode}:%{response_code}:%{ssl_verify_result}___%{certs}' \
 			| head -n4 \
 		); \
-		echo "$$result" | grep -Ez --quiet "^0:200:0___.*Issuer:.*Caddy" \
+		echo "$$result" | grep -Ez --quiet "^0:200:0___(.*Issuer:.*Caddy.*)?\s*\$$" \
 			&& echo "pass $$url" \
 			|| echo "fail $$url $$(echo "$$result" | head -n3)"; \
 	done

@@ -36,15 +36,8 @@ apps:
                     #protocol: http
                     #versions: ['1.1']
                     #terminal: true
-          - match:
-            - host:
-              - '*'
-              - '*.*'
-              - '*.*.*'
-              - '*.*.*.*'
-              - '*.*.*.*.*'
-              - '*.*.*.*.*.*'
-            handle:
+            terminal: true
+          - handle:
               - handler: reverse_proxy
                 upstreams:
                   - dial: '{env.PKG_PROXY_HOST}:{env.PKG_PROXY_PORT}'
