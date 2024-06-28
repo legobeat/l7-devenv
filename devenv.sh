@@ -160,10 +160,10 @@ configure_gh_token() {
   local cfg="${CONF_DIR}/git-auth-proxy/config.json"
   local cfg_tmpl="${cfg}.tmpl"
   if [[ ! -f "${cfg}" ]]; then
-    echo -n "No auth-proxy configuration found at ${cfg}. "
+     msg="${msg}No auth-proxy configuration found at ${cfg}. "
     if [[ ! -f "${cfg_tmpl}" ]]; then
       tmpl_src="${ROOT_DIR}/examples/auth-proxy.default.json.tmpl"
-      echo -n "Copying default template from ${tmpl_src} to ${cfg_tmpl}" >&2
+      msg="${msg}Copying default template from ${tmpl_src} to ${cfg_tmpl}. " >&2
       cp "${tmpl_src}" "${cfg_tmpl}"
     fi
   fi
@@ -176,10 +176,11 @@ configure_gh_token() {
     fi
     if [[ -z "${L7_USER_TOKEN_HASH}" ]]; then
       L7_USER_TOKEN="$(head -c 1000 /dev/random | base32 | head -c32)"
-      echo "Generated new internal gh auth token" >&2
+      msg="${msg}Generated new internal gh auth token. " >&2
       L7_USER_TOKEN_HASH="$(mkpasswd -m sha512crypt "${L7_USER_TOKEN}")"
       SHOULD_RESTART_HTTP_PROXY=1
     fi
+    [[ -n "${msg}" ]] && echo "${msg}"
     # todo: use podman secrets or sth instead of passing around env vars and files
     # simple templating
     envsubst '${L7_GITHUB_TOKEN},${L7_USER_TOKEN_HASH}' < "${cfg_tmpl}" > "${cfg}"
