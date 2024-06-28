@@ -297,7 +297,7 @@ test_lsp_node: IMAGE_TAG = ${RUNNER_IMAGE_TAG}
 test_lsp_node: # image_lsp_node
 	${CMD} run --rm -it \
 		"${IMAGE_NAME}:lsp-${IMAGE_TAG}" \
-		-c 'typescript-language-server --version'
+		--version
 
 
 # inspect jobs here just for ci, not really useful otherwise
@@ -412,6 +412,7 @@ test_e2e_curl:
 		"https://google.com" \
 		"https://github.com/" \
 		"https://github.com" \
+		"https://github.com/lspcontainers/lspcontainers.nvim" \
 		"https://github.com/actions/example-services/pulls" \
 		"https://registry.npmjs.org/xtend/" \
 		"https://registry.npmjs.org/xtend" \
@@ -453,4 +454,4 @@ test_e2e_lsp_typescript : IMAGE_NAME = ${NVIM_IMAGE_NAME}
 test_e2e_lsp_typescript : IMAGE_TAG = ${NVIM_IMAGE_TAG}
 test_e2e_lsp_typescript : image_nvim_test
 	set -e
-	IMAGE=${IMAGE_NAME}-ht:${IMAGE_TAG} ./devenv.sh /bin/bash -l -Ec test/lsp-js/ht-test-1-1.sh
+	IMAGE=${IMAGE_NAME}-ht:${IMAGE_TAG} NAME=l7ide-test-runner-lsp ./devenv.sh /bin/bash -l -Ec test/lsp-js/ht-test-1-1.sh

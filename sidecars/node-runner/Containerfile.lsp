@@ -1,5 +1,7 @@
 ARG NODE_VERSION=20
-FROM localhost/l7/node:${NODE_VERSION}-bookworm AS tsserver-builder
+ARG BASE_IMAGE=localhost/l7/node:${NODE_VERSION}-bookworm
+ARG BUILDER_IMAGE=${BASE_IMAGE}
+FROM ${BUILDER_IMAGE} AS tsserver-builder
 
 USER root
 COPY --chown=1002:1002 contrib/typescript-language-server /build/typescript-language-server
@@ -19,7 +21,7 @@ RUN set -x &&  cd /build/typescript-language-server \
   && npm i /build/typescript-language-server/*.t*gz \
   && rm -rf /tmp/1002-home /build/typescript-language-server/*.t*gz
 
-FROM localhost/l7/node:${NODE_VERSION}-bookworm
+FROM ${BASE_IMAGE}
 
 USER root
 COPY --from=tsserver-builder --chown=2:2 /out/node_modules/ /usr/local/lib/node_modules/
@@ -34,3 +36,5 @@ RUN ln -sf \
 ARG UID=1000
 ARG GID=1000
 USER ${UID}:${GID}
+
+ENTRYPOINT [ "typescript-language-server", "--stdio" ]
