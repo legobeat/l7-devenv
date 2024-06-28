@@ -155,9 +155,9 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: true
-      - run: make CMD=${{ matrix.cmd }} image_${{ matrix.image }}
+      - run: make -j4 CMD=${{ matrix.cmd }} image_${{ matrix.image }}
       - run: make CMD=${{ matrix.cmd }} inspect_${{ matrix.image }}
-      - run: make CMD=${{ matrix.cmd }} test_${{ matrix.image }}
+      - run: make -j4 CMD=${{ matrix.cmd }} test_${{ matrix.image }}
 
     env:
       CMD: ${{ matrix.cmd }}
@@ -220,7 +220,7 @@ jobs:
       - name: Run test ${{ matrix.test }}
         run: |
           podman network ls
-          make test_e2e_${{ matrix.test }}
+          make -j4 test_e2e_${{ matrix.test }}
     env:
       DEBUG: '0'
 
