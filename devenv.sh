@@ -171,19 +171,24 @@ configure_gh_token() {
     # allow supplying secrets via stdout of command to avoid leaking
     if [[ -n "${L7_GITHUB_TOKEN_CMD}" ]] ; then
       local L7_GITHUB_TOKEN="$(L7_GITHUB_TOKEN_CMD)"
+      # TODO: diff with old value, only restart if different
+      SHOULD_RESTART_HTTP_PROXY=1
     fi
     if [[ -z "${L7_USER_TOKEN_HASH}" ]]; then
       L7_USER_TOKEN="$(head -c 1000 /dev/random | base32 | head -c32)"
       echo "Generated new internal gh auth token" >&2
-      export L7_USER_TOKEN_HASH="$(mkpasswd -m sha512crypt "${L7_USER_TOKEN}")"
+      L7_USER_TOKEN_HASH="$(mkpasswd -m sha512crypt "${L7_USER_TOKEN}")"
+      SHOULD_RESTART_HTTP_PROXY=1
     fi
     # todo: use podman secrets or sth instead of passing around env vars and files
     # simple templating
     envsubst '${L7_GITHUB_TOKEN},${L7_USER_TOKEN_HASH}' < "${cfg_tmpl}" > "${cfg}"
-    # restart auth-proxy if already running
-    # set -x
-    auth_proxy_name=$(get_compose_container_name 'auth-proxy')
-    "${cmd}" restart --running "${auth_proxy_name}" >/dev/null 2>/dev/null || true
+
+    if [[ -n "${SHOULD_RESTART_HTTP_PROXY}" ]]; then
+      # restart auth-proxy if already running
+      auth_proxy_name=$(get_compose_container_name 'auth-proxy')
+      "${cmd}" restart --running "${auth_proxy_name}" >/dev/null 2>/dev/null || true
+    fi
 
     # if existing user-auth token is provided and not set in user env conf, remove any existing one and replace
     if [[ -n "${L7_USER_TOKEN}" ]]; then
@@ -210,6 +215,7 @@ configure_gh_token() {
         fi
       fi
       echo "L7_GITHUB_TOKEN=${L7_GITHUB_TOKEN}" >> "${envcfg}"
+      echo "L7_USER_TOKEN_HASH=${L7_USER_TOKEN_HASH}" >> "${envcfg}"
     fi
   fi
 }
