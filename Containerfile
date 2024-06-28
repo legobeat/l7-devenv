@@ -122,6 +122,8 @@ RUN microdnf -y install --setopt=install_weak_deps=False \
     ip openssl procps-ng psmisc \
     man-db \
     podman-remote sudo containers-common \
+    # devenv-in-denvenv
+    gettext-envsubst mkpasswd \
     screen \
     w3m \
     which \
