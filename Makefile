@@ -372,7 +372,7 @@ test_e2e_curl:
 		"http://deb.debian.org/debian/dists/bookworm/InRelease" \
 		"http://archive.ubuntu.com/ubuntu/dists/noble/InRelease" \
 	; do \
-		result=$$(./devenv.sh \
+		result=$$(export NAME=l7ide-test-runner; ./devenv.sh \
 			curl -f -sSL --tlsv1.2 "$${url}" -o/dev/null \
 			-w '%{exitcode}:%{response_code}:%{ssl_verify_result}___%{certs}' \
 			| head -n4 \
