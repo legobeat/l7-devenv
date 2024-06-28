@@ -29,8 +29,6 @@ user_config () {
   mkdir -p ~/.local/share/l7ide/gh && touch ~/.local/share/l7ide/gh/hosts.yml && chmod 0600 ~/.local/share/l7ide/gh/hosts.yml
   mkdir -p ~/.local/share/l7ide/go-runner/go
   mkdir -p ~/.local/share/l7ide/apt-cacher-ng/cache
-
-  configure_gh_token
 }
 
 runtime_config () {
@@ -174,23 +172,24 @@ configure_gh_token() {
     if [[ -n "${L7_GITHUB_TOKEN_CMD}" ]] ; then
       local L7_GITHUB_TOKEN="$(L7_GITHUB_TOKEN_CMD)"
     fi
-    # todo: use podman secrets or sth
     if [[ -z "${L7_USER_TOKEN_HASH}" ]]; then
       L7_USER_TOKEN="$(head -c 1000 /dev/random | base32 | head -c32)"
       echo "Generated new internal gh auth token" >&2
       export L7_USER_TOKEN_HASH="$(mkpasswd -m sha512crypt "${L7_USER_TOKEN}")"
     fi
-    local L7_GITHUB_TOKEN="${L7_GITHUB_TOKEN:-FILLMEIN}"
-    # TODO: set internal or container env
-    #echo "Templating from ${cfg_tmpl} to ${cfg}" >&2
+    # todo: use podman secrets or sth instead of passing around env vars and files
     # simple templating
     envsubst '${L7_GITHUB_TOKEN},${L7_USER_TOKEN_HASH}' < "${cfg_tmpl}" > "${cfg}"
+    # restart auth-proxy if already running
+    # set -x
+    auth_proxy_name=$(get_compose_container_name 'auth-proxy')
+    "${cmd}" restart --running "${auth_proxy_name}" #>/dev/null 2>/dev/null || true
 
-    # if existing token is provided and not set in user env conf, remove any existing one and replace
+    # if existing user-auth token is provided and not set in user env conf, remove any existing one and replace
     if [[ -n "${L7_USER_TOKEN}" ]]; then
       envcfg="${CONF_DIR}/env"
       if [[ -f "${envcfg}" ]]; then
-        grep --quiet "^GITHUB_TOKEN=${L7_GITHUB_TOKEN}$" "${envcfg}"
+        grep --quiet "^GITHUB_TOKEN=${L7_USER_TOKEN}$" "${envcfg}"
         if (( $? != 0 )); then
           cp -b "${envcfg}" "${envcfg}.backup"
           grep -Ev '^GITHUB_TOKEN=|^GH_TOKEN=' "${envcfg}" \
@@ -198,6 +197,19 @@ configure_gh_token() {
         fi
       fi
       echo "GITHUB_TOKEN=${L7_USER_TOKEN}" >> "${envcfg}"
+    fi
+    # if existing gh token is provided and not set in env conf, remove any existing one and replace
+    if [[ -n "${L7_GITHUB_TOKEN}" ]]; then
+      envcfg="${CONF_DIR}/.env"
+      if [[ -f "${envcfg}" ]]; then
+        grep --quiet "^L7_GITHUB_TOKEN=${L7_GITHUB_TOKEN}$" "${envcfg}"
+        if (( $? != 0 )); then
+          cp -b "${envcfg}" "${envcfg}.backup"
+          grep -Ev '^GITHUB_TOKEN=|^GH_TOKEN=' "${envcfg}" \
+            | sponge "${envcfg}"
+        fi
+      fi
+      echo "GITHUB_TOKEN=${L7_GITHUB_TOKEN}" >> "${envcfg}"
     fi
   fi
 }
@@ -233,6 +245,7 @@ fi
 
 user_config
 runtime_config
+configure_gh_token
 start_compose
 
 ${cmd} network ls --filter="name=${NETWORK_NAME}" | grep --quiet "${NETWORK_NAME}"
