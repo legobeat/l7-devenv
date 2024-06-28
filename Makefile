@@ -176,6 +176,20 @@ image_runner_node_ios: submodules image_runner_node
 		-f './sidecars/node-runner/Containerfile.ios' \
 		.
 
+# for mermaid etc
+image_runner_node_puppeteer : IMAGE_NAME = ${RUNNER_IMAGE_NAME}
+image_runner_node_puppeteer : IMAGE_TAG = ${RUNNER_IMAGE_TAG}
+image_runner_node_puppeteer: submodules image_runner_node
+	${CMD} buildx build \
+		${BUILD_OPTIONS} \
+		--build-arg "SHELL=${USER_SHELL}" \
+		--build-arg "UID=${UID}" \
+		--build-arg "GID=${GID}" \
+		--build-arg "NODE_VERSION=20" \
+		-t "${IMAGE_NAME}:puppeteer-${IMAGE_TAG}" \
+		-f './sidecars/node-puppeteer/Containerfile' \
+		./sidecars/node-puppeteer
+
 image_runner_node_all: IMAGE_NAME = ${RUNNER_IMAGE_NAME}
 image_runner_node_all: IMAGE_TAG = ${RUNNER_IMAGE_TAG}
 image_runner_node_all: image_runner_node_20 image_runner_node_18 image_runner_node_22 # image_runner_node_ios

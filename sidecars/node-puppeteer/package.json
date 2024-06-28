@@ -1,0 +1,17 @@
+{
+  "name": "l7-node-puppeteer",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "AGPL-3.0",
+  "packageManager": "npm@10.8.1",
+  "dependencies": {
+    "@puppeteer/browsers": "^2.2.3",
+    "puppeteer": "^22.12.1",
+    "puppeteer-core": "^22.12.1"
+  }
+}
