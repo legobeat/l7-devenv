@@ -40,3 +40,6 @@ RUN npm i
 ######
 
 USER node
+WORKDIR /
+RUN node /usr/local/lib/node_modules/.bin/puppeteer install chromium@latest \
+ && node /usr/local/lib/node_modules/.bin/puppeteer install firefox@stable
