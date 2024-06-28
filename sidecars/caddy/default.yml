@@ -20,6 +20,8 @@ apps:
               - 'registry.yarnpkg.com'
               - 'registry.npmmirror.com'
               #- 'replicate.npmjs.com'
+            # TODO: Reject publish (note: audit is still POST/PUT)
+            # TODO: forward non-publish non-GET to upstream (audit)
             handle:
               - handler: rewrite
                 uri: '{http.request.host}/{http.request.uri}/'
@@ -36,15 +38,8 @@ apps:
                     #protocol: http
                     #versions: ['1.1']
                     #terminal: true
-          - match:
-            - host:
-              - '*'
-              - '*.*'
-              - '*.*.*'
-              - '*.*.*.*'
-              - '*.*.*.*.*'
-              - '*.*.*.*.*.*'
-            handle:
+            terminal: true
+          - handle:
               - handler: reverse_proxy
                 upstreams:
                   - dial: '{env.PKG_PROXY_HOST}:{env.PKG_PROXY_PORT}'
@@ -79,8 +74,7 @@ apps:
                 upstreams:
                   - dial: '{env.GITHUB_PROXY_HOST}:{env.GITHUB_PROXY_PORT}'
             terminal: true
-          - match: []
-            handle:
+          - handle:
               - handler: reverse_proxy
                 upstreams:
                   - dial: '{http.request.host}:80'
@@ -135,7 +129,8 @@ apps:
                   sni:
                     - deb.debian.org
                     - dl-cdn.alpinelinux.org
-                    - mirrors.fedoraproject.org
+                    # todo
+                    #- mirrors.fedoraproject.org
                     - registry.npmjs.org
                     - registry.yarnpkg.com
                     - registry.npmmirror.com
