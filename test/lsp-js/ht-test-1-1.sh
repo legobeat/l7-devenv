@@ -2,7 +2,7 @@
 # senss keystrokes to neovim (navigate to element and inspect) and screenscrapes for expected output
 result="$(
   (
-    sleep 10
+    sleep 20
     echo '{ "type": "sendKeys", "keys": ["w"] }'
     sleep 0.2
     echo '{ "type": "sendKeys", "keys": ["w"] }'
@@ -10,7 +10,7 @@ result="$(
     echo '{ "type": "sendKeys", "keys": [" "] }'
     sleep 0.2
     echo '{ "type": "sendKeys", "keys": ["\""] }'
-    sleep 1
+    sleep 5
     echo '{ "type": "getView" }'
     echo '{ "type": "sendKeys", "keys": [":LspInfo", "Enter"] }'
     sleep 0.5

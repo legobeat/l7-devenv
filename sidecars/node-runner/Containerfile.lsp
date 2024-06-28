@@ -34,3 +34,5 @@ RUN ln -sf \
 ARG UID=1000
 ARG GID=1000
 USER ${UID}:${GID}
+
+ENTRYPOINT [ "typescript-language-server", "--stdio" ]

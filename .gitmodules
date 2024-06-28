@@ -52,3 +52,6 @@
 [submodule "sidecars/git-auth-proxy"]
 	path = sidecars/git-auth-proxy
 	url = https://github.com/legobeat/git-auth-proxy.git
+[submodule "contrib/nvim-plugins/lspcontainers.nvim"]
+	path = contrib/nvim-plugins/lspcontainers.nvim
+	url = https://github.com/legobeat/lspcontainers.nvim
