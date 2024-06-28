@@ -79,8 +79,7 @@ apps:
                 upstreams:
                   - dial: '{env.GITHUB_PROXY_HOST}:{env.GITHUB_PROXY_PORT}'
             terminal: true
-          - match: []
-            handle:
+          - handle:
               - handler: reverse_proxy
                 upstreams:
                   - dial: '{http.request.host}:80'
@@ -135,7 +134,8 @@ apps:
                   sni:
                     - deb.debian.org
                     - dl-cdn.alpinelinux.org
-                    - mirrors.fedoraproject.org
+                    # todo
+                    #- mirrors.fedoraproject.org
                     - registry.npmjs.org
                     - registry.yarnpkg.com
                     - registry.npmmirror.com
