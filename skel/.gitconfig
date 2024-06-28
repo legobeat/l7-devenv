@@ -1,6 +1,9 @@
 [include]
   path = ~/.config/git/config
 
+[url "git@github.com:"]
+  insteadOf = "https://github.com/"
+
 [gpg]
   program = /usr/local/bin/l7-gpg-proxy
 
