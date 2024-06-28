@@ -38,6 +38,11 @@ for tokenvar in $(env | cut -d= -f1 | grep -i _token); do
   unset "${tokenvar}";
 done
 
+# detect tty
+if [ -t 1 ] ; then
+  RUNNER_OPTS="${RUNNER_OPTS} -t "
+fi
+
 sudo -E \
   podman run --rm -i \
   --user "$(id -u):$(id -g)" --userns=keep-id:uid=$(id -u),gid=$(id -g) \
