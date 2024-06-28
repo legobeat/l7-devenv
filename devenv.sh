@@ -104,7 +104,7 @@ runtime_config () {
   fi
 
   # podman / netavark hijack both dns and/or resolv.conf no matter what, it seems...
-  RESOLV_CONF_PATH="$(mktemp)"
+  RESOLV_CONF_PATH="${L7_RESOLV_CONF_PATH:-$(mktemp)}"
   echo "nameserver ${CONTAINER_DNS}" > "${RESOLV_CONF_PATH}"
 
   # detect tty
