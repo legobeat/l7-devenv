@@ -373,6 +373,8 @@ test_e2e_curl:
 		"http://product-details.mozilla.org/1.0/firefox_versions.json" \
 		"https://product-details.mozilla.org/1.0/firefox_versions.json" \
 		"http://archive.ubuntu.com/ubuntu/dists/noble/InRelease" \
+		"http://product-details.mozilla.org/1.0/firefox_versions.json" \
+		"https://product-details.mozilla.org/1.0/firefox_versions.json" \
 	; do \
 		result=$$(export NAME=l7ide-test-runner; ./devenv.sh \
 			curl -f -sSL --tlsv1.2 "$${url}" -o/dev/null \
