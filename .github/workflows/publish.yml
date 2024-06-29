@@ -209,6 +209,7 @@ jobs:
               ghcr.io/legobeat/l7-devenv/node:lsp-20-${{ github.ref_name }}
             build-args: |
               CADDY_IMAGE=ghcr.io/legobeat/l7-devenv/caddy:${{ github.ref_name }}
+              BASE_IMAGE=ghcr.io/legobeat/l7-devenv/node:20-${{ github.ref_name }}
     steps:
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
