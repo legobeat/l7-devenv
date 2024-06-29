@@ -133,6 +133,17 @@ jobs:
               ghcr.io/legobeat/l7-devenv/node:20-${{ github.ref_name }}
             build-args: |
               CADDY_IMAGE=ghcr.io/legobeat/l7-devenv/caddy:${{ github.ref_name }}
+          - name: lsp-typescript
+            file: sidecars/node-runner/Containerfile.lsp
+            context: .
+            tags: |
+              ghcr.io/legobeat/l7-devenv/lsp/typescript:latest
+              ghcr.io/legobeat/l7-devenv/lsp/typescript:${{ github.ref_name }}
+              ghcr.io/legobeat/l7-devenv/node:lsp-latest
+              ghcr.io/legobeat/l7-devenv/node:lsp-20-bookworm
+              ghcr.io/legobeat/l7-devenv/node:lsp-20-${{ github.ref_name }}
+            build-args: |
+              CADDY_IMAGE=ghcr.io/legobeat/l7-devenv/caddy:${{ github.ref_name }}
           - name: nvim
             file: Containerfile
             context: .
