@@ -20,6 +20,12 @@ result="$(
     | ht nvim test/lsp-js/fixtures/1/index.ts
 )"
 
+echo "#####################"
+echo "#####################"
+echo "TEST RESULT:" "${result}" | sed 's#\\n#\n#g'
+echo "#####################"
+echo "#####################"
+
 echo "$result" \
   | grep --quiet 'class Struct<Type = unknown, Schema = unknown>.*encapsulate the validation logic.*typescript'
 if (( $? != 0 )); then
