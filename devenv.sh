@@ -33,6 +33,10 @@ user_config () {
 
 runtime_config () {
   cmd="${CONTAINER_CMD:-$(detect_runtime_command)}"
+  if [[ -z "${cmd}" ]]; then
+    echo "Missing container rumtime. Install podman or set env var CONTAINER_CMD." >&2
+    exit 1
+  fi
   composecmd="${COMPOSE_CMD:-$(detect_compose_command)}"
   NAME="${NAME:-l7-nvim}"
   IMAGE_TAG=${IMAGE_TAG:-latest}
