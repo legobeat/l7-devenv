@@ -148,6 +148,42 @@ get_compose_container_name() {
   echo -n "${cn}-${name}-1"
 }
 
+# set value in shell env file
+envfile_upsert_shell() {
+  envcfg="${1}"
+  name="${2}"
+  value="${3}"
+  # remove old value, if any, and replace
+  if [[ -f "${envcfg}" ]]; then
+    grep --quiet "^${name}=${val}$" "${envcfg}"
+    if (( $? == 0 )); then
+      # new value already set
+      return
+    fi
+    grep -Ev "^(export\s)?\s*${name}=" "${envcfg}" > "${envcfg}.new"
+  fi
+  echo "export ${name}='${value}'" >> "${envcfg}.new"
+  mv -b "${envcfg}.new" "${envcfg}"
+}
+
+# set value in podman .env file
+envfile_upsert() {
+  envcfg="${1}"
+  name="${2}"
+  value="${3}"
+  # remove old value, if any, and replace
+  if [[ -f "${envcfg}" ]]; then
+    grep --quiet "^${name}=${val}$" "${envcfg}"
+    if (( $? == 0 )); then
+      # new value already set
+      return
+    fi
+    grep -Ev "^${name}=" "${envcfg}" > "${envcfg}.new"
+  fi
+  echo "${name}=${value}" >> "${envcfg}.new"
+  mv -b "${envcfg}.new" "${envcfg}"
+}
+
 configure_gh_token() {
   mkdir -p "${CONF_DIR}/git-auth-proxy"
   local cfg="${CONF_DIR}/git-auth-proxy/config.json"
@@ -163,20 +199,37 @@ configure_gh_token() {
   if [[ -f "${cfg_tmpl}" ]]; then
     # allow supplying secrets via stdout of command to avoid leaking
     if [[ -n "${L7_GITHUB_TOKEN_CMD}" ]] ; then
-      local L7_GITHUB_TOKEN="$(L7_GITHUB_TOKEN_CMD)"
+      export L7_GITHUB_TOKEN="$(L7_GITHUB_TOKEN_CMD)"
       # TODO: diff with old value, only restart if different
       SHOULD_RESTART_HTTP_PROXY=1
     fi
     if [[ -z "${L7_USER_TOKEN_HASH}" ]]; then
-      L7_USER_TOKEN="$(head -c 1000 /dev/random | base32 | head -c32)"
+      export L7_USER_TOKEN="$(head -c 1000 /dev/random | base32 | head -c32)"
       msg="${msg}Generated new internal gh auth token. " >&2
-      L7_USER_TOKEN_HASH="$(mkpasswd -m sha512crypt "${L7_USER_TOKEN}")"
+      export L7_USER_TOKEN_HASH="$(mkpasswd -m sha512crypt "${L7_USER_TOKEN}")"
       SHOULD_RESTART_HTTP_PROXY=1
     fi
     [[ -n "${msg}" ]] && echo "${msg}" >&2
     # todo: use podman secrets or sth instead of passing around env vars and files
     # simple templating
-    envsubst '${L7_GITHUB_TOKEN},${L7_USER_TOKEN_HASH}' < "${cfg_tmpl}" > "${cfg}"
+    L7_GITHUB_TOKEN="${L7_GITHUB_TOKEN}" L7_USER_TOKEN_HASH="${L7_USER_TOKEN_HASH}" \
+      envsubst '${L7_GITHUB_TOKEN},${L7_USER_TOKEN_HASH}' < "${cfg_tmpl}" > "${cfg}"
+
+    # if existing user-auth token is provided and not set in user env conf, remove any existing one and replace
+    if [[ -n "${L7_USER_TOKEN}" ]]; then
+      envfile_upsert "${CONF_DIR}/env" GITHUB_TOKEN "${L7_USER_TOKEN}"
+      envfile_upsert "${CONF_DIR}/env" GH_TOKEN     "${L7_USER_TOKEN}"
+    fi
+    # if existing gh token is provided and not set in env conf, remove any existing one and replace
+    if [[ -n "${L7_GITHUB_TOKEN}" ]]; then
+      envfile_upsert_shell "${CONF_DIR}/.env" L7_GITHUB_TOKEN "${L7_GITHUB_TOKEN}"
+    fi
+    if [[ -n "${L7_USER_TOKEN_HASH}" ]]; then
+      envfile_upsert_shell "${CONF_DIR}/.env" L7_USER_TOKEN_HASH "${L7_USER_TOKEN_HASH}"
+    fi
+
+    unset L7_GITHUB_TOKEN
+    unset L7_GITHUB_TOKEN_HASH
 
     if [[ -n "${SHOULD_RESTART_HTTP_PROXY}" ]]; then
       # restart auth-proxy if already running
@@ -184,33 +237,6 @@ configure_gh_token() {
       "${cmd}" restart --running "${auth_proxy_name}" >/dev/null 2>/dev/null || true
     fi
 
-    # if existing user-auth token is provided and not set in user env conf, remove any existing one and replace
-    if [[ -n "${L7_USER_TOKEN}" ]]; then
-      envcfg="${CONF_DIR}/env"
-      if [[ -f "${envcfg}" ]]; then
-        grep --quiet "^GITHUB_TOKEN=${L7_USER_TOKEN}$" "${envcfg}"
-        if (( $? != 0 )); then
-          cp -b "${envcfg}" "${envcfg}.backup"
-          grep -Ev '^GITHUB_TOKEN=|^GH_TOKEN=' "${envcfg}" \
-            | sponge "${envcfg}"
-        fi
-      fi
-      echo "GITHUB_TOKEN=${L7_USER_TOKEN}" >> "${envcfg}"
-    fi
-    # if existing gh token is provided and not set in env conf, remove any existing one and replace
-    if [[ -n "${L7_GITHUB_TOKEN}" ]]; then
-      envcfg="${CONF_DIR}/.env"
-      if [[ -f "${envcfg}" ]]; then
-        grep --quiet "^L7_GITHUB_TOKEN=${L7_GITHUB_TOKEN}$" "${envcfg}"
-        if (( $? != 0 )); then
-          cp -b "${envcfg}" "${envcfg}.backup"
-          grep -Ev '^L7_GITHUB_TOKEN=|GITHUB_TOKEN=|^GH_TOKEN=' "${envcfg}" \
-            | sponge "${envcfg}"
-        fi
-      fi
-      echo "L7_GITHUB_TOKEN=${L7_GITHUB_TOKEN}" >> "${envcfg}"
-      echo "L7_USER_TOKEN_HASH=${L7_USER_TOKEN_HASH}" >> "${envcfg}"
-    fi
   fi
 }
 
