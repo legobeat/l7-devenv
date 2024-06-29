@@ -9,7 +9,8 @@ env:
 
 jobs:
   # build caddy first because it generates tls root cert. rest run in parallel
-  publish-image-caddy:
+  # node-runner is used as base for lsp
+  publish-image-pre:
     runs-on: ubuntu-latest
     services:
       registry:
@@ -33,6 +34,15 @@ jobs:
               ghcr.io/legobeat/l7-devenv/caddy:alpine
               ghcr.io/legobeat/l7-devenv/caddy:alpine-${{ github.ref_name }}
               ghcr.io/legobeat/l7-devenv/caddy:${{ github.ref_name }}
+          - name: node
+            file: sidecars/node-runner/Containerfile
+            context: .
+            tags: |
+              ghcr.io/legobeat/l7-devenv/node:latest
+              ghcr.io/legobeat/l7-devenv/node:20-bookworm
+              ghcr.io/legobeat/l7-devenv/node:20-${{ github.ref_name }}
+            build-args: |
+              CADDY_IMAGE=ghcr.io/legobeat/l7-devenv/caddy:${{ github.ref_name }}
     # exact duplicate of publish steps for other images. yaml anchors not supported in gha
     steps:
       - name: Set up QEMU
@@ -78,7 +88,7 @@ jobs:
           cache-to: type=gha,mode=max
 
   publish-image:
-    needs: publish-image-caddy
+    needs: publish-image-pre
     runs-on: ubuntu-latest
     services:
       registry:
@@ -124,13 +134,15 @@ jobs:
               ghcr.io/legobeat/l7-devenv/gpg-vault:alpine
               ghcr.io/legobeat/l7-devenv/gpg-vault:${{ github.ref_name }}
               ghcr.io/legobeat/l7-devenv/gpg-vault:alpine-${{ github.ref_name }}
-          - name: node
-            file: sidecars/node-runner/Containerfile
+          - name: lsp-typescript
+            file: sidecars/node-runner/Containerfile.lsp
             context: .
             tags: |
-              ghcr.io/legobeat/l7-devenv/node:latest
-              ghcr.io/legobeat/l7-devenv/node:20-bookworm
-              ghcr.io/legobeat/l7-devenv/node:20-${{ github.ref_name }}
+              ghcr.io/legobeat/l7-devenv/lsp/typescript:latest
+              ghcr.io/legobeat/l7-devenv/lsp/typescript:${{ github.ref_name }}
+              ghcr.io/legobeat/l7-devenv/node:lsp-latest
+              ghcr.io/legobeat/l7-devenv/node:lsp-20-bookworm
+              ghcr.io/legobeat/l7-devenv/node:lsp-20-${{ github.ref_name }}
             build-args: |
               CADDY_IMAGE=ghcr.io/legobeat/l7-devenv/caddy:${{ github.ref_name }}
           - name: nvim
