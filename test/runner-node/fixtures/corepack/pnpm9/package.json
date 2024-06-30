@@ -1,0 +1,5 @@
+{
+  "name": "pnpm9",
+  "main": "index.js",
+  "packageManager": "pnpm@9.4.0"
+}

@@ -55,7 +55,7 @@ ENV NPM_CONFIG_PREFIX=/home/node/.npm-global
 WORKDIR /tmp
 
 COPY sidecars/node-runner/install-package-managers.sh .
-ARG COREPACK_PMS='yarn@1.22.22 yarn@3 yarn@4 npm@7 npm@9 npm@10 pnpm@9'
+ARG COREPACK_PMS='yarn@1.22.22 yarn@3 yarn@4 npm@7 npm@9 npm@10 pnpm@9.4'
 RUN ./install-package-managers.sh \
   && mkdir -p /home/node/.corepack/bin \
   # `corepack enable` determines shim installation path based on `which corepack` directory
