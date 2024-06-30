@@ -9,39 +9,41 @@ services:
       container-control:
         ipv4_address: 10.7.9.2
     environment:
-      - ALLOW_START=1 #optional
-      - ALLOW_STOP=1 #optional
-      - ALLOW_RESTARTS=1 #optional
-      - AUTH=0 #optional
-      - BUILD=0 #optional
-      - COMMIT=0 #optional
-      - CONFIGS=0 #optional
-      - CONTAINERS=0 #optional
-      - DISABLE_IPV6=1 #optional
-      - DISTRIBUTION=0 #optional
-      - EVENTS=1 #optional
-      - EXEC=1 #optional
-      - IMAGES=0 #optional
-      - INFO=1 #optional
-      - NETWORKS=0 #optional
-      - NODES=0 #optional
-      - PING=1 #optional
-      - POST=1 #optional
-      - PLUGINS=0 #optional
-      - SECRETS=0 #optional
-      - SERVICES=0 #optional
-      - SESSION=0 #optional
-      - SWARM=0 #optional
-      - SYSTEM=0 #optional
-      - TASKS=0 #optional
-      - VERSION=1 #optional
-      - VOLUMES=0 #optional
+      - ALLOW_START=1
+      - ALLOW_STOP=1
+      - ALLOW_RESTARTS=1
+      - AUTH=0
+      - BUILD=0
+      - COMMIT=0
+      - CONFIGS=0
+      - CONTAINERS=1
+      - DISABLE_IPV6=1
+      - DISTRIBUTION=0
+      - EVENTS=1
+      - EXEC=0
+      - IMAGES=1 # shouldn't be necessary but gets called by podman-run despite pull=never
+      - INFO=0
+      - NETWORKS=0
+      - NODES=0
+      - PING=1
+      - POST=1
+      - PLUGINS=0
+      - SECRETS=0
+      - SERVICES=0
+      - SESSION=0
+      - SWARM=0
+      - SYSTEM=0
+      - TASKS=0
+      - VERSION=1
+      - VOLUMES=0
     volumes:
       #- /run/user/1000/podman/podman.sock:/var/run/docker.sock
       - ${CONTAINER_SOCKET}:/var/run/docker.sock:ro
       #- /run/user/${UID}/podman/podman.sock:/var/run/docker.sock:ro
     restart: unless-stopped
     #read_only: true
+    tmpfs:
+      - /run
 
   auth-proxy:
     build:
