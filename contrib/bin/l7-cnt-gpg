@@ -6,7 +6,7 @@ RUNNER_IMAGE="${GPG_IMAGE:-${RUNNER_IMAGE}}"
 COMMAND="$1"
 ARGS="${@:2}"
 
-podman run --rm -it \
+podman run --pull=never --rm -it \
   --stop-signal 9 --stop-timeout=3 \
   -e GNUPGHOME=/vault/gnupg \
   --mount "type=volume,chown=true,Z,source=${GPG_PK_VOLUME},target=/vault/gnupg" \
