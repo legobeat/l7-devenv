@@ -25,7 +25,7 @@ user_config () {
   mkdir -p "${LOG_DIR}"
   mkdir -p "${CONF_DIR}/ssh.d" "${LOCAL_DIR}/ssh" "${CONF_DIR}/git"
   touch "${CONF_DIR}/git/config"
-  mkdir -p ~/.local/share/l7ide/node-runner/{yarn/cache/classic,yarn/cache/berry,npm/cache,node/cache}
+  mkdir -p ~/.local/share/l7ide/node-runner/{yarn/cache/classic,yarn/cache/berry,npm/cache,node/cache,pnpm/cache}
   mkdir -p ~/.local/share/l7ide/gh && touch ~/.local/share/l7ide/gh/hosts.yml && chmod 0600 ~/.local/share/l7ide/gh/hosts.yml
   mkdir -p ~/.local/share/l7ide/go-runner/go
   mkdir -p ~/.local/share/l7ide/apt-cacher-ng/cache
