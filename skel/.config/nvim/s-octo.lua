@@ -9,7 +9,7 @@ require('octo').setup({
     -- TODO: GH token from file instead of env
     return { GITHUB_TOKEN = os.getenv("GITHUB_TOKEN") }
   end,
-  default_to_projects_v2 = true,
+  default_to_projects_v2 = false,
   picker_config = {
     use_emojis = true, -- only used by "fzf-lua" picker for now
   },
