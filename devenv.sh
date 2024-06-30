@@ -88,8 +88,9 @@ runtime_config () {
     # uidmap for rootless
     uid=$(id -u)
     gid=$(id -g)
+    #--user ${uid}:${gid} --userns=keep-id:uid=${uid},gid=${gid} \
     RUN_ARGS="${RUN_ARGS} \
-      --user ${uid}:${gid} --userns=keep-id:uid=1000,gid=1000 \
+      --user 1000:1000 --userns=keep-id:uid=1000,gid=1000 \
     "
     # below uidmap/gidmap monstrosity is compat alternative on podman <4.3
     ## https://github.com/containers/podman/blob/main/troubleshooting.md#39-podman-run-fails-with-error-unrecognized-namespace-mode-keep-iduid1000gid1000-passed
