@@ -63,6 +63,10 @@ runtime_config () {
     COMPOSE_NETWORK_NAME="${COMPOSE_NETWORK_NAME:-internal}"
     NETWORK_NAME=${NETWORK_NAME:-$(get_compose_network_name "${COMPOSE_NETWORK_NAME}")}
   fi
+  if [[ -z "${CONTROL_NETWORK_NAME}" ]]; then
+    CONTROL_COMPOSE_NETWORK_NAME="${CONTROL_COMPOSE_NETWORK_NAME:-container-control}"
+    CONTROL_NETWORK_NAME=${CONTROL_NETWORK_NAME:-$(get_compose_network_name "${CONTROL_COMPOSE_NETWORK_NAME}")}
+  fi
 
   ### run args
   if [[ -n "${SSH_SOCKET}" ]]; then
@@ -286,6 +290,7 @@ ${cmd} run --rm -i \
   -e HOME=/home/user \
   -e "SRC_DIR=${SRC_DIR}" \
   --network "${NETWORK_NAME}" \
+  --network "${CONTROL_NETWORK_NAME}" \
   --dns "${CONTAINER_DNS}" \
   ${RUN_ARGS} \
   "${IMAGE}" \
