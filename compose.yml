@@ -4,7 +4,7 @@ services:
     build:
       context: sidecars/git-auth-proxy
       dockerfile: Dockerfile
-    image: localhost/l7/git-auth-proxy:latest
+    image: localhost/l7/auth-proxy:latest
     networks:
       svcs:
         ipv4_address: 10.7.7.135

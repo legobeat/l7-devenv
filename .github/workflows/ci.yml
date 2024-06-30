@@ -110,7 +110,7 @@ jobs:
           mkdir -p /tmp/ci-images
           set -x
           images=$(podman images --format=json \
-            | jq -r 'map(.Names)|flatten|map(select(.)|select(test("/l7/")))|.[]' \
+            | jq -r 'map(.Names)|flatten|map(select(.)|select(test("/l7[^/]*/")))|.[]' \
             | sort \
             | uniq
           )

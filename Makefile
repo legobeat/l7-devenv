@@ -347,7 +347,7 @@ export_runner_node: # image_runner_node
 submodules:
 	@git submodule update --checkout --init --recursive --rebase
 
-images: image_caddy image_dnsmasq image_nvim image_runner_node image_gpg_pk image_acng
+images: image_caddy image_dnsmasq image_nvim image_runner_node image_gpg_pk image_acng image_auth_proxy
 
 images_test: images image_nvim_test
 
