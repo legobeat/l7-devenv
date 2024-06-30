@@ -89,7 +89,7 @@ runtime_config () {
     uid=$(id -u)
     gid=$(id -g)
     RUN_ARGS="${RUN_ARGS} \
-      --user ${uid}:${gid} --userns=keep-id:uid=${uid},gid=${gid} \
+      --user ${uid}:${gid} --userns=keep-id:uid=1000,gid=1000 \
     "
     # below uidmap/gidmap monstrosity is compat alternative on podman <4.3
     ## https://github.com/containers/podman/blob/main/troubleshooting.md#39-podman-run-fails-with-error-unrecognized-namespace-mode-keep-iduid1000gid1000-passed
