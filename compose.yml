@@ -23,7 +23,6 @@ services:
       - EXEC=1 #optional
       - IMAGES=0 #optional
       - INFO=1 #optional
-      - LIBPOD=1 #optional
       - NETWORKS=0 #optional
       - NODES=0 #optional
       - PING=1 #optional
