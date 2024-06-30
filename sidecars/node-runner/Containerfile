@@ -7,7 +7,7 @@ FROM docker.io/node:${NODE_VERSION}-bookworm-slim
 RUN apt-get update \
   && apt-get install -y --no-install-recommends \
     git curl ca-certificates gnupg ssh-client less psmisc jq time man manpages zsh \
-    sudo locales fakeroot libpcre3 \
+    locales fakeroot libpcre3 \
     build-essential ccache cmake cmake-format distcc zlib1g-dev libzlcore-dev libffi-dev libssl-dev libyaml-dev \
   && sed -i '/en_US.UTF-8/s/^# //' /etc/locale.gen \
   && locale-gen \
@@ -23,9 +23,7 @@ ARG GID=1000
 ARG SHELL=/usr/bin/zsh
 # if UID differs from default: create new user/group; take over /home/node
 RUN  bash -c "[ ${GID} != \"1000\" ] && groupadd -g ${GID} -U node userz || true" \
-  && bash -c "[ ${UID} != \"1000\" ] && useradd -u ${UID} -g ${GID} -s ${SHELL} -d /home/node user && chown -R ${UID}:${GID} /home/node || true" \
-  && usermod -G sudo -a $(id -un ${UID}) \
-  && echo '%sudo ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers
+  && bash -c "[ ${UID} != \"1000\" ] && useradd -u ${UID} -g ${GID} -s ${SHELL} -d /home/node user && chown -R ${UID}:${GID} /home/node || true"
 
 WORKDIR /tmp/
 COPY sidecars/node-runner/package.json \
