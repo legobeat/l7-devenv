@@ -32,6 +32,13 @@ user_config () {
 }
 
 runtime_config () {
+  if [[ "$(id -u)" -eq "0"  || "${cmd}" == sudo\ * ]]; then
+    if [[ -z "${L7_FORCE_UNSAFE_ROOT}" ]]; then
+      echo "ERROR: Running as superuser is unsupported. Do not run as root."
+      exit 1
+    fi
+  fi
+
   cmd="${CONTAINER_CMD:-$(detect_runtime_command)}"
   if [[ -z "${cmd}" ]]; then
     echo "Missing container rumtime. Install podman or set env var CONTAINER_CMD." >&2
@@ -87,30 +94,6 @@ runtime_config () {
   fi
   if [[ -f "${CONF_DIR}/env" ]]; then
     RUN_ARGS="${RUN_ARGS} --env-file ${CONF_DIR}/env"
-  fi
-
-  if [[ "$(id -u)" -ne "0"  && ! "${cmd}" == sudo\ * ]]; then
-    # uidmap for rootless
-    uid=$(id -u)
-    gid=$(id -g)
-    #--user ${uid}:${gid} --userns=keep-id:uid=${uid},gid=${gid} \
-    RUN_ARGS="${RUN_ARGS} \
-      --user 1000:1000 --userns=keep-id:uid=1000,gid=1000 \
-    "
-    # below uidmap/gidmap monstrosity is compat alternative on podman <4.3
-    ## https://github.com/containers/podman/blob/main/troubleshooting.md#39-podman-run-fails-with-error-unrecognized-namespace-mode-keep-iduid1000gid1000-passed
-    #subuidSize=$(( $(${cmd} info --format "{{ range \
-    #   .Host.IDMappings.UIDMap }}+{{.Size }}{{end }}" ) - 1 ))
-    #subgidSize=$(( $(${cmd} info --format "{{ range \
-    #   .Host.IDMappings.GIDMap }}+{{.Size }}{{end }}" ) - 1 ))
-    #RUN_ARGS="${RUN_ARGS}
-    #  --uidmap 0:1:$uid
-    #  --uidmap $uid:0:1
-    #  --uidmap $(($uid+1)):$(($uid+1)):$(($subuidSize-$uid))
-    #  --gidmap 0:1:$gid
-    #  --gidmap $gid:0:1
-    #  --gidmap $(($gid+1)):$(($gid+1)):$(($subgidSize-$gid))
-    #"
   fi
 
   # podman / netavark hijack both dns and/or resolv.conf no matter what, it seems...
