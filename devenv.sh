@@ -226,6 +226,7 @@ start_compose () {
 
 if [[ -n "${DEBUG}" ]]; then
   set -x
+  RUN_ARGS="${RUN_ARGS} -e DEBUG=${DEBUG} "
 fi
 
 # default workdir to pwd if within SRC_DIR or /src; otherwise SRC_DIR
