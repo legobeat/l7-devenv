@@ -24,7 +24,7 @@ FROM base AS nvim-builder
 
 ARG EXTRA_BUILD_PKGS=''
 # enable/disable treesitter language parsers. These are fetched remotely.
-ARG TREESITTER_INSTALL='bash c dockerfile hcl javascript lua make markdown nix python ruby typescript vim vimdoc yaml'
+ARG TREESITTER_INSTALL='bash c dockerfile hcl javascript lua make markdown mermaid nix python ruby typescript vim vimdoc yaml'
 ENV HOME=/tmp/1001-home
 
 # TODO: not supported on podman ubuntu-22.03
