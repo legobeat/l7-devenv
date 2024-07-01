@@ -12,9 +12,7 @@ RUN microdnf -y update \
   && microdnf -y install --setopt=install_weak_deps=False \
      make automake gcc gcc-c++ cpp binutils patch  \
      curl wget jq yq moreutils tar \
-     git git-lfs openssh-clients gnupg2 \
-     libnotify \
-     man-db \
+     git gnupg2 \
      neovim lua python3-neovim \
      nodejs typescript \
      $EXTRA_BASE_PKGS \
@@ -117,7 +115,7 @@ WORKDIR ${HOME}
 RUN microdnf -y install --setopt=install_weak_deps=False \
     diffutils tree fzf ripgrep \
     sshpass \
-    hub gh tig \
+    git-lfs hub gh tig \
     libnotify \
     ip openssl procps-ng psmisc \
     man-db \
