@@ -41,6 +41,9 @@ ENV NODE_EXTRA_CA_CERTS=/usr/local/share/ca-certificates/l7-fwd-proxy.crt
 
 RUN DEBIAN_FRONTEND=noninteractive dpkg-reconfigure ca-certificates
 
+# default trust github.com known ssh key
+COPY contrib/data/ssh_known_hosts /etc/ssh/ssh_known_hosts
+
 ####
 
 USER ${UID}:${GID}
