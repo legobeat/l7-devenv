@@ -415,6 +415,7 @@ test_e2e_curl:
 		echo "$$result" | grep -Ez --quiet "^0:200:0___(.*Issuer:.*Caddy.*)?\s*\$$" \
 			&& echo "pass $$url" \
 			|| echo "fail $$url $$(echo "$$result" | head -n3)"; \
+		sleep 0.05; \
 	done
 
 test_e2e_node_corepack: IMAGE_NAME = ${RUNNER_IMAGE_NAME}
