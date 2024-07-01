@@ -9,6 +9,8 @@ RUNNER_IMAGE_NAME := localhost/l7/node
 RUNNER_IMAGE_TAG  := bookworm
 PUPPETEER_IMAGE_NAME := localhost/l7/node-puppeteer
 PUPPETEER_IMAGE_TAG  := bookworm
+MERMAID_IMAGE_NAME := localhost/l7/mermaid
+MERMAID_IMAGE_TAG  := bookworm
 AUTH_PROXY_IMAGE_NAME := localhost/l7/auth-proxy
 AUTH_PROXY_IMAGE_TAG  := latest
 CONTAINER_PROXY_IMAGE_NAME := localhost/l7/container-socket-proxy
@@ -179,7 +181,7 @@ image_runner_node_ios: submodules image_runner_node
 		-f './sidecars/node-runner/Containerfile.ios' \
 		.
 
-# for mermaid etc
+# base for mermaid etc
 image_runner_node_puppeteer: IMAGE_NAME = ${PUPPETEER_IMAGE_NAME}
 image_runner_node_puppeteer: IMAGE_TAG = ${PUPPETEER_IMAGE_TAG}
 image_runner_node_puppeteer: submodules # image_runner_node
@@ -189,6 +191,17 @@ image_runner_node_puppeteer: submodules # image_runner_node
 		--build-arg "NODE_VERSION=20" \
 		-t "${IMAGE_NAME}:${IMAGE_TAG}" \
 		-f './sidecars/node-puppeteer/Containerfile' \
+		./sidecars/node-puppeteer
+
+image_runner_mermaid: IMAGE_NAME = ${MERMAID_IMAGE_NAME}
+image_runner_mermaid: IMAGE_TAG = ${MERMAID_IMAGE_TAG}
+image_runner_mermaid: submodules # image_runner_node
+	${CMD} buildx build \
+		${BUILD_OPTIONS} \
+		--build-arg "SHELL=${USER_SHELL}" \
+		--build-arg "NODE_VERSION=20" \
+		-t "${IMAGE_NAME}:${IMAGE_TAG}" \
+		-f './sidecars/node-puppeteer/Containerfile.mermaid' \
 		./sidecars/node-puppeteer
 
 image_runner_node_all: IMAGE_NAME = ${RUNNER_IMAGE_NAME}
@@ -401,6 +414,9 @@ submodules:
 	@git submodule update --checkout --init --recursive --rebase
 
 images: image_caddy image_dnsmasq image_nvim image_runner_node image_gpg_pk image_acng image_auth_proxy image_container_proxy image_lsp_node
+
+# these are optional and not enabled by default due to extra build time and disk usage
+images_opt: images_runner_mermaid image_runner_node_all
 
 images_test: images image_nvim_test
 
