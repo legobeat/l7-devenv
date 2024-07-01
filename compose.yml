@@ -92,6 +92,7 @@ services:
     image: localhost/l7/apt-cacher-ng
     restart: always
     init: true
+    #command: 'apt-cacher-ng -v PassThroughPattern=.*'
     #cap_drop:
     #  - all
     networks:
@@ -124,7 +125,11 @@ services:
       - 18743:443
     volumes:
       - ${HOME}/.config/l7ide/config/caddy:/config
+      #- ./sidecars/caddy/default.yml:/etc/caddy/default.yml:ro
       #- ${HOME}/.local/share/l7ide/caddy/data:/data
+    tmpfs:
+      - /data/caddy/certificates
+      - /data/caddy/pki
 
 networks:
   svcs:
