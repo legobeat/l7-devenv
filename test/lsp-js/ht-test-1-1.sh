@@ -33,7 +33,7 @@ echo "$result" \
   | grep --quiet 'class Struct<Type = unknown, Schema = unknown>.*encapsulate the validation logic.*typescript'
 grepresult="$?"
 
-if [[ -n "${DEBUG}" || $? != 0 ]]; then
+if [[ -n "${DEBUG}" || ${grepresult} != 0 ]]; then
   echo "#####################"
   echo "#####################"
   echo "TEST OUTPUT:" "${result}" | sed 's#\\n#\n#g'
