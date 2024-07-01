@@ -15,6 +15,15 @@ result="$(
     echo '{ "type": "sendKeys", "keys": [":LspInfo", "Enter"] }'
     sleep 0.5
     echo '{ "type": "getView" }'
+    echo '{ "type": "sendKeys", "keys": [":", "e term://zsh", "Enter"] }'
+    sleep 5
+    echo '{ "type": "sendKeys", "keys": ["A"] }'
+    sleep 2
+    echo '{ "type": "sendKeys", "keys": ["env | sort", "Enter"] }'
+    sleep 1
+    echo '{ "type": "getView" }'
+    echo '{ "type": "sendKeys", "keys": ["^l"] }'
+    sleep 1
     echo '{ "type": "sendKeys", "keys": [":q", "Enter"] }'
   ) \
     | ht nvim test/lsp-js/fixtures/1/index.ts
@@ -32,7 +41,7 @@ if [[ -n "${DEBUG}" || $? != 0 ]]; then
   echo "#####################"
 fi
 
-if (( $? != 0 )); then
+if (( "${grepresult}" != 0 )); then
   echo 'FAIL typescript lsp' >&2
   exit 4
 fi
