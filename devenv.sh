@@ -256,30 +256,39 @@ if (( $? != 0 )) ; then
   exit 1
 fi
 
-${cmd} run --rm -i \
-  --user 1000:1000 --userns=keep-id:uid=1000,gid=1000 \
-  --mount type=bind,source="${LOCAL_DIR},target=/home/user/.local" \
-  --mount type=bind,source="${CONF_DIR}/ssh.d,target=/home/user/.ssh/config.d,ro=true" \
-  --mount type=bind,source="${CONF_DIR}/git,target=/home/user/.config/git,ro=true" \
-  -v "${SRC_DIR}:${SRC_DIR}:Z" \
-  -v "${SRC_DIR}:/src:Z" \
-  -v "${RESOLV_CONF_PATH}:/etc/resolv.conf:ro" \
-  -w "${CWD}" \
-  --mount type=tmpfs,tmpfs-size=2G,destination=/tmp,tmpfs-mode=0777 \
-  -e "L7_COMPOSE_NETWORK_NAME_INTERNAL=${NETWORK_NAME}" \
-  -e "L7_RESOLV_CONF_PATH=${RESOLV_CONF_PATH}" \
-  -e "CONTAINER_HOST=tcp://10.7.9.2:2375" \
-  -e "GO_RUNNER_IMAGE=${GO_RUNNER_IMAGE}" \
-  -e "NODE_RUNNER_IMAGE=${NODE_RUNNER_IMAGE}" \
-  -e "GPG_IMAGE=${GPG_IMAGE}" \
-  -e HOME=/home/user \
-  -e "SRC_DIR=${SRC_DIR}" \
-  --network "${NETWORK_NAME}" \
-  --network "${CONTROL_NETWORK_NAME}" \
-  --dns "${CONTAINER_DNS}" \
-  ${RUN_ARGS} \
-  "${IMAGE}" \
-  ${@:2}
+container_id="$(${cmd} ps -f "name=${NAME}" -q || echo '')"
 
+if [[ -n "${container_id}" ]]; then
+  entrypoint=${1:-${SHELL}}
+  ${cmd} exec -it \
+    -w "${CWD}" "${NAME}" \
+    ${entrypoint} \
+    "${@:2}"
+else
+  ${cmd} run --rm -i \
+    --user 1000:1000 --userns=keep-id:uid=1000,gid=1000 \
+    --mount type=bind,source="${LOCAL_DIR},target=/home/user/.local" \
+    --mount type=bind,source="${CONF_DIR}/ssh.d,target=/home/user/.ssh/config.d,ro=true" \
+    --mount type=bind,source="${CONF_DIR}/git,target=/home/user/.config/git,ro=true" \
+    -v "${SRC_DIR}:${SRC_DIR}:Z" \
+    -v "${SRC_DIR}:/src:Z" \
+    -v "${RESOLV_CONF_PATH}:/etc/resolv.conf:ro" \
+    -w "${CWD}" \
+    --mount type=tmpfs,tmpfs-size=2G,destination=/tmp,tmpfs-mode=0777 \
+    -e "L7_COMPOSE_NETWORK_NAME_INTERNAL=${NETWORK_NAME}" \
+    -e "L7_RESOLV_CONF_PATH=${RESOLV_CONF_PATH}" \
+    -e "CONTAINER_HOST=tcp://10.7.9.2:2375" \
+    -e "GO_RUNNER_IMAGE=${GO_RUNNER_IMAGE}" \
+    -e "NODE_RUNNER_IMAGE=${NODE_RUNNER_IMAGE}" \
+    -e "GPG_IMAGE=${GPG_IMAGE}" \
+    -e HOME=/home/user \
+    -e "SRC_DIR=${SRC_DIR}" \
+    --network "${NETWORK_NAME}" \
+    --network "${CONTROL_NETWORK_NAME}" \
+    --dns "${CONTAINER_DNS}" \
+    ${RUN_ARGS} \
+    "${IMAGE}" \
+    ${@:2}
+fi
 ###
 # --sysctl "net.ipv4.ping_group_range=1000 1000" \
