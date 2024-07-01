@@ -12,7 +12,7 @@ fi
 [[ -n "${DEBUG}" ]] && set -x
 
 # mount/volume source path on host despite run command being run in container
-podman run --rm \
+podman run --pull=never --rm \
   -i \
   --name l7-gpg \
   --stop-signal 9 --stop-timeout=3 \
