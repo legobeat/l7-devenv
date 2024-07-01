@@ -57,7 +57,7 @@ runtime_config () {
   fi
   export CONTAINER_SOCKET
 
-  # used to run de itself. could (should) be separate from CONTAINER_SOCKET
+  # used to run de itself. should be separate from CONTAINER_HOST inside de itself
   export DOCKER_HOST="${DOCKER_HOST:-unix://${CONTAINER_SOCKET}}"
 
   if [[ -z "${NETWORK_NAME}" ]]; then
@@ -277,7 +277,6 @@ ${cmd} run --rm -i \
   --mount type=bind,source="${LOCAL_DIR},target=/home/user/.local" \
   --mount type=bind,source="${CONF_DIR}/ssh.d,target=/home/user/.ssh/config.d,ro=true" \
   --mount type=bind,source="${CONF_DIR}/git,target=/home/user/.config/git,ro=true" \
-  -v "${CONTAINER_SOCKET}:/run/docker.sock" \
   -v "${SRC_DIR}:${SRC_DIR}:Z" \
   -v "${SRC_DIR}:/src:Z" \
   -v "${RESOLV_CONF_PATH}:/etc/resolv.conf:ro" \
@@ -285,7 +284,7 @@ ${cmd} run --rm -i \
   --mount type=tmpfs,tmpfs-size=2G,destination=/tmp,tmpfs-mode=0777 \
   -e "L7_COMPOSE_NETWORK_NAME_INTERNAL=${NETWORK_NAME}" \
   -e "L7_RESOLV_CONF_PATH=${RESOLV_CONF_PATH}" \
-  -e "CONTAINER_HOST=unix:///run/docker.sock" \
+  -e "CONTAINER_HOST=tcp://10.7.9.2:2375" \
   -e "GO_RUNNER_IMAGE=${GO_RUNNER_IMAGE}" \
   -e "NODE_RUNNER_IMAGE=${NODE_RUNNER_IMAGE}" \
   -e "GPG_IMAGE=${GPG_IMAGE}" \
