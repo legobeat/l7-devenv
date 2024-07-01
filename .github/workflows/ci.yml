@@ -20,6 +20,10 @@ jobs:
             file: sidecars/git-auth-proxy/Dockerfile
             context: sidecars/git-auth-proxy
             tags: localhost/l7/auth-proxy:latest
+          - name: container-socket-proxy
+            context: sidecars/container-socket-proxy
+            file: sidecars/container-socket-proxy/Dockerfile
+            tags: localhost/l7/container-socket-proxy:latest
           - name: dnsmasq
             file: sidecars/dnsmasq/Containerfile
             context: sidecars/dnsmasq
@@ -139,6 +143,7 @@ jobs:
         image:
           - acng
           - auth_proxy
+          - container_proxy
           - caddy
           - dnsmasq
           - gpg_pk
@@ -216,7 +221,7 @@ jobs:
           echo 'export L7_GITHUB_TOKEN=${{ github.token }}' > .env
       - name: Prep podman
         run: |
-          podman compose up -d && sleep 10
+          CONTAINER_SOCKET=${XDG_RUNTIME_DIR}/podman/podman.sock podman compose up -d && sleep 10
       - name: Run test ${{ matrix.test }}
         run: |
           podman network ls

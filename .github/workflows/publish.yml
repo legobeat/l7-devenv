@@ -108,6 +108,12 @@ jobs:
             tags: |
               ghcr.io/legobeat/l7-devenv/auth-proxy:latest
               ghcr.io/legobeat/l7-devenv/auth-proxy:${{ github.ref_name }}
+          - name: container-socket-proxy
+            file: sidecars/container-socket-proxy/Dockerfile
+            context: sidecars/container-socket-proxy
+            tags: |
+              ghcr.io/legobeat/l7-devenv/container-socket-proxy:latest
+              ghcr.io/legobeat/l7-devenv/container-socket-proxy:${{ github.ref_name }}
           - name: dnsmasq
             file: sidecars/dnsmasq/Containerfile
             context: sidecars/dnsmasq
