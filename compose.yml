@@ -1,5 +1,50 @@
 ---
 services:
+  container-socket-proxy:
+    build: 
+      context: sidecars/container-socket-proxy
+      dockerfile: Dockerfile
+    image: localhost/l7/container-socket-proxy:latest
+    networks:
+      container-control:
+        ipv4_address: 10.7.9.2
+    environment:
+      - ALLOW_START=1
+      - ALLOW_STOP=1
+      - ALLOW_RESTARTS=1
+      - AUTH=0
+      - BUILD=0
+      - COMMIT=0
+      - CONFIGS=0
+      - CONTAINERS=1
+      - DISABLE_IPV6=1
+      - DISTRIBUTION=0
+      - EVENTS=1
+      - EXEC=0
+      - IMAGES=1 # shouldn't be necessary but gets called by podman-run despite pull=never
+      - INFO=0
+      - NETWORKS=0
+      - NODES=0
+      - PING=1
+      - POST=1
+      - PLUGINS=0
+      - SECRETS=0
+      - SERVICES=0
+      - SESSION=0
+      - SWARM=0
+      - SYSTEM=0
+      - TASKS=0
+      - VERSION=1
+      - VOLUMES=0
+    volumes:
+      #- /run/user/1000/podman/podman.sock:/var/run/docker.sock
+      - ${CONTAINER_SOCKET}:/var/run/docker.sock:ro
+      #- /run/user/${UID}/podman/podman.sock:/var/run/docker.sock:ro
+    restart: unless-stopped
+    #read_only: true
+    tmpfs:
+      - /run
+
   auth-proxy:
     build:
       context: sidecars/git-auth-proxy
@@ -95,6 +140,16 @@ networks:
     ipam:
       config:
         - subnet: 10.7.8.0/24
+    driver: bridge
+    driver_opts:
+      inhibit_ipv4: 1
+      disable_dns: 1
+  container-control:
+    attachable: true
+    ipam:
+      config:
+        - subnet: 10.7.9.0/29
+          ip_range: 10.7.9.4/30
     driver: bridge
     driver_opts:
       inhibit_ipv4: 1

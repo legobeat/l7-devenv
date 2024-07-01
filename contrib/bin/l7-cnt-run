@@ -43,8 +43,7 @@ if [ -t 1 ] ; then
   RUNNER_OPTS="${RUNNER_OPTS} -t "
 fi
 
-sudo -E \
-  podman run --rm -i \
+podman run --pull=never --rm -i \
   --user "$(id -u):$(id -g)" --userns=keep-id:uid=$(id -u),gid=$(id -g) \
   -e '*' \
   --network "${L7_COMPOSE_NETWORK_NAME_INTERNAL}" \
