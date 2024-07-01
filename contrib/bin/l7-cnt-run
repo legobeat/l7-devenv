@@ -4,6 +4,8 @@
 
 [[ -n "$DEBUG" ]] && set -x
 
+RUNNER_IMAGE="${RUNNER_IMAGE:-${NODE_RUNNER_IMAGE:-localhost/l7/node:20-bookworm}}"
+
 if [[ "$(basename $0)" = "l7-cnt-run" ]]; then
   COMMAND="$1"
   ARGS="${@:2}"
