@@ -1,7 +1,7 @@
 ---
 services:
   container-socket-proxy:
-    build: 
+    build:
       context: sidecars/container-socket-proxy
       dockerfile: Dockerfile
     image: localhost/l7/container-socket-proxy:latest

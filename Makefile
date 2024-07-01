@@ -398,6 +398,7 @@ test_e2e_curl:
 		"https://github.com" \
 		"https://github.com/lspcontainers/lspcontainers.nvim" \
 		"https://github.com/actions/example-services/pulls" \
+		"https://codeload.github.com/legobeat/mermaid-cli/tar.gz/02153e234a876c95b44e1af84d02bca65681f6d1" \
 		"https://registry.npmjs.org/xtend/" \
 		"https://registry.npmjs.org/xtend" \
 		"https://registry.yarnpkg.com/xtend/" \
