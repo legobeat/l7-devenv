@@ -7,6 +7,8 @@ GPG_IMAGE_NAME := localhost/l7/gpg-vault
 GPG_IMAGE_TAG  := pk
 RUNNER_IMAGE_NAME := localhost/l7/node
 RUNNER_IMAGE_TAG  := bookworm
+PUPPETEER_IMAGE_NAME := localhost/l7/node-puppeteer
+PUPPETEER_IMAGE_TAG  := bookworm
 AUTH_PROXY_IMAGE_NAME := localhost/l7/auth-proxy
 AUTH_PROXY_IMAGE_TAG  := latest
 CONTAINER_PROXY_IMAGE_NAME := localhost/l7/container-socket-proxy
@@ -177,16 +179,14 @@ image_runner_node_ios: submodules image_runner_node
 		.
 
 # for mermaid etc
-image_runner_node_puppeteer : IMAGE_NAME = ${RUNNER_IMAGE_NAME}
-image_runner_node_puppeteer : IMAGE_TAG = ${RUNNER_IMAGE_TAG}
-image_runner_node_puppeteer: submodules image_runner_node
+image_runner_node_puppeteer: IMAGE_NAME = ${PUPPETEER_IMAGE_NAME}
+image_runner_node_puppeteer: IMAGE_TAG = ${PUPPETEER_IMAGE_TAG}
+image_runner_node_puppeteer: submodules # image_runner_node
 	${CMD} buildx build \
 		${BUILD_OPTIONS} \
 		--build-arg "SHELL=${USER_SHELL}" \
-		--build-arg "UID=${UID}" \
-		--build-arg "GID=${GID}" \
 		--build-arg "NODE_VERSION=20" \
-		-t "${IMAGE_NAME}:puppeteer-${IMAGE_TAG}" \
+		-t "${IMAGE_NAME}:${IMAGE_TAG}" \
 		-f './sidecars/node-puppeteer/Containerfile' \
 		./sidecars/node-puppeteer
 
