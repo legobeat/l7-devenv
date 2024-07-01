@@ -173,7 +173,7 @@ configure_gh_token() {
       L7_USER_TOKEN_HASH="$(mkpasswd -m sha512crypt "${L7_USER_TOKEN}")"
       SHOULD_RESTART_HTTP_PROXY=1
     fi
-    [[ -n "${msg}" ]] && echo "${msg}"
+    [[ -n "${msg}" ]] && echo "${msg}" >&2
     # todo: use podman secrets or sth instead of passing around env vars and files
     # simple templating
     envsubst '${L7_GITHUB_TOKEN},${L7_USER_TOKEN_HASH}' < "${cfg_tmpl}" > "${cfg}"
