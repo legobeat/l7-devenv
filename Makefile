@@ -22,8 +22,8 @@ GO_RUNNER_IMAGE_TAG  := bookworm
 USER_SHELL ?= /usr/bin/zsh
 BUILD_OPTIONS :=
 EXTRA_PKGS := zsh podman-remote
-UID:=$(shell id -u)
-GID:=$(shell id -g)
+UID:=1000
+GID:=1000
 CMD := $(shell which podman || which docker)
 
 install:

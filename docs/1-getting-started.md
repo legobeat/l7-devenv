@@ -119,7 +119,7 @@ $ de # or ./devenv.sh, if you are not running an installed version
 > echo foo > ~/footest
 > echo bar > ~/.local/bartest
 > echo baz > /etc/shouldfail
-> echo bay | sudo tee /etc/cansudo
+> echo bay | sudo tee /etc/nosudo
 > git status  # or g st
 > exit        # or C^l
 ```

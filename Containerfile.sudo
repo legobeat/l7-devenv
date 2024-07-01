@@ -1,4 +1,7 @@
 # syntax=docker/dockerfile:1.4-labs
+#
+# NOTE: This is unsupported but here to show how in-container rootless sudo can be achieved
+#
 ARG CADDY_IMAGE=localhost/l7/caddy:latest
 FROM registry.fedoraproject.org/fedora-minimal:40 AS base
 
@@ -16,7 +19,6 @@ RUN microdnf -y update \
      libnotify \
      man-db \
      neovim lua python3-neovim \
-     nodejs typescript \
      $EXTRA_BASE_PKGS \
   && ln -sf nvim /usr/bin/vim
 
@@ -52,32 +54,6 @@ RUN \
   && microdnf clean all \
   && cp -a /etc/xdg/nvim/pack/build-l7ide/start/* /out/plugins/
 
-
-##############################################
-##### TYPESCRIPT-LANGUAGE-SERVER BUILDER #####
-
-FROM base AS tsserver-builder
-
-ENV NODE_OPTIONS='--no-network-family-autoselection --trace-warnings'
-ENV HOME=/tmp/1002-home
-
-# TODO: not supported on podman ubuntu-22.03
-# RUN --mount=source=contrib/typescript-language-server,target=/build/typescript-language-server,rw=true \
-COPY contrib/typescript-language-server /build/typescript-language-server
-RUN \
-  microdnf -y install --setopt=install_weak_deps=False \
-    npm yarnpkg \
-  && mkdir -p /out /build/typescript-language-server \
-  # build, pack, and install typescript-language-server
-  && cd /build/typescript-language-server  \
-  && yarn install --frozen-lockfile --network-concurrency 10 \
-  && yarn build \
-  && yarn pack \
-  && cd /out \
-  && npm i /build/typescript-language-server/*.t*gz \
-  && microdnf remove -y npm yarnpkg \
-  && microdnf clean all \
-  && rm -rf /tmp/1002-home /build/typescript-language-server/*.t*gz
 
 # this assumes we already have a locally built caddy image
 # the image contains a pregenerated ca root cert for mitm, which we copy here
@@ -121,7 +97,7 @@ RUN microdnf -y install --setopt=install_weak_deps=False \
     libnotify \
     ip openssl procps-ng psmisc \
     man-db \
-    podman-remote containers-common \
+    podman-remote sudo containers-common \
     # devenv-in-denvenv
     gettext-envsubst mkpasswd \
     screen \
@@ -132,8 +108,19 @@ RUN microdnf -y install --setopt=install_weak_deps=False \
   && ln -sf nvim /usr/bin/vim \
 
   # create user entry or podman will mess up /etc/passwd entry
+  # also grant passwordless sudo
+  # this means image will have to be rebuilt with --build-arg UID=$(id -u) if runtime user has different UID from default 1000
   && bash -c "groupadd -g ${GID} userz || true" \
   && bash -c "useradd -u ${UID} -g ${GID} -d /home/user -m user -s "${SHELL}" && chown -R ${UID}:${GID} /home/user || true" \
+  && usermod -G wheel -a $(id -un ${UID}) \
+  && echo '%wheel ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers \
+  && echo '%userz ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers \
+  # allow accessing mounted container runtime socket ("docker-in-docker"/"podman-in-podman"/"d-i-p")
+  # https://github.com/containers/image_build/blob/main/podman/Containerfile
+  && usermod --add-subuids 1001-64535    --add-subgids 1001-64535 user \
+  && usermod --add-subuids 1-999         --add-subgids 1-999      user \
+  && setcap cap_setuid=+eip /usr/bin/newuidmap \
+  && setcap cap_setgid=+eip /usr/bin/newgidmap \
   # https://github.com/gabyx/container-nesting/blob/7efbd79707e1be366bee462f6200443ca23bc077/src/podman/container/Containerfile#L46
   && mkdir -p /etc/containers .config/containers \
   && sed -e 's|^#mount_program|mount_program|g' \
@@ -150,9 +137,9 @@ RUN microdnf -y install --setopt=install_weak_deps=False \
   && microdnf remove npm yarnpkg \
   && microdnf clean all
 
-COPY --from=nvim-builder     --chown=2:2 /out/plugins /etc/xdg/nvim/pack/l7ide/start
-COPY --from=tsserver-builder --chown=2:2 /out/node_modules/ /usr/lib/node_modules/
-COPY contrib/bin/* contrib/*/bin/*       /usr/local/bin/
+COPY --from=nvim-builder --chown=2:2 \
+  /out/plugins /etc/xdg/nvim/pack/l7ide/start
+COPY --chmod=755 --chown=root contrib/bin/* contrib/*/bin/*       /usr/local/bin/
 ARG NODE_BINS='allow-scripts  corepack glob  lavamoat-ls mkdirp node-gyp node-which nopt npx pnpx resolve semver yarn-deduplicate'
 RUN bash -c 'for bin in ${NODE_BINS}; do ln -s l7-run-node "/usr/local/bin/${bin}"; done'
 
@@ -164,12 +151,6 @@ RUN cat /home/user/.env >> /etc/profile \
     /home/user \
     # treesitter needs write to parsers dirs
     /etc/xdg/nvim/pack/l7ide/start/nvim-treesitter/parser{-info,} \
-  # hardcode node path for lsp to use in-container binary
-  && sed -i 's@^#!/usr/bin/env node@#!/usr/bin/node@' /usr/lib/node_modules/typescript-language-server/lib/cli.mjs \
-  # symlink can get messed up by copy; effective .mjs extension is important for node
-  && ln -sf \
-    /usr/lib/node_modules/typescript-language-server/lib/cli.mjs \
-    /usr/lib/node_modules/.bin/typescript-language-server \
   && ln -s \
     podman-remote /usr/bin/podman
 
