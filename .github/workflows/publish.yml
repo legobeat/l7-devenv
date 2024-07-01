@@ -134,6 +134,7 @@ jobs:
             file: sidecars/node-runner/Containerfile
             context: .
             tags: |
+              localhost/l7/node:20-bookworm
               ghcr.io/legobeat/l7-devenv/node:latest
               ghcr.io/legobeat/l7-devenv/node:20-bookworm
               ghcr.io/legobeat/l7-devenv/node:20-${{ github.ref_name }}
