@@ -24,7 +24,7 @@ apps:
             # TODO: forward non-publish non-GET to upstream (audit)
             handle:
               - handler: rewrite
-                uri: '{http.request.host}/{http.request.uri}/'
+                uri: '{http.request.host}{http.request.uri}/'
               - handler: rewrite
                 path_regexp:
                   - find: '[^/]$'
