@@ -226,7 +226,6 @@ start_compose () {
 
 if [[ -n "${DEBUG}" ]]; then
   set -x
-  tail -F "${LOG_DIR}/compose.log" "${LOG_DIR}/compose.err" &
 fi
 
 # default workdir to pwd if within SRC_DIR or /src; otherwise SRC_DIR
