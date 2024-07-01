@@ -20,23 +20,21 @@ result="$(
     | ht nvim test/lsp-js/fixtures/1/index.ts
 )"
 
-
 echo "$result" \
   | grep --quiet 'class Struct<Type = unknown, Schema = unknown>.*encapsulate the validation logic.*typescript'
-if (( $? != 0 )); then
-  echo 'FAIL typescript lsp types' >&2
+grepresult="$?"
+
+if [[ -n "${DEBUG}" || $? != 0 ]]; then
   echo "#####################"
   echo "#####################"
   echo "TEST OUTPUT:" "${result}" | sed 's#\\n#\n#g'
   echo "#####################"
   echo "#####################"
-  exit 4
 fi
 
-echo "$result" \
-  | grep --quiet 'class Struct<Type = unknown, Schema = unknown>.*encapsulate the validation logic.*typescript'
 if (( $? != 0 )); then
-  echo 'FAIL typescript lsp'  && exit 3
+  echo 'FAIL typescript lsp' >&2
+  exit 4
 fi
 
 echo 'pass typescript lsp'
