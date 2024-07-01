@@ -55,6 +55,7 @@ runtime_config () {
   if [[ -z "${CONTAINER_SOCKET}" || ! -f "${CONTAINER_SOCKET}" ]]; then
     CONTAINER_SOCKET="${CONTAINER_SOCKET:-/var/run/docker.sock}"
   fi
+  export CONTAINER_SOCKET
 
   # used to run de itself. could (should) be separate from CONTAINER_SOCKET
   export DOCKER_HOST="${DOCKER_HOST:-unix://${CONTAINER_SOCKET}}"
