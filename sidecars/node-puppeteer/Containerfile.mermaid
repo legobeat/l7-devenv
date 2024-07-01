@@ -1,6 +1,6 @@
 FROM localhost/l7/node-puppeteer:bookworm
 USER root
 #RUN echo $PATH >&2 && find / -name npm
-RUN yarn global add '@mermaid-js/mermaid-cli'
 #RUN /usr/local/bin/npm i -g 'mermaid@^10.9.1'
+RUN DEBUG='*' yarn global add 'git+github.com:legobeat/mermaid-cli/#02153e234a876c95b44e1af84d02bca65681f6d1'
 USER node
