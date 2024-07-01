@@ -40,6 +40,8 @@ apps:
                     #terminal: true
             terminal: true
           - handle:
+              - handler: rewrite
+                uri: '{http.request.host}{http.request.uri}'
               - handler: reverse_proxy
                 upstreams:
                   - dial: '{env.PKG_PROXY_HOST}:{env.PKG_PROXY_PORT}'
