@@ -235,7 +235,7 @@ start_compose () {
   (cd "${ROOT_DIR}" \
     && DOCKER_HOST="unix://${CONTAINER_SOCKET}" \
        CONTAINER_SOCKET="${CONTAINER_SOCKET}" \
-      ${composecmd} up -d >> "${LOG_DIR}/compose.log" 2>> "${LOG_DIR}/compose.err"
+      ${composecmd} up -d --wait >> "${LOG_DIR}/compose.log" 2>> "${LOG_DIR}/compose.err"
   )
 }
 
