@@ -9,6 +9,8 @@ RUNNER_IMAGE_NAME := localhost/l7/node
 RUNNER_IMAGE_TAG  := bookworm
 AUTH_PROXY_IMAGE_NAME := localhost/l7/auth-proxy
 AUTH_PROXY_IMAGE_TAG  := latest
+CONTAINER_PROXY_IMAGE_NAME := localhost/l7/container-socket-proxy
+CONTAINER_PROXY_IMAGE_TAG  := latest
 CADDY_IMAGE_NAME := localhost/l7/caddy
 CADDY_IMAGE_TAG  := latest
 DNSMASQ_IMAGE_NAME := localhost/l7/dnsmasq
@@ -35,6 +37,15 @@ image_auth_proxy:
 		-t "${IMAGE_NAME}:${IMAGE_TAG}" \
 		-f './sidecars/git-auth-proxy/Dockerfile' \
 		./sidecars/git-auth-proxy
+
+image_container_proxy : IMAGE_NAME = ${CONTAINER_PROXY_IMAGE_NAME}
+image_container_proxy : IMAGE_TAG = ${CONTAINER_PROXY_IMAGE_TAG}
+image_container_proxy:
+	${CMD} buildx build \
+		${BUILD_OPTIONS} \
+		-t "${IMAGE_NAME}:${IMAGE_TAG}" \
+		-f './sidecars/container-socket-proxy/Dockerfile' \
+		./sidecars/container-socket-proxy
 
 image_caddy : IMAGE_NAME = ${CADDY_IMAGE_NAME}
 image_caddy : IMAGE_TAG = ${CADDY_IMAGE_TAG}
@@ -202,6 +213,14 @@ test_auth_proxy: # image_auth_proxy
 		"${IMAGE_NAME}:${IMAGE_TAG}" \
 		--help
 
+test_container_proxy: IMAGE_NAME = ${CONTAINER_PROXY_IMAGE_NAME}
+test_container_proxy: IMAGE_TAG = ${CONTAINER_PROXY_IMAGE_TAG}
+test_container_proxy: # image_container_proxy
+	${CMD} run --rm \
+		"${IMAGE_NAME}:${IMAGE_TAG}" \
+		-f /usr/local/etc/haproxy/haproxy.cfg \
+		-c
+
 test_caddy: IMAGE_NAME = ${CADDY_IMAGE_NAME}
 test_caddy: IMAGE_TAG = ${CADDY_IMAGE_TAG}
 test_caddy: # image_caddy
@@ -274,6 +293,12 @@ inspect_auth_proxy: # image_auth_proxy
 	@${CMD} inspect \
 		"${IMAGE_NAME}:${IMAGE_TAG}"
 
+inspect_container_proxy: IMAGE_NAME = ${CONTAINER_PROXY_IMAGE_NAME}
+inspect_container_proxy: IMAGE_TAG = ${CONTAINER_PROXY_IMAGE_TAG}
+inspect_container_proxy: # image_container_proxy
+	@${CMD} inspect \
+		"${IMAGE_NAME}:${IMAGE_TAG}"
+
 inspect_gpg_pk: IMAGE_NAME = ${GPG_IMAGE_NAME}
 inspect_gpg_pk: IMAGE_TAG = ${GPG_IMAGE_TAG}
 inspect_gpg_pk: # image_gpg_pk
@@ -318,6 +343,12 @@ export_auth_proxy: # image_auth_proxy
 	@@${CMD} save \
 		"${IMAGE_NAME}:${IMAGE_TAG}"
 
+export_container_proxy: IMAGE_NAME = ${CONTAINER_PROXY_IMAGE_NAME}
+export_container_proxy: IMAGE_TAG = ${CONTAINER_PROXY_IMAGE_TAG}
+export_container_proxy: # image_container_proxy
+	@@${CMD} save \
+		"${IMAGE_NAME}:${IMAGE_TAG}"
+
 export_gpg_pk: IMAGE_NAME = ${GPG_IMAGE_NAME}
 export_gpg_pk: IMAGE_TAG = ${GPG_IMAGE_TAG}
 export_gpg_pk: # image_gpg_pk
@@ -347,7 +378,7 @@ export_runner_node: # image_runner_node
 submodules:
 	@git submodule update --checkout --init --recursive --rebase
 
-images: image_caddy image_dnsmasq image_nvim image_runner_node image_gpg_pk image_acng image_auth_proxy
+images: image_caddy image_dnsmasq image_nvim image_runner_node image_gpg_pk image_acng image_auth_proxy image_container_proxy
 
 images_test: images image_nvim_test
 
