@@ -425,7 +425,8 @@ test_e2e_node_corepack: # image_nvim
 
 test_e2e_ghauth:
 	set -e
-	./devenv.sh gh auth status
+	NAME=l7ide-test-runner-ghauth ./devenv.sh gh auth status
+	NAME=l7ide-test-runner-ghauth ./devenv.sh gh auth status
 
 test_e2e_lsp_typescript : IMAGE_NAME = ${NVIM_IMAGE_NAME}
 test_e2e_lsp_typescript : IMAGE_TAG = ${NVIM_IMAGE_TAG}
