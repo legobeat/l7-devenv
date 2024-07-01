@@ -22,8 +22,6 @@ GO_RUNNER_IMAGE_TAG  := bookworm
 USER_SHELL ?= /usr/bin/zsh
 BUILD_OPTIONS :=
 EXTRA_PKGS := zsh podman-remote
-UID:=1000
-GID:=1000
 CMD := $(shell which podman || which docker)
 
 install:
@@ -96,8 +94,6 @@ image_nvim : submodules image_caddy
 		${BUILD_OPTIONS} \
 		--build-arg "EXTRA_PKGS=${EXTRA_PKGS}" \
 		--build-arg "SHELL=${USER_SHELL}" \
-		--build-arg "UID=${UID}" \
-		--build-arg "GID=${GID}" \
 		-t "${IMAGE_NAME}:${IMAGE_TAG}" \
 		-f './Containerfile' \
 		.
@@ -122,8 +118,6 @@ image_runner_go_1.20: submodules
 	${CMD} buildx build \
 		${BUILD_OPTIONS} \
 		--build-arg "SHELL=${USER_SHELL}" \
-		--build-arg "UID=${UID}" \
-		--build-arg "GID=${GID}" \
 		--build-arg "GO_VERSION=1.20" \
 		-t "${IMAGE_NAME}:1.20-${IMAGE_TAG}" \
 		-f './sidecars/go-runner/Containerfile' \
@@ -144,8 +138,6 @@ image_runner_node_18: submodules image_caddy
 	${CMD} buildx build \
 		${BUILD_OPTIONS} \
 		--build-arg "SHELL=${USER_SHELL}" \
-		--build-arg "UID=${UID}" \
-		--build-arg "GID=${GID}" \
 		--build-arg "NODE_VERSION=18" \
 		--build-arg "NODE_OPTIONS='--trace-warnings'" \
 		-t "${IMAGE_NAME}:18-${IMAGE_TAG}" \
@@ -157,8 +149,6 @@ image_runner_node_20: submodules image_caddy
 	${CMD} buildx build \
 		${BUILD_OPTIONS} \
 		--build-arg "SHELL=${USER_SHELL}" \
-		--build-arg "UID=${UID}" \
-		--build-arg "GID=${GID}" \
 		--build-arg "NODE_VERSION=20" \
 		-t "${IMAGE_NAME}:20-${IMAGE_TAG}" \
 		-f './sidecars/node-runner/Containerfile' \
@@ -169,8 +159,6 @@ image_runner_node_22: submodules image_caddy
 	${CMD} buildx build \
 		${BUILD_OPTIONS} \
 		--build-arg "SHELL=${USER_SHELL}" \
-		--build-arg "UID=${UID}" \
-		--build-arg "GID=${GID}" \
 		--build-arg "NODE_VERSION=22" \
 		-t "${IMAGE_NAME}:22-${IMAGE_TAG}" \
 		-f './sidecars/node-runner/Containerfile' \
@@ -183,8 +171,6 @@ image_runner_node_ios: submodules image_runner_node
 	${CMD} buildx build \
 		${BUILD_OPTIONS} \
 		--build-arg "SHELL=${USER_SHELL}" \
-		--build-arg "UID=${UID}" \
-		--build-arg "GID=${GID}" \
 		--build-arg "NODE_VERSION=20" \
 		-t "${IMAGE_NAME}:ios-${IMAGE_TAG}" \
 		-f './sidecars/node-runner/Containerfile.ios' \
@@ -211,8 +197,6 @@ image_lsp_node: image_runner_node_20
 	${CMD} buildx build \
 		${BUILD_OPTIONS} \
 		--build-arg "SHELL=${USER_SHELL}" \
-		--build-arg "UID=${UID}" \
-		--build-arg "GID=${GID}" \
 		--build-arg "NODE_VERSION=20" \
 		-t "${IMAGE_NAME}:lsp-${IMAGE_TAG}" \
 		-f './sidecars/node-runner/Containerfile.lsp' \
