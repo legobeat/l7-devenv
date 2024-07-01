@@ -38,8 +38,9 @@ COPY package.json package-lock.json .
 RUN npm i
 
 WORKDIR ${PUPPETEER_CACHE_DIR}
-RUN node /usr/local/lib/node_modules/.bin/puppeteer install chromium@latest \
- && node /usr/local/lib/node_modules/.bin/puppeteer install firefox@stable
+USER root
+RUN puppeteer browsers install chromium@latest \
+ && puppeteer browsers install firefox@stable
 
 ######
 ######
