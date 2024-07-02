@@ -255,7 +255,7 @@ build_start_compose () {
   (cd "${ROOT_DIR}" \
     && DOCKER_HOST="${DOCKER_HOST}" \
        CONTAINER_SOCKET="${CONTAINER_SOCKET}" \
-      ${composecmd} up --build -d --wait >> "${LOG_DIR}/compose.log" 2>> "${LOG_DIR}/compose.err"
+      ${composecmd} up --build -d --wait
   )
 }
 
