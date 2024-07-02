@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -x
+
 export RUNNER_IMAGE="${RUNNER_IMAGE:-${NODE_RUNNER_IMAGE}}"
 
 export RUNNER_ENV="${RUNNER_ENV}
