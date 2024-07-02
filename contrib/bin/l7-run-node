@@ -7,7 +7,7 @@ HOME=/home/node
 "
 
 export RUNNER_ENV_MERGE="${RUNNER_ENV_MERGE}
-NODE_OPTIONS=\${NODE_OPTIONS} ${NODE_OPTIONS}
+NODE_OPTIONS=\"\${NODE_OPTIONS} ${NODE_OPTIONS}\"
 "
 #PATH=/home/node/.corepack/bin:/home/node/.npm-global/bin:/usr/local/lib/node_modules/.bin:/usr/local/lib/node_modules/corepack/shims:/home/node/.rbenv/shims:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
