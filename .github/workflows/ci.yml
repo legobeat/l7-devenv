@@ -232,7 +232,7 @@ jobs:
           make test_e2e_${{ matrix.test }}
     env:
       DEBUG: ''
-      BUILD_COMPOSE: '1'
+      BUILD_COMPOSE: ''
 
 # TODO: should work
 #  test-e2e-docker:
