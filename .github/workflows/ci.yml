@@ -195,7 +195,7 @@ jobs:
           mkdir -p ~/.config/containers/storage.conf.d
           echo "[[registry]]
             location = 'localhost:80'
-            insecure = true" | tee ~/.config/containers/registries.conf.d/insecure-localhost.conf
+          insecure = true" | tee ~/.config/containers/registries.conf.d/insecure-localhost.conf
           systemctl --user restart podman
       - name: Restore image cache
         uses: actions/cache/restore@v4
