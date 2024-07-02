@@ -1,5 +1,5 @@
 # This image isn't run directly: The built binary is copied to other images
-FROM rust:1.79-alpine
+FROM docker.io/rust:1.79-alpine
 
 RUN apk add --no-cache musl-dev \
   && cargo install --git \
