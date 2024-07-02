@@ -228,7 +228,7 @@ jobs:
       - name: Run test ${{ matrix.test }}
         run: |
           podman network ls
-          make -j4 test_e2e_${{ matrix.test }}
+          make -j6 test_e2e_${{ matrix.test }}
     env:
       DEBUG: ''
 
