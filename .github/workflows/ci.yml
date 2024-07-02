@@ -109,9 +109,14 @@ jobs:
 
       - name: Allow cleartext http to localhost container registry (podman)
         run: |
+          set -x
+          ls -la /etc/containers
+          cat /etc/containers/*
+          echo '####################'
+          echo '####################'
           sudo cat /etc/subuid
           sudo cat /etc/subgid
-          sudo rm -rf /etc/subuid /etc/subgid
+          #sudo rm -rf /etc/subuid /etc/subgid
           mkdir -p ~/.config/containers/registries.conf.d
           mkdir -p ~/.config/containers/storage.conf.d
           echo "[[registry]]
@@ -221,7 +226,7 @@ jobs:
           mount_program = '/usr/bin/fuse-overlayfs'" | tee ~/.config/containers/storage.conf.d/overlay-driver.conf
           podman info
           podman system migrate
-          podman system reset -f
+          #podman system reset -f
           systemctl --user restart podman
           podman info
       - name: Restore image cache
