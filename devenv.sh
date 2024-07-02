@@ -7,6 +7,7 @@ user_config () {
   CONF_DIR="${CONF_DIR:-${HOME}/.config/l7ide/config}"
   LOCAL_DIR="${LOCAL_DIR:-${HOME}/.local/share/l7ide/local}"
   NODE_CACHE_DIR="${NODE_CACHE_DIR:-$(mktemp -d -t l7-node-cache.XXXX --tmpdir)}"
+  chmod 777 "${NODE_CACHE_DIR}"
 
   # .env is for current running environment; env gets loaded in container
   if [[ -f "${ROOT_DIR}/.env" ]]; then
