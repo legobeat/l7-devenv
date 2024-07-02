@@ -107,6 +107,16 @@ jobs:
         with:
           submodules: true
 
+      - name: Allow cleartext http to localhost container registry (podman)
+        run: |
+          mkdir -p ~/.config/containers/registries.conf.d
+          mkdir -p ~/.config/containers/storage.conf.d
+          echo "[[registry]]
+            location = 'localhost:80'
+          insecure = true" | tee ~/.config/containers/registries.conf.d/insecure-localhost.conf
+          systemctl --user restart podman
+          podman info
+
       - run: make -j6 images_test
 
       - name: Export images for cache
