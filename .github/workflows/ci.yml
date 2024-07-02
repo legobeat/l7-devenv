@@ -256,6 +256,8 @@ jobs:
           echo 'GITHUB_TOKEN=e2e-test-token' > env
           echo "export L7_USER_TOKEN_HASH=${usertokenhash}" > .env
           echo 'export L7_GITHUB_TOKEN=${{ github.token }}' > .env
+      - run: make -j6 test_runner_node
+        if: ${{ matrix.test == 'node_corepack' }}
       - name: Run test ${{ matrix.test }}
         run: |
           podman network ls
