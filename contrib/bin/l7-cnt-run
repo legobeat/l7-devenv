@@ -21,11 +21,17 @@ fi
 
 # replace newlines with spaces
 RUNNER_ENV="${RUNNER_ENV//@@ /$'\n'}"
+RUNNER_ENV_MERGE="${RUNNER_ENV_MERGE//@@ /$'\n'}"
 RUNNER_PORTS="${RUNNER_PORTS//@@ /$'\n'}"
 RUNNER_VOLS="${RUNNER_VOLS//@@ /$'\n'}"
 if [ -n "${RUNNER_ENV}"  ]; then
   for e in ${RUNNER_ENV}; do
     export RUNNER_OPTS="${RUNNER_OPTS} -e ${e}"
+  done
+fi
+if [ -n "${RUNNER_ENV_MERGE}"  ]; then
+  for e in ${RUNNER_ENV_MERGE}; do
+    export RUNNER_OPTS="${RUNNER_OPTS} --env-merge=${e}"
   done
 fi
 if [ -n "${RUNNER_PORTS}"  ]; then
