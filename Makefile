@@ -432,7 +432,7 @@ test_e2e_ghauth: image_nvim
 
 test_e2e_node_corepack: IMAGE_NAME = ${RUNNER_IMAGE_NAME}
 test_e2e_node_corepack: IMAGE_TAG = ${RUNNER_IMAGE_TAG}
-test_e2e_node_corepack: image_nvim image_node_runner
+test_e2e_node_corepack: image_nvim image_runner_node
 	set -e
 	./test/runner-node/test-corepack-pms.sh
 
