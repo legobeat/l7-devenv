@@ -13,7 +13,7 @@ RUN microdnf -y update \
      make automake patch \
      curl wget jq yq moreutils tar \
      git gnupg2 \
-     neovim lua python3-neovim \
+     neovim python3-neovim \
      $EXTRA_BASE_PKGS \
   && ln -sf nvim /usr/bin/vim
 
@@ -34,6 +34,7 @@ COPY contrib/nvim-plugins /etc/xdg/nvim/pack/build-l7ide/start
 RUN \
   microdnf install -y --setopt=install_weak_deps=False \
     # lua-lunitx binutils \
+    lua \
     gcc gcc-c++ cpp \
     $EXTRA_BUILD_PKGS \
   && cd /etc/xdg/nvim/pack/build-l7ide/start \
