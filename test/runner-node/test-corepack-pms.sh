@@ -3,7 +3,7 @@
 for pm in yarn pnpm npm; do
   export TEST_PM=${pm};
   export TEST_DIR=${pm};
-  if [[ -z "${DEBUG}" ]]; then
+  if [[ -n "${DEBUG}" ]]; then
     export RUN_ARGS="${RUN_ARGS} -e DEBUG=${DEBUG}"
   fi
   NAME=l7ide-test-runner-corepack find test/runner-node/fixtures/corepack -maxdepth 1 -name "${pm}*" \
