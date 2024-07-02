@@ -109,6 +109,7 @@ jobs:
       - name: Make all images
         run: make -j6 images_test
     env:
+      BUILDAH_FORMAT: docker
       CMD: ${{ matrix.cmd }}
       CONTAINER_CMD: ${{ matrix.cmd }}
 
@@ -221,6 +222,7 @@ jobs:
           podman network ls
           make -j6 test_e2e_${{ matrix.test }}
     env:
+      BUILDAH_FORMAT: docker
       DEBUG: ''
       L7_DISABLE_SELINUX: '1'
 
