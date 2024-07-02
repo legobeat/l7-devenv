@@ -1,7 +1,10 @@
 #!/bin/bash
 export RUNNER_IMAGE=${YARN_RUNNER_IMAGE:-${NODE_RUNNER_IMAGE:-${RUNNER_IMAGE}}}
-export RUNNER_VOLS="${RUNNER_VOLS} ${L7_NODE_CACHE_DIR}/yarn/cache/berry:/home/node/.yarn/cache/berry"
-export RUNNER_VOLS="${RUNNER_VOLS} ${L7_NODE_CACHE_DIR}/yarn/cache/classic:/home/node/.cache/yarn"
+if [[ -n "${RUNNER_VOLS}" ]]; then
+export RUNNER_VOLS="${RUNNER_VOLS} "
+fi
+export RUNNER_VOLS="${RUNNER_VOLS}${L7_NODE_CACHE_DIR}/yarn/cache/berry:/home/node/.yarn/cache/berry "
+export RUNNER_VOLS="${RUNNER_VOLS}${L7_NODE_CACHE_DIR}/yarn/cache/classic:/home/node/.cache/yarn"
 if [[ -n "${YARN_VERSION}" ]]; then
   l7-run-node "/home/node/.cache/node/corepack/v1/yarn/${YARN_VERSION}/bin/yarn" ${@}
 else
