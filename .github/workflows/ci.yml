@@ -228,7 +228,8 @@ jobs:
       - name: Run test ${{ matrix.test }}
         run: |
           podman network ls
-          make -j6 test_e2e_${{ matrix.test }}
+          make -j8 images
+          make test_e2e_${{ matrix.test }}
     env:
       DEBUG: ''
       BUILD_COMPOSE: '1'
