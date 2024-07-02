@@ -5,7 +5,7 @@ FROM ${CADDY_IMAGE} AS fwdproxy
 FROM docker.io/node:${NODE_VERSION}-bookworm-slim
 
 RUN apt-get update \
-  && apt-get install -y --no-install-recommends \
+  && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
     git curl ca-certificates gnupg ssh-client less psmisc jq time man manpages zsh \
     locales fakeroot libpcre3 \
     build-essential ccache cmake cmake-format distcc zlib1g-dev libzlcore-dev libffi-dev libssl-dev libyaml-dev \
