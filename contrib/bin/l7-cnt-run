@@ -48,15 +48,9 @@ if [ -t 1 ] ; then
   RUNNER_OPTS="${RUNNER_OPTS} -t "
 fi
 
-set -x
-env | sort >&2
-ls -la /home
-ls -la /home/*
-echo $HOME
-ls -la $HOME
-
 podman run --pull=never --rm -i \
   --user 1000:1000 --userns=keep-id:uid=1000,gid=1000 \
+  -e '*' \
   --network "${L7_COMPOSE_NETWORK_NAME_INTERNAL}" \
   -v "${SRC_DIR}:${SRC_DIR}" -v "${SRC_DIR}:/src" -w "${PWD}" \
   -v "${L7_RESOLV_CONF_PATH}:/etc/resolv.conf:ro" \
