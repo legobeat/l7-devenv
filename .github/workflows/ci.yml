@@ -196,7 +196,7 @@ jobs:
 
   test-e2e-podman:
     runs-on: ubuntu-${{ matrix.ubuntu-version }}
-    needs: test-make-all
+    #needs: test-make-all
     services:
       registry:
         image: registry:2
@@ -233,18 +233,6 @@ jobs:
           # podman system reset -f
           systemctl --user restart podman
           podman info
-      - name: Restore image cache
-        uses: actions/cache/restore@v4
-        with:
-          path: /tmp/ci-images
-          key: 'ci-test-${{ github.sha }}'
-          fail-on-cache-miss: true
-      - name: Import cached images
-        run: |
-          set -x
-          ls -la /tmp/ci-images
-          find /tmp/ci-images -type f -name '*.tar' -exec podman load -i '{}' \;
-          podman images
       - uses: actions/checkout@v4
         with:
           submodules: true
