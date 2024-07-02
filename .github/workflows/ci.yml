@@ -260,6 +260,7 @@ jobs:
         run: |
           podman network ls
           #make -j8 images
+          make -j4 image_nvim
           make test_e2e_${{ matrix.test }}
     env:
       BUILDAH_FORMAT: docker
