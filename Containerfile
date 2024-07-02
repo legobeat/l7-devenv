@@ -105,8 +105,8 @@ RUN microdnf -y install --setopt=install_weak_deps=False \
   && ln -sf nvim /usr/bin/vim \
 
   # create user entry or podman will mess up /etc/passwd entry
-  && bash -c "groupadd -g ${GID} userz || true" \
-  && bash -c "useradd -u ${UID} -g ${GID} -d /home/user -m user -s "${SHELL}" && chown -R ${UID}:${GID} /home/user || true" \
+  && bash -c "groupadd -g 1000 userz || true" \
+  && bash -c "useradd -u 1000 -g 1000 -d /home/user -m user -s "${SHELL}" && chown -R 1000:1000 /home/user || true" \
   # https://github.com/gabyx/container-nesting/blob/7efbd79707e1be366bee462f6200443ca23bc077/src/podman/container/Containerfile#L46
   && mkdir -p /etc/containers .config/containers \
   && sed -e 's|^#mount_program|mount_program|g' \
@@ -128,10 +128,10 @@ ARG NODE_BINS='allow-scripts  corepack glob  lavamoat-ls mkdirp node-gyp node-wh
 RUN bash -c 'for bin in ${NODE_BINS}; do ln -s l7-run-node "/usr/local/bin/${bin}"; done'
 
 COPY skel/.config/containers/containers.conf /etc/containers/containers.conf
-COPY --chown=${UID}:${GID} skel/ /home/user/
+COPY --chown=1000:1000 skel/ /home/user/
 
 RUN cat /home/user/.env >> /etc/profile \
-  && chown -R ${UID}:${GID} \
+  && chown -R 1000:1000 \
     /home/user \
     # treesitter needs write to parsers dirs
     /etc/xdg/nvim/pack/l7ide/start/nvim-treesitter/parser{-info,} \
@@ -148,6 +148,6 @@ COPY --from=fwdproxy \
   /etc/pki/ca-trust/source/anchors/l7-fwd-proxy.crt
 RUN update-ca-trust
 
-USER ${UID}
+USER 1000
 WORKDIR /src
 ENTRYPOINT ${SHELL}
