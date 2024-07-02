@@ -1,4 +1,8 @@
 #!/bin/bash
 export RUNNER_IMAGE=${PNPM_RUNNER_IMAGE:-${NODE_RUNNER_IMAGE:-${RUNNER_IMAGE}}}
 export RUNNER_VOLS="${RUNNER_VOLS} ${HOME}/.local/share/l7ide/node-runner/pnpm/cache:/home/node/.cache/pnpm"
-l7-run-node pnpm ${@}
+if [[ -n "${PNPM_VERSION}" ]]; then
+  l7-run-node "/home/node/.cache/node/corepack/v1/pnpm/${PNPM_VERSION}/bin/pnpm" ${@}
+else
+  l7-run-node pnpm ${@}
+fi
