@@ -196,6 +196,7 @@ jobs:
           echo "[[registry]]
             location = 'localhost:80'
             insecure = true" | tee ~/.config/containers/registries.conf.d/insecure-localhost.conf
+            systemctl --user restart podman
 #          echo "[storage]
 #            driver = 'overlay'
 #            force_mask = 'shared'
