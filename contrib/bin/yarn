@@ -1,4 +1,5 @@
 #!/bin/bash
+set -x
 export RUNNER_IMAGE=${YARN_RUNNER_IMAGE:-${NODE_RUNNER_IMAGE:-${RUNNER_IMAGE}}}
 export RUNNER_ENV="${RUNNER_ENV}"
 export RUNNER_OPTS="${RUNNER_OPTS}"
