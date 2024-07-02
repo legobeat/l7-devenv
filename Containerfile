@@ -130,7 +130,16 @@ RUN for bin in ${NODE_BINS}; do ln -s l7-run-node "/usr/local/bin/${bin}"; done
 COPY skel/.config/containers/containers.conf /etc/containers/containers.conf
 COPY --chown=1000:1000 skel/ /home/user/
 
-RUN cat /home/user/.env >> /etc/profile \
+# default trust github.com known ssh key
+COPY contrib/data/ssh_known_hosts /etc/ssh/ssh_known_hosts
+# https://docs.fedoraproject.org/en-US/quick-docs/using-shared-system-certificates/
+COPY --from=fwdproxy \
+  --chmod=444 \
+  /data/caddy/pki/authorities/local/root.crt \
+  /etc/pki/ca-trust/source/anchors/l7-fwd-proxy.crt
+RUN update-ca-trust \
+  && cat /home/user/.env >> /etc/profile \
+  # Note: Currently important that chown comes after laft `COPY --from`, prob podman bug
   && chown -R 1000:1000 \
     /home/user \
     # treesitter needs write to parsers dirs
@@ -139,14 +148,6 @@ RUN cat /home/user/.env >> /etc/profile \
     podman-remote /usr/bin/podman
 
 
-# default trust github.com known ssh key
-COPY contrib/data/ssh_known_hosts /etc/ssh/ssh_known_hosts
-# https://docs.fedoraproject.org/en-US/quick-docs/using-shared-system-certificates/
-COPY --from=fwdproxy \
-  --chmod=444 \
-  /data/caddy/pki/authorities/local/root.crt \
-  /etc/pki/ca-trust/source/anchors/l7-fwd-proxy.crt
-RUN update-ca-trust
 
 USER 1000
 WORKDIR /src
