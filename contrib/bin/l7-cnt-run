@@ -28,6 +28,11 @@ if [ -n "${RUNNER_ENV}"  ]; then
     export RUNNER_OPTS="${RUNNER_OPTS} -e ${e}"
   done
 fi
+if [ -n "${RUNNER_ENV_MERGE}"  ]; then
+  for e in ${RUNNER_ENV_MERGE}; do
+    export RUNNER_OPTS="${RUNNER_OPTS} --env-merge=${e}"
+  done
+fi
 if [ -n "${RUNNER_PORTS}"  ]; then
   for ports in ${RUNNER_PORTS}; do
     export RUNNER_OPTS="${RUNNER_OPTS} -p ${ports}"
