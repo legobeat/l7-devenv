@@ -209,19 +209,19 @@ jobs:
       - name: Allow cleartext http to localhost container registry (podman)
         run: |
           set -x
-          sudo sed -E -i -e 's/^\s*runtime\s*=\s*"crun"/#\0/' -e 's/^#\s*(runtime\s*=\s*"runc")/\1/' /etc/containers/libpod.conf
-          mkdir -p ~/.config/containers/registries.conf.d
-          mkdir -p ~/.config/containers/storage.conf.d
-          echo "[[registry]]
-            location = 'localhost:80'
-          insecure = true" | tee ~/.config/containers/registries.conf.d/insecure-localhost.conf
-          echo "[storage]
-            driver = 'overlay'
-            force_mask = 'shared'
-          mount_program = '/usr/bin/fuse-overlayfs'" | tee ~/.config/containers/storage.conf.d/overlay-driver.conf
-          podman info
-          podman system migrate
-          podman system reset -f
+          # sudo sed -E -i -e 's/^\s*runtime\s*=\s*"crun"/#\0/' -e 's/^#\s*(runtime\s*=\s*"runc")/\1/' /etc/containers/libpod.conf
+          # mkdir -p ~/.config/containers/registries.conf.d
+          # mkdir -p ~/.config/containers/storage.conf.d
+          # echo "[[registry]]
+          #   location = 'localhost:80'
+          # insecure = true" | tee ~/.config/containers/registries.conf.d/insecure-localhost.conf
+          # echo "[storage]
+          #   driver = 'overlay'
+          #   force_mask = 'shared'
+          # mount_program = '/usr/bin/fuse-overlayfs'" | tee ~/.config/containers/storage.conf.d/overlay-driver.conf
+          # podman info
+          # podman system migrate
+          # podman system reset -f
           systemctl --user restart podman
           podman info
       - name: Restore image cache
