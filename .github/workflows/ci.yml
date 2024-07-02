@@ -259,7 +259,7 @@ jobs:
       - name: Run test ${{ matrix.test }}
         run: |
           podman network ls
-          #make -j8 images
+          # NOTE: For no apparent reason, building nvim image in separate stage and then importing results in all files under /home/user to be owned by root:root when running container off image
           make -j4 image_nvim
           make test_e2e_${{ matrix.test }}
     env:
