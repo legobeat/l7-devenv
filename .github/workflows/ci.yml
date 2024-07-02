@@ -196,28 +196,23 @@ jobs:
           echo "[[registry]]
             location = 'localhost:80'
             insecure = true" | tee ~/.config/containers/registries.conf.d/insecure-localhost.conf
-          echo "[storage]
-            driver = 'overlay'
-            force_mask = 'shared'
-            mount_program = '/usr/bin/fuse-overlayfs'" | tee ~/.config/containers/storage.conf.d/overlay-driver.conf
-
-          systemctl --user restart podman
-          set -x
-          set +e
-          id -a
-          echo $HOME
-          ls -la /home
-          ls -la /home/*
-          #sudo apt-get update
-          #sudo apt-get dist-upgrade -y
-          podman info
-          podman system migrate
-          podman info
-          #podman system reset -f
-          #podman info
-          systemctl --user restart podman
-          set -e
-          set +x
+#          echo "[storage]
+#            driver = 'overlay'
+#            force_mask = 'shared'
+#            mount_program = '/usr/bin/fuse-overlayfs'" | tee ~/.config/containers/storage.conf.d/overlay-driver.conf
+#
+#          systemctl --user restart podman
+#          set -x
+#          set +e
+#          id -a
+#          echo $HOME
+#          ls -la /home
+#          ls -la /home/*
+#          #sudo apt-get update
+#          #sudo apt-get dist-upgrade -y
+#          podman system migrate
+#          systemctl --user restart podman
+#          set +x
 
 #      - name: Restore image cache
 #        uses: actions/cache/restore@v4
