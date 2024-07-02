@@ -109,6 +109,9 @@ jobs:
 
       - name: Allow cleartext http to localhost container registry (podman)
         run: |
+          sudo cat /etc/subuid
+          sudo cat /etc/subgid
+          sudo rm -rf /etc/subuid /etc/subgid
           mkdir -p ~/.config/containers/registries.conf.d
           mkdir -p ~/.config/containers/storage.conf.d
           echo "[[registry]]
