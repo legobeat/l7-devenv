@@ -1,4 +1,5 @@
 #!/bin/bash
+set -x
 # test auto-version from package.json
 for pm in yarn pnpm npm; do
   export TEST_PM=${pm};
