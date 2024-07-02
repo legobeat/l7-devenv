@@ -287,6 +287,10 @@ fi
 
 container_id="$(${cmd} ps -f "name=${NAME}" -q || echo '')"
 
+if [[ -n "${DEBUG}" ]]; then
+  env
+fi
+
 if [[ -n "${container_id}" ]]; then
   entrypoint=${1:-${SHELL}}
   ${cmd} exec -it \
