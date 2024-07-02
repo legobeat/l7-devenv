@@ -16,7 +16,11 @@ for pm in yarn1 yarn3 yarn4 npm7 npm9 npm10 pnpm9; do
   # compare if major version is same as expected
   if [[ "$(echo "${version}" | grep -o '[0-9]*' | head -n1)" != "$(echo "${pm}" | grep -o '[0-9]*' | head -n1)" ]]; then
     echo "FAIL ${pm} is v${version}" >&2
-    exit 1
+    export TESTFAIL=1
+    continue
   fi
   echo "PASS ${pm} is v${version}" >&2
 done
+if [[ -n "${TESTFAIL}" ]]; then
+  exit 1
+fi
