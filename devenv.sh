@@ -316,10 +316,10 @@ else
     --mount type=bind,source="${LOCAL_DIR},target=/home/user/.local" \
     --mount type=bind,source="${CONF_DIR}/ssh.d,target=/home/user/.ssh/config.d,ro=true" \
     --mount type=bind,source="${CONF_DIR}/git,target=/home/user/.config/git,ro=true" \
-    -v "${SRC_DIR}:${SRC_DIR}:Z" \
-    -v "${SRC_DIR}:/src:Z" \
-    -v "${NVIM_STATE_PATH}:/home/user/.local/state/nvim" \
-    -v "${RESOLV_CONF_PATH}:/etc/resolv.conf:ro" \
+    -v "${SRC_DIR}:${SRC_DIR}:z" \
+    -v "${SRC_DIR}:/src:z" \
+    -v "${NVIM_STATE_PATH}:/home/user/.local/state/nvim:z" \
+    -v "${RESOLV_CONF_PATH}:/etc/resolv.conf:ro,z" \
     -w "${CWD}" \
     --mount type=tmpfs,tmpfs-size=2G,destination=/tmp,tmpfs-mode=0777 \
     -e "L7_COMPOSE_NETWORK_NAME_INTERNAL=${NETWORK_NAME}" \
