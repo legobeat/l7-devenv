@@ -256,7 +256,7 @@ jobs:
           echo 'GITHUB_TOKEN=e2e-test-token' > env
           echo "export L7_USER_TOKEN_HASH=${usertokenhash}" > .env
           echo 'export L7_GITHUB_TOKEN=${{ github.token }}' > .env
-      - run: make -j6 test_runner_node image_nvim
+      - run: make -j6 image_runner_node image_nvim test_runner_node
           # NOTE: For no apparent reason, building nvim image in separate stage and then importing results in all files under /home/user to be owned by root:root when running container off image
           # As for node, it just hangs when starting from imported...
           # Both only observed in GHA
