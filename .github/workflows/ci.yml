@@ -192,9 +192,15 @@ jobs:
       - name: Allow cleartext http to localhost container registry (podman)
         run: |
           mkdir -p ~/.config/containers/registries.conf.d
+          mkdir -p ~/.config/containers/storage.conf.d
           echo "[[registry]]
             location = 'localhost:80'
-          insecure = true" | tee ~/.config/containers/registries.conf.d/insecure-localhost.conf
+            insecure = true" | tee ~/.config/containers/registries.conf.d/insecure-localhost.conf
+          echo "[storage]
+            driver = 'overlay'
+            force_mask = 'shared'
+            mount_program = '/usr/bin/fuse-overlayfs'" | tee ~/.config/containers/storage.conf.d/overlay-driver.conf
+
           systemctl --user restart podman
       - name: Restore image cache
         uses: actions/cache/restore@v4
