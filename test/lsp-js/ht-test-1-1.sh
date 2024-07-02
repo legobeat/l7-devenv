@@ -2,7 +2,7 @@
 # senss keystrokes to neovim (navigate to element and inspect) and screenscrapes for expected output
 result="$(
   (
-    sleep 5
+    sleep 10
     echo '{ "type": "sendKeys", "keys": ["Escape"] }'
     sleep 0.5
     echo '{ "type": "sendKeys", "keys": ["w"] }'
