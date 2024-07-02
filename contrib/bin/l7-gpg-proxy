@@ -19,8 +19,8 @@ podman run --pull=never --rm \
   -e GNUPGHOME=/vault/gnupg \
   --entrypoint "${GPG_RUNNER_ENTRYPOINT}" \
   --mount type=volume,source=l7-gpg-vault-pk,target=/vault/gnupg \
-  -v /run/user/$(id -u)/gnupg:/run/user/0/gnupg:ro \
-  -v /run/user/1000/gnupg/S.gpg-agent:/vault/gnupg/S.gpg-agent \
+  -v /run/user/$(id -u)/gnupg:/run/user/0/gnupg:ro:Z \
+  -v /run/user/1000/gnupg/S.gpg-agent:/vault/gnupg/S.gpg-agent:Z \
   ${GPG_RUNNER_OPTS} \
   localhost/l7/gpg-vault:pk \
   ${@}
