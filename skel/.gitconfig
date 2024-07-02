@@ -53,6 +53,8 @@
   f    = fetch
   wt   = worktree
   wta  = worktree add
+  worktree-add-branch = "!add_and_log() { git worktree add \"${1}\" \"${2}\" && echo \"pushd '${1}'\" ; }; add_and_log \"${SRC_DIR}/.worktrees/$(basename \"$(pwd)\")/${1}\""
+  wtab = worktree-add-branch
   wtl  = worktree list
   wtp  = worktree prune
   wtr  = worktree remove
