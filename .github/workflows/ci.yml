@@ -107,7 +107,7 @@ jobs:
         with:
           submodules: true
 
-      - run: make -j8 images_test
+      - run: make -j6 images_test
 
       - name: Export images for cache
         run: |
@@ -228,7 +228,7 @@ jobs:
       - name: Run test ${{ matrix.test }}
         run: |
           podman network ls
-          make -j8 images
+          #make -j8 images
           make test_e2e_${{ matrix.test }}
     env:
       DEBUG: ''
