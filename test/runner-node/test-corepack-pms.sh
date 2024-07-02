@@ -2,7 +2,6 @@
 for pm in yarn pnpm npm; do
   export TEST_PM=${pm};
   export TEST_DIR=${pm};
-  export NAME=l7ide-test-runner;
   if [[ -z "${DEBUG}" ]]; then
     export RUN_ARGS="${RUN_ARGS} -e DEBUG=${DEBUG}"
   fi
