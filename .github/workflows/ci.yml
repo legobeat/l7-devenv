@@ -177,6 +177,8 @@ jobs:
     steps:
       - name: Setup podman
         run: |
+          set -x
+          sudo sed -E -i -e 's/^\s*runtime\s*=\s*"crun"/#\0/' -e 's/^#\s*(runtime\s*=\s*"runc")/\1/' /etc/containers/libpod.conf
           mkdir -p ~/.config/containers/registries.conf.d
           echo "[[registry]]
             location = 'localhost:80'
