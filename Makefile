@@ -278,7 +278,7 @@ test_runner_node: # image_runner_node
 
 test_lsp_node: IMAGE_NAME = ${RUNNER_IMAGE_NAME}
 test_lsp_node: IMAGE_TAG = ${RUNNER_IMAGE_TAG}
-test_lsp_node: # image_lsp_node
+test_lsp_node: image_lsp_node image_nvim
 	${CMD} run --rm -it \
 		"${IMAGE_NAME}:lsp-${IMAGE_TAG}" \
 		--version
@@ -389,7 +389,7 @@ images_test: images image_nvim_test
 
 test: test_nvim test_runner_node test_gpg_pk
 
-test_e2e_curl:
+test_e2e_curl: image_nvim
 	set -e
 	for url in \
 		"https://google.com/" \
@@ -425,14 +425,14 @@ test_e2e_curl:
 		sleep 0.05; \
 	done
 
-test_e2e_ghauth:
+test_e2e_ghauth: image_nvim
 	set -e
 	NAME=l7ide-test-runner-ghauth ./devenv.sh gh auth status
 	NAME=l7ide-test-runner-ghauth ./devenv.sh gh auth status
 
 test_e2e_node_corepack: IMAGE_NAME = ${RUNNER_IMAGE_NAME}
 test_e2e_node_corepack: IMAGE_TAG = ${RUNNER_IMAGE_TAG}
-test_e2e_node_corepack: # image_nvim
+test_e2e_node_corepack: image_nvim image_runner_node
 	set -e
 	./test/runner-node/test-corepack-pms.sh
 
