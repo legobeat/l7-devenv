@@ -18,4 +18,4 @@ else
   ARGS="${@}"
 fi
 
-l7-cnt-run "${COMMAND}" ${ARGS}
+exec l7-cnt-run "${COMMAND}" ${ARGS}
