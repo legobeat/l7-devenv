@@ -251,6 +251,15 @@ start_compose () {
   )
 }
 
+build_start_compose () {
+  (cd "${ROOT_DIR}" \
+    && DOCKER_HOST="${DOCKER_HOST}" \
+       CONTAINER_SOCKET="${CONTAINER_SOCKET}" \
+      ${composecmd} up --build -d --wait >> "${LOG_DIR}/compose.log" 2>> "${LOG_DIR}/compose.err"
+  )
+}
+
+
 ########## MAIN
 
 if [[ -n "${DEBUG}" ]]; then
@@ -277,7 +286,11 @@ fi
 user_config
 runtime_config
 configure_gh_token
-start_compose
+if [[ -n "${BUILD_COMPOSE}" ]]; then
+  build_start_compose
+else
+  start_compose
+fi
 
 ${cmd} network ls --filter="name=${NETWORK_NAME}" | grep --quiet "${NETWORK_NAME}" >/dev/null 2>/dev/null
 if (( $? != 0 )) ; then
