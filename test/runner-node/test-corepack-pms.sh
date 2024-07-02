@@ -1,5 +1,6 @@
 #!/bin/bash
 set -x
+export RUNNER_OPTS="${RUNNER_OPTS} -t "
 # test auto-version from package.json
 for pm in yarn pnpm npm; do
   export TEST_PM=${pm};
