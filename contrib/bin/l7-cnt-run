@@ -5,6 +5,8 @@
 if [[ -n "$DEBUG" ]]; then
   set -x
   env
+  ls -la /home
+  ls -la /home/*
 fi
 
 RUNNER_IMAGE="${RUNNER_IMAGE:-${NODE_RUNNER_IMAGE:-localhost/l7/node:20-bookworm}}"
