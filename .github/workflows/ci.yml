@@ -211,10 +211,10 @@ jobs:
           #sudo apt-get update
           #sudo apt-get dist-upgrade -y
           podman info
-          #podman system migrate
-          #podman info
-          #podman system reset -f
+          podman system migrate
           podman info
+          #podman system reset -f
+          #podman info
           systemctl --user restart podman
           set -e
           set +x
