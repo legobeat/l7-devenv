@@ -112,7 +112,6 @@ jobs:
           set -x
           ls -la /etc/containers
           sudo sed -E -i -e 's/^\s*runtime\s*=\s*"crun"/#\0/' -e 's/^#\s*(runtime\s*=\s*"runc")/\1/' /etc/containers/libpod.conf
-#runtime = "runc"
           find /etc/containers/ -type f -exec sh -c 'echo; echo {}; cat {}; echo ____________________ ' \;
           echo '####################'
           echo '####################'
