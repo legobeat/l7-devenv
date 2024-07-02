@@ -6,6 +6,7 @@ user_config () {
   ### dirs
   CONF_DIR="${CONF_DIR:-${HOME}/.config/l7ide/config}"
   LOCAL_DIR="${LOCAL_DIR:-${HOME}/.local/share/l7ide/local}"
+  NODE_CACHE_DIR="${NODE_CACHE_DIR:-$(mktemp -d -t l7-node-cache.XXXX --tmpdir)}"
 
   # .env is for current running environment; env gets loaded in container
   if [[ -f "${ROOT_DIR}/.env" ]]; then
@@ -25,7 +26,7 @@ user_config () {
   mkdir -p "${LOG_DIR}"
   mkdir -p "${CONF_DIR}/ssh.d" "${LOCAL_DIR}/ssh" "${CONF_DIR}/git"
   touch "${CONF_DIR}/git/config"
-  mkdir -p ~/.local/share/l7ide/node-runner/{yarn/cache/classic,yarn/cache/berry,npm/cache,node/cache,pnpm/cache}
+  mkdir -p ${NODE_CACHE_DIR}/{yarn/cache/classic,yarn/cache/berry,npm/cache,node/cache,pnpm/cache}
   mkdir -p ~/.local/share/l7ide/gh && touch ~/.local/share/l7ide/gh/hosts.yml && chmod 0600 ~/.local/share/l7ide/gh/hosts.yml
   mkdir -p ~/.local/share/l7ide/go-runner/go
   mkdir -p ~/.local/share/l7ide/nvim/state
@@ -98,9 +99,9 @@ runtime_config () {
   fi
 
   # podman / netavark hijack both dns and/or resolv.conf no matter what, it seems...
-  RESOLV_CONF_PATH="${L7_RESOLV_CONF_PATH:-$(mktemp)}"
+  RESOLV_CONF_PATH="${L7_RESOLV_CONF_PATH:-$(mktemp -t l7-resolvconf.XXX --tmpdir)}"
   echo "nameserver ${CONTAINER_DNS}" > "${RESOLV_CONF_PATH}"
-  NVIM_STATE_PATH="${L7_NVIM_STATE_PATH:-$(mktemp -d)}"
+  NVIM_STATE_PATH="${L7_NVIM_STATE_PATH:-$(mktemp -d -t l7-nvim-state.XXXX --tmpdir)}"
 
   # detect tty
   if [ -t 1 ] ; then
@@ -306,6 +307,7 @@ else
     --mount type=tmpfs,tmpfs-size=2G,destination=/tmp,tmpfs-mode=0777 \
     -e "L7_COMPOSE_NETWORK_NAME_INTERNAL=${NETWORK_NAME}" \
     -e "L7_NVIM_STATE_PATH=${NVIM_STATE_PATH}" \
+    -e "L7_NODE_CACHE_DIR=${NODE_CACHE_DIR}" \
     -e "L7_RESOLV_CONF_PATH=${RESOLV_CONF_PATH}" \
     -e "CONTAINER_HOST=tcp://10.7.9.2:2375" \
     -e "GO_RUNNER_IMAGE=${GO_RUNNER_IMAGE}" \
