@@ -10,7 +10,7 @@ ARG EXTRA_BASE_PKGS=''
 
 RUN microdnf -y update \
   && microdnf -y install --setopt=install_weak_deps=False \
-     make automake gcc gcc-c++ cpp binutils patch  \
+     make automake patch \
      curl wget jq yq moreutils tar \
      git gnupg2 \
      neovim lua python3-neovim \
@@ -22,6 +22,7 @@ RUN microdnf -y update \
 
 FROM base AS nvim-builder
 
+ARG EXTRA_BUILD_PKGS=''
 # enable/disable treesitter language parsers. These are fetched remotely.
 ARG TREESITTER_INSTALL='bash c dockerfile hcl javascript lua make markdown nix python ruby typescript vim vimdoc yaml'
 ENV HOME=/tmp/1001-home
@@ -31,11 +32,12 @@ ENV HOME=/tmp/1001-home
 # RUN --mount=source=contrib/nvim-plugins,target=/etc/xdg/nvim/pack/build-l7ide/start,rw=true \
 COPY contrib/nvim-plugins /etc/xdg/nvim/pack/build-l7ide/start
 RUN \
-  microdnf install -y lua-lunitx \
+  microdnf install -y --setopt=install_weak_deps=False \
+    # lua-lunitx binutils \
+    gcc gcc-c++ cpp \
+    $EXTRA_BUILD_PKGS \
   && cd /etc/xdg/nvim/pack/build-l7ide/start \
-  # make nvim plugins, but skip running long-running test-only makefiles
-  # TODO: disabled for now; run separately in tests
-  && bash -c 'find . -maxdepth 1 -mindepth 1 -type d ! -name "plenary.nvim" ! -name "neo-tree.nvim" | xargs -I{} echo SKIPPING: bash -c "cd {}; make -j4 build || make -j4 || true"' >&2 \
+  # install TreeSitter parsers
   && nvim --headless \
      -c 'packadd nvim-treesitter' \
      -c 'packloadall' \
@@ -45,7 +47,6 @@ RUN \
      -c q \
   && mkdir -p /out/plugins \
   && cd /out \
-  && microdnf remove -y lua-lunitx \
   && microdnf clean all \
   && cp -a /etc/xdg/nvim/pack/build-l7ide/start/* /out/plugins/
 
@@ -117,8 +118,6 @@ RUN microdnf -y install --setopt=install_weak_deps=False \
          /etc/containers/storage.conf > .config/containers/storage.conf \
   && rpm --setcaps shadow-utils 2>/dev/null \
   && microdnf -y install podman-remote fuse-overlayfs openssh-clients --exclude container-selinux \
-  # explicitly remove providers for commands proxied to sibling containers
-  && microdnf remove npm yarnpkg \
   && microdnf clean all
 
 COPY --from=nvim-builder --chown=2:2 \
