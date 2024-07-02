@@ -425,16 +425,16 @@ test_e2e_curl:
 		sleep 0.05; \
 	done
 
+test_e2e_ghauth:
+	set -e
+	NAME=l7ide-test-runner-ghauth ./devenv.sh gh auth status
+	NAME=l7ide-test-runner-ghauth ./devenv.sh gh auth status
+
 test_e2e_node_corepack: IMAGE_NAME = ${RUNNER_IMAGE_NAME}
 test_e2e_node_corepack: IMAGE_TAG = ${RUNNER_IMAGE_TAG}
 test_e2e_node_corepack: # image_nvim
 	set -e
 	./test/runner-node/test-corepack-pms.sh
-
-test_e2e_ghauth:
-	set -e
-	NAME=l7ide-test-runner-ghauth ./devenv.sh gh auth status
-	NAME=l7ide-test-runner-ghauth ./devenv.sh gh auth status
 
 test_e2e_lsp_typescript : IMAGE_NAME = ${NVIM_IMAGE_NAME}
 test_e2e_lsp_typescript : IMAGE_TAG = ${NVIM_IMAGE_TAG}
