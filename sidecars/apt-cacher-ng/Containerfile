@@ -1,4 +1,4 @@
-FROM ubuntu:noble-20240605
+FROM docker.io/ubuntu:noble-20240605
 
 ENV APT_CACHER_NG_VERSION=3.7.4
 ARG UID=100
