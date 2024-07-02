@@ -271,7 +271,7 @@ test_gpg_pk: # image_gpg_pk
 
 test_runner_node: IMAGE_NAME = ${RUNNER_IMAGE_NAME}
 test_runner_node: IMAGE_TAG = ${RUNNER_IMAGE_TAG}
-test_runner_node: # image_runner_node
+test_runner_node: image_runner_node
 	${CMD} run --rm \
 		"${IMAGE_NAME}:${IMAGE_TAG}" \
 		-c 'node --version'
@@ -432,12 +432,12 @@ test_e2e_ghauth: image_nvim
 
 test_e2e_node_corepack: IMAGE_NAME = ${RUNNER_IMAGE_NAME}
 test_e2e_node_corepack: IMAGE_TAG = ${RUNNER_IMAGE_TAG}
-test_e2e_node_corepack: image_nvim image_runner_node
+test_e2e_node_corepack: image_nvim test_runner_node
 	set -e
 	./test/runner-node/test-corepack-pms.sh
 
 test_e2e_lsp_typescript : IMAGE_NAME = ${NVIM_IMAGE_NAME}
 test_e2e_lsp_typescript : IMAGE_TAG = ${NVIM_IMAGE_TAG}
-test_e2e_lsp_typescript : image_nvim_test
+test_e2e_lsp_typescript : image_nvim_test test_lsp_node
 	set -e
 	IMAGE=${IMAGE_NAME}-ht:${IMAGE_TAG} NAME=l7ide-test-runner-lsp ./devenv.sh /bin/bash -l -Ec test/lsp-js/ht-test-1-1.sh
