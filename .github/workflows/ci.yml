@@ -148,6 +148,7 @@ jobs:
         if: ${{ matrix.cmd == 'podman' }}
 
     env:
+      BUILDAH_FORMAT: docker
       CMD: ${{ matrix.cmd }}
       CONTAINER_CMD: ${{ matrix.cmd }}
 
@@ -252,6 +253,7 @@ jobs:
           #make -j8 images
           make test_e2e_${{ matrix.test }}
     env:
+      BUILDAH_FORMAT: docker
       DEBUG: ''
       BUILD_COMPOSE: ''
 
