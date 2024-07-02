@@ -30,7 +30,9 @@ COPY sidecars/node-runner/package.json \
      sidecars/node-runner/package-lock.json \
      .
 RUN npm ci --omit=dev --ignore-scripts \
-  && mv node_modules/* node_modules/.bin /usr/local/lib/node_modules/
+  && mv node_modules/* node_modules/.bin /usr/local/lib/node_modules/ \
+  # seems strange that this is needed
+  && ln -s /usr/local/lib/node_modules/ /usr/local/bin/node_modules
 
 COPY --from=fwdproxy \
   --chmod=444 \
