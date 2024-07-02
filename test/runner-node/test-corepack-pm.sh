@@ -2,10 +2,6 @@
 
 # Test that package manager versions gets used according to package.json packageManager field
 set -e
-set -x
-env
-ls -la $HOME
-ls -la /home
 cd "${1}"
 TEST_PM=${2}
 
