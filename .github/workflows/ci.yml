@@ -111,7 +111,7 @@ jobs:
         run: |
           set -x
           ls -la /etc/containers
-          cat /etc/containers/*
+          find /etc/containers/ -type f -exec sh -c 'echo; echo {}; cat {}; echo ____________________ ' \;
           echo '####################'
           echo '####################'
           sudo cat /etc/subuid
