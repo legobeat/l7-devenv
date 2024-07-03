@@ -333,7 +333,6 @@ else
     -e "GPG_IMAGE=${GPG_IMAGE}" \
     -e HOME=/home/user \
     -e "SRC_DIR=${SRC_DIR}" \
-    --privileged \
     --network "${NETWORK_NAME}" \
     --network "${CONTROL_NETWORK_NAME}" \
     --dns "${CONTAINER_DNS}" \

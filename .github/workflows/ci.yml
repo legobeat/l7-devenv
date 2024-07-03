@@ -293,6 +293,9 @@ jobs:
       BUILDAH_FORMAT: docker
       DEBUG: ''
       BUILD_COMPOSE: ''
+      # it is unclear why this is needed in CI
+      # should not be needed and can not reproduce failure locally
+      RUN_ARGS: '--privileged'
 
 # TODO: should work
 #  test-e2e-docker:
