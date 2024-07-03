@@ -58,6 +58,6 @@ podman run --pull=never --rm \
   -e '*' \
   --network "${L7_COMPOSE_NETWORK_NAME_INTERNAL}" \
   -v "${SRC_DIR}:${SRC_DIR}" -v "${SRC_DIR}:/src" -w "${PWD}" \
-  -v "${L7_RESOLV_CONF_PATH}:/etc/resolv.conf:ro,z" \
+  -v "${L7_RESOLV_CONF_PATH}:/etc/resolv.conf:ro" \
   ${RUNNER_OPTS} \
   --entrypoint "${COMMAND}" -- $RUNNER_IMAGE ${ARGS}
