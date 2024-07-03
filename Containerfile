@@ -127,11 +127,11 @@ COPY --chmod=755 --chown=root contrib/bin/* contrib/*/bin/*       /usr/local/bin
 ARG NODE_BINS='allow-scripts corepack glob lavamoat-ls mkdirp node-gyp node-which nopt npx pnpx resolve semver yarn-deduplicate'
 RUN bash -c 'for bin in ${NODE_BINS}; do ln -s l7-run-node "/usr/local/bin/${bin}"; done'
 ARG NPM_MAJORS='7 9 10'
-RUN bash -c 'for bin in ${NPM_VERSIONS}; do ln -s npm "/usr/local/bin/npm${v}"; done'
+RUN bash -c 'for v in ${NPM_VERSIONS}; do ln -s npm "/usr/local/bin/npm${v}"; done'
 ARG YARN_MAJORS='1 3 4'
-RUN bash -c 'for bin in ${YARN_VERSIONS}; do ln -s yarn "/usr/local/bin/yarn${v}"; done'
+RUN bash -c 'for v in ${YARN_VERSIONS}; do ln -s yarn "/usr/local/bin/yarn${v}"; done'
 ARG PNPM_MAJORS='9'
-RUN bash -c 'for bin in ${PNPM_VERSIONS}; do ln -s pnpm "/usr/local/bin/pnpm${v}"; done'
+RUN bash -c 'for v in ${PNPM_VERSIONS}; do ln -s pnpm "/usr/local/bin/pnpm${v}"; done'
 
 COPY skel/.config/containers/containers.conf /etc/containers/containers.conf
 COPY --chown=1000:1000 skel/ /home/user/
