@@ -107,31 +107,6 @@ jobs:
         with:
           submodules: true
 
-      - name: Allow cleartext http to localhost container registry (podman)
-        run: |
-          set -x
-          ls -la /etc/containers
-          sudo sed -E -i -e 's/^\s*runtime\s*=\s*"crun"/#\0/' -e 's/^#\s*(runtime\s*=\s*"runc")/\1/' /etc/containers/libpod.conf
-          find /etc/containers/ -type f -exec sh -c 'echo; echo {}; cat {}; echo ____________________ ' \;
-          echo '####################'
-          echo '####################'
-          sudo cat /etc/subuid
-          sudo cat /etc/subgid
-          #sudo rm -rf /etc/subuid /etc/subgid
-          mkdir -p ~/.config/containers/registries.conf.d
-          mkdir -p ~/.config/containers/storage.conf.d
-          echo "[[registry]]
-            location = 'localhost:80'
-          insecure = true" | tee ~/.config/containers/registries.conf.d/insecure-localhost.conf
-          echo "[storage]
-            driver = 'overlay'
-            force_mask = 'shared'
-          mount_program = '/usr/bin/fuse-overlayfs'" | tee ~/.config/containers/storage.conf.d/overlay-driver.conf
-          podman system migrate
-          podman system reset -f
-          systemctl --user restart podman
-          podman info
-
       - run: make -j6 images_test
 
       - name: Export images for cache
@@ -187,7 +162,6 @@ jobs:
           submodules: true
       - name: Prep
         run: sudo apt-get install -y whois --no-install-recommends
-
       - run: make -j4 CMD=${{ matrix.cmd }} image_${{ matrix.image }}
       - run: make CMD=${{ matrix.cmd }} inspect_${{ matrix.image }}
       - name: Extra tests
@@ -221,21 +195,7 @@ jobs:
         ubuntu-version:
           - 24.04
     steps:
-      # disabling selinux should not actually be required and works fine locally; something specific to GHA
-      - name: check selinux
-        run: |
-          sudo apt-get install -y selinux-utils
-          sudo getenforce
-          #sudo setenforce 0
-          #sudo getenforce
-      - name: Setup podman
-        # sudo sed -E -i -e 's/^\s*runtime\s*=\s*"crun"/#\0/' -e 's/^#\s*(runtime\s*=\s*"runc")/\1/' /etc/containers/libpod.conf
-        # mkdir -p ~/.config/containers/registries.conf.d
-        # mkdir -p ~/.config/containers/storage.conf.d
-        # echo "[storage]
-        #   driver = 'overlay'
-        #   force_mask = 'shared'
-        # mount_program = '/usr/bin/fuse-overlayfs'" | tee ~/.config/containers/storage.conf.d/overlay-driver.conf
+      - name: Prep podman
         run: |
           mkdir -p ~/.config/containers/registries.conf.d
           echo "[[registry]]
@@ -244,8 +204,6 @@ jobs:
           podman system migrate
           systemctl --user restart podman.socket
           systemctl --user restart podman.service
-          sleep 0.01
-          podman info
       - uses: actions/checkout@v4
         with:
           submodules: true
@@ -279,7 +237,6 @@ jobs:
       - name: Run test ${{ matrix.test }}
         run: |
           podman network ls
-          #make test_image_nvim
           make -j6 test_e2e_${{ matrix.test }}
     env:
       DEBUG: ''
