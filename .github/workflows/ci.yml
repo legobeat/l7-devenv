@@ -219,6 +219,13 @@ jobs:
           #sudo setenforce 0
           #sudo getenforce
       - name: Setup podman
+        # sudo sed -E -i -e 's/^\s*runtime\s*=\s*"crun"/#\0/' -e 's/^#\s*(runtime\s*=\s*"runc")/\1/' /etc/containers/libpod.conf
+        # mkdir -p ~/.config/containers/registries.conf.d
+        # mkdir -p ~/.config/containers/storage.conf.d
+        # echo "[storage]
+        #   driver = 'overlay'
+        #   force_mask = 'shared'
+        # mount_program = '/usr/bin/fuse-overlayfs'" | tee ~/.config/containers/storage.conf.d/overlay-driver.conf
         run: |
           mkdir -p ~/.config/containers/registries.conf.d
           echo "[[registry]]
