@@ -223,6 +223,10 @@ jobs:
     env:
       DEBUG: ''
       L7_DISABLE_SELINUX: '1'
+      # it is unclear why this is needed in CI
+      # should not be needed and can not reproduce failure locally
+      RUN_ARGS: '--privileged'
+
 
 
 # TODO: should work
