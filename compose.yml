@@ -38,7 +38,7 @@ services:
       - VOLUMES=0
     volumes:
       #- /run/user/1000/podman/podman.sock:/var/run/docker.sock
-      - ${CONTAINER_SOCKET}:/var/run/docker.sock:ro
+      - ${CONTAINER_SOCKET}:/var/run/docker.sock:Z
       #- /run/user/${UID}/podman/podman.sock:/var/run/docker.sock:ro
     restart: unless-stopped
     #read_only: true
@@ -57,7 +57,7 @@ services:
     ports:
       - 18774:8080
     volumes:
-      - ${HOME}/.config/l7ide/config/git-auth-proxy:/etc/git-auth-proxy
+      - ${HOME}/.config/l7ide/config/git-auth-proxy:/etc/git-auth-proxy:Z
     command:
       - --config
       - /etc/git-auth-proxy/config.json
@@ -101,8 +101,8 @@ services:
     ports:
     - "13142:13142"
     volumes:
-    - ${HOME}/.local/share/l7ide/apt-cacher-ng/cache:/var/cache/apt-cacher-ng
-    - ${HOME}/.local/share/l7ide/apt-cacher-ng/log:/var/log/apt-cacher-ng
+    - ${HOME}/.local/share/l7ide/apt-cacher-ng/cache:/var/cache/apt-cacher-ng:Z
+    - ${HOME}/.local/share/l7ide/apt-cacher-ng/log:/var/log/apt-cacher-ng:Z
 
   http-proxy:
     build:
@@ -124,7 +124,7 @@ services:
       - 18780:80
       - 18743:443
     volumes:
-      - ${HOME}/.config/l7ide/config/caddy:/config
+      - ${HOME}/.config/l7ide/config/caddy:/config:Z,ro
       #- ./sidecars/caddy/default.yml:/etc/caddy/default.yml:ro
       #- ${HOME}/.local/share/l7ide/caddy/data:/data
     tmpfs:

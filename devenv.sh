@@ -17,6 +17,7 @@ user_config () {
   fi
 
   SRC_DIR="${SRC_DIR:-${L7_SRC_DIR:-$(pwd)}}"
+  SRC_DIR_OPTS="${SRC_DIR_OPTS:-:rshared,nosuid}"
   LOG_DIR="${LOG_DIR:-${HOME}/.local/share/l7ide/logs}"
   XDG_RUNTIME_DIR="${XDG_RUNTIME_DIR:-/var/run/user/$(id -u)}"
   SSH_SOCKET="${SSH_SOCKET:-${SSH_AUTH_SOCK}}"
@@ -306,9 +307,9 @@ else
     --mount type=bind,source="${LOCAL_DIR},target=/home/user/.local" \
     --mount type=bind,source="${CONF_DIR}/ssh.d,target=/home/user/.ssh/config.d,ro=true" \
     --mount type=bind,source="${CONF_DIR}/git,target=/home/user/.config/git,ro=true" \
-    -v "${SRC_DIR}:${SRC_DIR}:Z" \
-    -v "${SRC_DIR}:/src:Z" \
-    -v "${NVIM_STATE_PATH}:/home/user/.local/state/nvim" \
+    -v "${SRC_DIR}:${SRC_DIR}${SRC_DIR_OPTS}" \
+    -v "${SRC_DIR}:/src${SRC_DIR_OPTS}" \
+    -v "${NVIM_STATE_PATH}:/home/user/.local/state/nvim:z" \
     -v "${RESOLV_CONF_PATH}:/etc/resolv.conf:ro" \
     -w "${CWD}" \
     --mount type=tmpfs,tmpfs-size=2G,destination=/tmp,tmpfs-mode=0777 \

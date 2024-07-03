@@ -39,7 +39,7 @@ result="$(
     sleep 1
     echo '{ "type": "sendKeys", "keys": [":q", "Enter"] }'
   ) \
-    | ht nvim test/lsp-js/fixtures/1/index.ts
+    | ht nvim ./fixtures/1/index.ts
 )"
 
 ####
