@@ -203,6 +203,7 @@ jobs:
       - name: Extra tests
         if: ${{ matrix.image == 'nvim' && matrix.cmd == 'podman' }}
         run: |
+          make -j6 CMD=${{ matrix.cmd }} images
           make -j4 CMD=${{ matrix.cmd }} test_extra_${{ matrix.image }}
 
     env:
