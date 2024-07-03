@@ -169,11 +169,14 @@ jobs:
         run: |
           make -j6 CMD=${{ matrix.cmd }} images
           make -j4 CMD=${{ matrix.cmd }} test_extra_${{ matrix.image }}
+          podman compose up -d --wait
+          make -j4 CMD=${{ matrix.cmd }} test_extra_${{ matrix.image }}
 
     env:
       CMD: ${{ matrix.cmd }}
       CONTAINER_CMD: ${{ matrix.cmd }}
       L7_DISABLE_SELINUX: '1'
+      RUN_ARGS: '--privileged'
 
   test-e2e-podman:
     runs-on: ubuntu-${{ matrix.ubuntu-version }}
