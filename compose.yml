@@ -36,6 +36,8 @@ services:
       - TASKS=0
       - VERSION=1
       - VOLUMES=0
+    # TODO: Fix SElinux privileges of podman socket such that privileged-workaround for proxy not needed
+    privileged: true
     volumes:
       #- /run/user/1000/podman/podman.sock:/var/run/docker.sock
       - ${CONTAINER_SOCKET}:/var/run/docker.sock:Z
