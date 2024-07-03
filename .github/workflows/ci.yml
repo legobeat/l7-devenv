@@ -191,7 +191,10 @@ jobs:
 
       - run: make -j4 CMD=${{ matrix.cmd }} image_${{ matrix.image }}
       - run: make CMD=${{ matrix.cmd }} inspect_${{ matrix.image }}
-      - run: make -j4 CMD=${{ matrix.cmd }} test_${{ matrix.image }}
+      - name: Extra tests
+        if: ${{ matrix.image == 'nvim' && matrix.cmd == 'podman' }}
+        run: |
+          make -j4 CMD=${{ matrix.cmd }} test_extra_${{ matrix.image }}
 
     env:
       CMD: ${{ matrix.cmd }}
