@@ -169,7 +169,6 @@ jobs:
         run: |
           make -j6 CMD=${{ matrix.cmd }} images
           make -j4 CMD=${{ matrix.cmd }} test_extra_${{ matrix.image }}
-          podman compose up -d --wait
           make -j4 CMD=${{ matrix.cmd }} test_extra_${{ matrix.image }}
 
     env:
