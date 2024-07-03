@@ -97,6 +97,9 @@ runtime_config () {
   if [[ -f "${CONF_DIR}/env" ]]; then
     RUN_ARGS="${RUN_ARGS} --env-file ${CONF_DIR}/env"
   fi
+  if [[ "${L7_DISABLE_SELINUX}" == "1" ]]; then
+    RUN_ARGS="${RUN_ARGS} --security-opt=label=disable"
+  fi
 
   # podman / netavark hijack both dns and/or resolv.conf no matter what, it seems...
   RESOLV_CONF_PATH="${L7_RESOLV_CONF_PATH:-$(mktemp -t l7-resolvconf.XXX --tmpdir)}"
@@ -314,11 +317,11 @@ else
   ${cmd} run --rm -i \
     --user 1000:1000 --userns=keep-id:uid=1000,gid=1000 \
     --mount type=bind,source="${LOCAL_DIR},target=/home/user/.local,U" \
-    --mount type=bind,source="${CONF_DIR}/ssh.d,target=/home/user/.ssh/config.d,ro=true,U" \
-    --mount type=bind,source="${CONF_DIR}/git,target=/home/user/.config/git,ro=true,U" \
-    -v "${SRC_DIR}:${SRC_DIR}:z" \
-    -v "${SRC_DIR}:/src:z" \
-    -v "${NVIM_STATE_PATH}:/home/user/.local/state/nvim:z,U" \
+    --mount type=bind,source="${CONF_DIR}/ssh.d,target=/home/user/.ssh/config.d,ro=true,UZ" \
+    --mount type=bind,source="${CONF_DIR}/git,target=/home/user/.config/git,ro=true,UZ" \
+    -v "${SRC_DIR}:${SRC_DIR}" \
+    -v "${SRC_DIR}:/src" \
+    -v "${NVIM_STATE_PATH}:/home/user/.local/state/nvim:z" \
     -v "${RESOLV_CONF_PATH}:/etc/resolv.conf:ro,z" \
     -w "${CWD}" \
     --mount type=tmpfs,tmpfs-size=2G,destination=/tmp,tmpfs-mode=0777 \
