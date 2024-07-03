@@ -232,8 +232,9 @@ jobs:
             location = 'localhost:80'
           insecure = true" | tee ~/.config/containers/registries.conf.d/insecure-localhost.conf
           podman system migrate
-          systemctl --user restart podman.service
           systemctl --user restart podman.socket
+          systemctl --user restart podman.service
+          sleep 0.01
           podman info
       - uses: actions/checkout@v4
         with:
