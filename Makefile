@@ -242,11 +242,13 @@ test_caddy: # image_caddy
 
 test_nvim : IMAGE_NAME = ${NVIM_IMAGE_NAME}
 test_nvim : IMAGE_TAG = ${NVIM_IMAGE_TAG}
-test_nvim: test_devenv_dir_owner # image_nvim
+test_nvim: # image_nvim
 	${CMD} run --rm \
 		--entrypoint sh \
 		"${IMAGE_NAME}:${IMAGE_TAG}" \
 		-c 'nvim --version'
+
+test_nvim_extra: test_devenv_dir_owner
 
 test_dnsmasq: IMAGE_NAME = ${DNSMASQ_IMAGE_NAME}
 test_dnsmasq: IMAGE_TAG = ${DNSMASQ_IMAGE_TAG}
