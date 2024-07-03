@@ -287,6 +287,7 @@ fi
 
 container_id="$(${cmd} ps -f "name=${NAME}" -q || echo '')"
 
+set -x
 if [[ -n "${container_id}" ]]; then
   entrypoint=${1:-${SHELL}}
   ${cmd} exec -it \
@@ -315,6 +316,7 @@ else
     -e "GPG_IMAGE=${GPG_IMAGE}" \
     -e HOME=/home/user \
     -e "SRC_DIR=${SRC_DIR}" \
+    --privileged \
     --network "${NETWORK_NAME}" \
     --network "${CONTROL_NETWORK_NAME}" \
     --dns "${CONTAINER_DNS}" \
