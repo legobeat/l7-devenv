@@ -1,4 +1,6 @@
 #!/bin/bash
+# test auto-version from package.json
+export L7_SRC_DIR=$(pwd)
 for pm in yarn pnpm npm; do
   export TEST_PM=${pm};
   export TEST_DIR=${pm};

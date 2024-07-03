@@ -15,7 +15,7 @@ user_config () {
     . "${CONF_DIR}/.env"
   fi
 
-  SRC_DIR="${SRC_DIR:-$(pwd)}"
+  SRC_DIR="${SRC_DIR:-${L7_SRC_DIR:-$(pwd)}}"
   LOG_DIR="${LOG_DIR:-${HOME}/.local/share/l7ide/logs}"
   XDG_RUNTIME_DIR="${XDG_RUNTIME_DIR:-/var/run/user/$(id -u)}"
   SSH_SOCKET="${SSH_SOCKET:-${SSH_AUTH_SOCK}}"
