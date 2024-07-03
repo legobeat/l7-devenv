@@ -248,6 +248,8 @@ test_nvim: # image_nvim
 		"${IMAGE_NAME}:${IMAGE_TAG}" \
 		-c 'nvim --version'
 
+test_extra_nvim: test_devenv_dir_owner
+
 test_dnsmasq: IMAGE_NAME = ${DNSMASQ_IMAGE_NAME}
 test_dnsmasq: IMAGE_TAG = ${DNSMASQ_IMAGE_TAG}
 test_dnsmasq: # image_dnsmasq
@@ -422,7 +424,7 @@ test_e2e_curl:
 		echo "$$result" | grep -Ez --quiet "^0:200:0___(.*Issuer:.*Caddy.*)?\s*\$$" \
 			&& echo "pass $$url" \
 			|| echo "fail $$url $$(echo "$$result" | head -n3)"; \
-		sleep 0.05; \
+		sleep 0.1; \
 	done
 
 test_e2e_ghauth:
@@ -438,6 +440,26 @@ test_e2e_node_corepack: # image_nvim
 
 test_e2e_lsp_typescript : IMAGE_NAME = ${NVIM_IMAGE_NAME}
 test_e2e_lsp_typescript : IMAGE_TAG = ${NVIM_IMAGE_TAG}
-test_e2e_lsp_typescript : image_nvim_test
+test_e2e_lsp_typescript : image_nvim_test test_lsp_node
 	set -e
 	IMAGE=${IMAGE_NAME}-ht:${IMAGE_TAG} NAME=l7ide-test-runner-lsp ./devenv.sh /bin/bash -l -Ec test/lsp-js/ht-test-1-1.sh
+
+test_devenv_dir_owner:
+	@export NAME=l7ide-test-runner-de; \
+	 export SRC_DIR=$$(mktemp -d --tmpdir "l7test.XXXX"); \
+	for p in \
+		"/home/user" \
+		"/home/user/.config" \
+		"$${SRC_DIR}" \
+	; do \
+		owner=$$(./devenv.sh stat --format '%u:%g' "$${p}"); \
+		if [[ "$${owner}" != "1000:1000" ]]; then \
+			echo "Invalid ownership of $${p}: $${HOME_OWNER}"; \
+			export TESTFAIL=1; \
+		fi; \
+	done; \
+	rm -r "$${SRC_DIR}"; \
+	if [[ -n "${TESTFAIL}" ]]; then \
+		echo 4; \
+	fi; \
+	echo "perms test pass";

@@ -160,9 +160,17 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: true
+      - name: Prep
+        run: sudo apt-get install -y whois --no-install-recommends
+
       - run: make -j4 CMD=${{ matrix.cmd }} image_${{ matrix.image }}
       - run: make CMD=${{ matrix.cmd }} inspect_${{ matrix.image }}
       - run: make -j4 CMD=${{ matrix.cmd }} test_${{ matrix.image }}
+      - name: Extra tests
+        if: ${{ matrix.image == 'nvim' && matrix.cmd == 'podman' }}
+        run: |
+          make -j6 CMD=${{ matrix.cmd }} images
+          make -j4 CMD=${{ matrix.cmd }} test_extra_${{ matrix.image }}
 
     env:
       CMD: ${{ matrix.cmd }}
@@ -227,6 +235,7 @@ jobs:
     env:
       DEBUG: ''
       L7_DISABLE_SELINUX: '1'
+
 
 # TODO: should work
 #  test-e2e-docker:
