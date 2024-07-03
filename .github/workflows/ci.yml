@@ -238,18 +238,18 @@ jobs:
           #sudo setenforce 0
           #sudo getenforce
       - name: Setup podman
+        # sudo sed -E -i -e 's/^\s*runtime\s*=\s*"crun"/#\0/' -e 's/^#\s*(runtime\s*=\s*"runc")/\1/' /etc/containers/libpod.conf
+        # mkdir -p ~/.config/containers/registries.conf.d
+        # mkdir -p ~/.config/containers/storage.conf.d
+        # echo "[storage]
+        #   driver = 'overlay'
+        #   force_mask = 'shared'
+        # mount_program = '/usr/bin/fuse-overlayfs'" | tee ~/.config/containers/storage.conf.d/overlay-driver.conf
         run: |
           set -x
           mkdir -p ~/.config/containers/registries.conf.d
           echo "[[registry]]
             location = 'localhost:80'
-          # sudo sed -E -i -e 's/^\s*runtime\s*=\s*"crun"/#\0/' -e 's/^#\s*(runtime\s*=\s*"runc")/\1/' /etc/containers/libpod.conf
-          # mkdir -p ~/.config/containers/registries.conf.d
-          # mkdir -p ~/.config/containers/storage.conf.d
-          # echo "[storage]
-          #   driver = 'overlay'
-          #   force_mask = 'shared'
-          # mount_program = '/usr/bin/fuse-overlayfs'" | tee ~/.config/containers/storage.conf.d/overlay-driver.conf
           insecure = true" | tee ~/.config/containers/registries.conf.d/insecure-localhost.conf
           podman system migrate
           podman info
