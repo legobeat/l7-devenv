@@ -105,8 +105,8 @@ RUN microdnf -y install --setopt=install_weak_deps=False \
   && ln -sf nvim /usr/bin/vim \
 
   # create user entry or podman will mess up /etc/passwd entry
-  && bash -c "groupadd -g 1000 userz || true" \
-  && bash -c "useradd -u 1000 -g 1000 -d /home/user -m user -s "${SHELL}" && chown -R 1000:1000 /home/user || true" \
+  && bash -c "groupadd -g ${GID} userz || true" \
+  && bash -c "useradd -u ${UID} -g ${GID} -d /home/user -m user -s "${SHELL}" && chown -R ${UID}:${GID} /home/user || true" \
   # https://github.com/gabyx/container-nesting/blob/7efbd79707e1be366bee462f6200443ca23bc077/src/podman/container/Containerfile#L46
   && mkdir -p /etc/containers .config/containers \
   && sed -e 's|^#mount_program|mount_program|g' \
@@ -134,7 +134,7 @@ ARG PNPM_MAJORS='9'
 RUN bash -c 'for v in ${PNPM_VERSIONS}; do ln -s pnpm "/usr/local/bin/pnpm${v}"; done'
 
 COPY skel/.config/containers/containers.conf /etc/containers/containers.conf
-COPY --chown=1000:1000 skel/ /home/user/
+COPY --chown=${UID}:${GID} skel/ /home/user/
 
 # default trust github.com known ssh key
 COPY contrib/data/ssh_known_hosts /etc/ssh/ssh_known_hosts
@@ -146,7 +146,7 @@ COPY --from=fwdproxy \
 RUN update-ca-trust \
   && cat /home/user/.env >> /etc/profile \
   # podman quirk: `COPY --from` messes up ownership so rechown needs to come last
-  && chown -R 1000:1000 \
+  && chown -R ${UID}:${GID} \
     /home/user \
     # treesitter needs write to parsers dirs?
     /etc/xdg/nvim/pack/l7ide/start/nvim-treesitter/parser{-info,} \
@@ -155,6 +155,6 @@ RUN update-ca-trust \
 
 
 
-USER 1000
+USER ${UID}:${GID}
 WORKDIR /src
 ENTRYPOINT ${SHELL}
