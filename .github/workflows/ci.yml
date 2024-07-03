@@ -205,12 +205,12 @@ jobs:
           - 24.04
     steps:
       # disabling selinux should not actually be required and works fine locally; something specific to GHA
-      - name: disable selinux
+      - name: check selinux
         run: |
           sudo apt-get install -y selinux-utils
           sudo getenforce
-          sudo setenforce 0
-          sudo getenforce
+          #sudo setenforce 0
+          #sudo getenforce
       - name: Setup podman
         run: |
           mkdir -p ~/.config/containers/registries.conf.d
