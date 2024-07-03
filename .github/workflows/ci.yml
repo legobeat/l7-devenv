@@ -186,6 +186,9 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: true
+      - name: Prep
+        run: sudo apt-get install -y whois --no-install-recommends
+
       - run: make -j4 CMD=${{ matrix.cmd }} image_${{ matrix.image }}
       - run: make CMD=${{ matrix.cmd }} inspect_${{ matrix.image }}
       - run: make -j4 CMD=${{ matrix.cmd }} test_${{ matrix.image }}
