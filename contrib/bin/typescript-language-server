@@ -1,5 +1,5 @@
 #!/bin/bash
 export RUNNER_IMAGE=${TS_LSP_IMAGE:-localhost/l7/node:lsp-bookworm}
 export RUNNER_VOLS="${RUNNER_VOLS} ${L7_NVIM_STATE_PATH}:/home/user/.local/state/nvim:ro"
-RUNNER_OPTS="${RUNNER_OPTS} -i "
+export RUNNER_OPTS="${RUNNER_OPTS} -i "
 l7-run-node typescript-language-server ${@}
