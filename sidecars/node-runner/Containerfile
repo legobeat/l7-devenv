@@ -28,6 +28,7 @@ RUN  bash -c "[ 1000 != \"1000\" ] && groupadd -g 1000 -U node userz || true" \
 WORKDIR /tmp/
 COPY sidecars/node-runner/package.json \
      sidecars/node-runner/package-lock.json \
+     .
 
 COPY --from=fwdproxy \
   --chmod=444 \
