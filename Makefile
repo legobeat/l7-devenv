@@ -248,7 +248,7 @@ test_nvim: # image_nvim
 		"${IMAGE_NAME}:${IMAGE_TAG}" \
 		-c 'nvim --version'
 
-test_nvim_extra: test_devenv_dir_owner
+test_extra_nvim: test_devenv_dir_owner
 
 test_dnsmasq: IMAGE_NAME = ${DNSMASQ_IMAGE_NAME}
 test_dnsmasq: IMAGE_TAG = ${DNSMASQ_IMAGE_TAG}
