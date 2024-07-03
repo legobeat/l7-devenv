@@ -1,5 +1,9 @@
 #!/bin/bash
 export RUNNER_IMAGE=${TS_LSP_IMAGE:-localhost/l7/node:lsp-bookworm}
-export RUNNER_VOLS="${RUNNER_VOLS} ${L7_NVIM_STATE_PATH}:/home/user/.local/state/nvim:ro,z"
+export RUNNER_VOLS="${L7_NVIM_STATE_PATH}:/home/user/.local/state/nvim:ro ${RUNNER_VOLS}"
+export RUNNER_VOLS="${L7_NODE_CACHE_DIR}/yarn/cache/berry:/home/node/.yarn/cache/berry:ro ${RUNNER_VOLS}"
+export RUNNER_VOLS="${L7_NODE_CACHE_DIR}/yarn/cache/classic:/home/node/.cache/yarn:ro ${RUNNER_VOLS}"
+export RUNNER_VOLS="${L7_NODE_CACHE_DIR}/pnpm/cache:/home/node/.cache/pnpm:ro ${RUNNER_VOLS}"
+export RUNNER_VOLS="${L7_NODE_CACHE_DIR}/npm/cache:/home/node/.npm/_cacache:ro ${RUNNER_VOLS}"
 export RUNNER_OPTS="${RUNNER_OPTS} -i "
 l7-run-node typescript-language-server ${@}

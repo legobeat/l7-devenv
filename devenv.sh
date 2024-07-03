@@ -311,6 +311,10 @@ else
     -v "${SRC_DIR}:/src${SRC_DIR_OPTS}" \
     -v "${NVIM_STATE_PATH}:/home/user/.local/state/nvim:z" \
     -v "${RESOLV_CONF_PATH}:/etc/resolv.conf:ro" \
+    -v "${NODE_CACHE_DIR}/yarn/cache/berry:/home/node/.yarn/cache/berry:z,ro" \
+    -v "${NODE_CACHE_DIR}/yarn/cache/classic:/home/node/.cache/yarn:z,ro" \
+    -v "${NODE_CACHE_DIR}/pnpm/cache:/home/node/.cache/pnpm:z,ro" \
+    -v "${NODE_CACHE_DIR}/npm/cache:/home/node/.npm/_cacache:z,ro" \
     -w "${CWD}" \
     --mount type=tmpfs,tmpfs-size=2G,destination=/tmp,tmpfs-mode=0777 \
     -e "L7_COMPOSE_NETWORK_NAME_INTERNAL=${NETWORK_NAME}" \
