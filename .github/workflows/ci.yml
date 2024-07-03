@@ -166,7 +166,6 @@ jobs:
         if: ${{ matrix.cmd == 'podman' }}
 
     env:
-      BUILDAH_FORMAT: docker
       CMD: ${{ matrix.cmd }}
       CONTAINER_CMD: ${{ matrix.cmd }}
 
@@ -291,7 +290,6 @@ jobs:
           #make test_image_nvim
           make -j6 test_e2e_${{ matrix.test }}
     env:
-      BUILDAH_FORMAT: docker
       DEBUG: ''
       BUILD_COMPOSE: ''
       # it is unclear why this is needed in CI
