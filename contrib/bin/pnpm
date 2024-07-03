@@ -5,7 +5,7 @@ export RUNNER_ENV="${RUNNER_ENV}"
 export RUNNER_OPTS="${RUNNER_OPTS}"
 export RUNNER_VOLS="${RUNNER_VOLS}"
 if [[ -n "${PNPM_VERSION}" ]]; then
-  l7-run-node "/home/node/.cache/node/corepack/v1/pnpm/${PNPM_VERSION}/bin/pnpm" ${@}
+  exec l7-run-node "/home/node/.cache/node/corepack/v1/pnpm/${PNPM_VERSION}/bin/pnpm" ${@}
 else
-  l7-run-node pnpm ${@}
+  exec l7-run-node pnpm ${@}
 fi
