@@ -106,31 +106,8 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: true
-
-      - run: make -j6 images_test
-
-      - name: Export images for cache
-        run: |
-          mkdir -p /tmp/ci-images
-          set -x
-          images=$(podman images --format=json \
-            | jq -r 'map(.Names)|flatten|map(select(.)|select(test("/l7[^/]*/")))|.[]' \
-            | sort \
-            | uniq
-          )
-          for img in ${images}; do
-            echo "exporting ${img}"
-            ${{ matrix.cmd }} save "${img}" -o "/tmp/ci-images/$(echo "${img}" | tr -d ':/').tar"
-          done
-        if: ${{ matrix.cmd == 'podman' }}
-
-      - name: Save image cache
-        uses: actions/cache/save@v4
-        with:
-          path: /tmp/ci-images
-          key: 'ci-test-${{ github.sha }}'
-        if: ${{ matrix.cmd == 'podman' }}
-
+      - name: Make all images
+        run: make -j6 images_test
     env:
       CMD: ${{ matrix.cmd }}
       CONTAINER_CMD: ${{ matrix.cmd }}
@@ -179,7 +156,6 @@ jobs:
 
   test-e2e-podman:
     runs-on: ubuntu-${{ matrix.ubuntu-version }}
-    needs: test-make-all
     services:
       registry:
         image: registry:2
@@ -198,25 +174,14 @@ jobs:
         ubuntu-version:
           - 24.04
     steps:
-      - name: Allow cleartext http to localhost container registry (podman)
+      - name: Setup podman
         run: |
           mkdir -p ~/.config/containers/registries.conf.d
           echo "[[registry]]
             location = 'localhost:80'
           insecure = true" | tee ~/.config/containers/registries.conf.d/insecure-localhost.conf
-          systemctl --user restart podman
-      - name: Restore image cache
-        uses: actions/cache/restore@v4
-        with:
-          path: /tmp/ci-images
-          key: 'ci-test-${{ github.sha }}'
-          fail-on-cache-miss: true
-      - name: Import cached images
-        run: |
-          set -x
-          ls -la /tmp/ci-images
-          find /tmp/ci-images -type f -name '*.tar' -exec podman load -i '{}' \;
-          podman images
+          systemctl --user restart podman.socket
+          podman info
       - uses: actions/checkout@v4
         with:
           submodules: true
@@ -228,6 +193,12 @@ jobs:
           echo 'GITHUB_TOKEN=e2e-test-token' > env
           echo "export L7_USER_TOKEN_HASH=${usertokenhash}" > .env
           echo 'export L7_GITHUB_TOKEN=${{ github.token }}' > .env
+      - run: |
+          make -j6 test_runner_node
+        if: ${{ matrix.test == 'node_corepack' }}
+      - run: |
+          make -j6 test_lsp_node
+        if: ${{ matrix.test == 'lsp_typescript' }}
       - name: Run test ${{ matrix.test }}
         run: |
           podman network ls
