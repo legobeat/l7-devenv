@@ -50,7 +50,6 @@ if [ -t 1 ] ; then
   RUNNER_OPTS="${RUNNER_OPTS} -t "
 fi
 
-set -x
 podman run --pull=never --rm -i \
   --user 1000:1000 --userns=keep-id:uid=1000,gid=1000 \
   --network "${L7_COMPOSE_NETWORK_NAME_INTERNAL}" \
