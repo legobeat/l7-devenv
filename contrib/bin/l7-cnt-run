@@ -53,7 +53,7 @@ if [[ "${L7_DISABLE_SELINUX}" == "1" ]]; then
   RUNNER_OPTS="${RUNNER_OPTS} --security-opt=label=disable -e L7_DISABLE_SELINUX=1"
 fi
 
-podman run --pull=never --rm -i \
+podman run --pull=never --rm \
   --user 1000:1000 --userns=keep-id:uid=1000,gid=1000 \
   --network "${L7_COMPOSE_NETWORK_NAME_INTERNAL}" \
   -v "${SRC_DIR}:${SRC_DIR}" -v "${SRC_DIR}:/src" -w "${PWD}" \
