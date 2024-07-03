@@ -103,6 +103,15 @@ jobs:
         os:
           - ubuntu-24.04
     steps:
+      - name: Setup podman
+        run: |
+          mkdir -p ~/.config/containers/registries.conf.d
+          echo "[[registry]]
+            location = 'localhost:80'
+          insecure = true" | tee ~/.config/containers/registries.conf.d/insecure-localhost.conf
+          podman migrate
+          podman info
+          systemctl --user restart podman.socket
       - uses: actions/checkout@v4
         with:
           submodules: true
@@ -190,13 +199,15 @@ jobs:
         ubuntu-version:
           - 24.04
     steps:
-      - name: Allow cleartext http to localhost container registry (podman)
+      - name: Setup podman
         run: |
           mkdir -p ~/.config/containers/registries.conf.d
           echo "[[registry]]
             location = 'localhost:80'
           insecure = true" | tee ~/.config/containers/registries.conf.d/insecure-localhost.conf
-          systemctl --user restart podman
+          podman system migrate
+          podman info
+          systemctl --user restart podman.socket
       - name: Restore image cache
         uses: actions/cache/restore@v4
         with:
