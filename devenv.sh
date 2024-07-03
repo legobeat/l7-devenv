@@ -321,7 +321,7 @@ else
     --mount type=bind,source="${CONF_DIR}/git,target=/home/user/.config/git,ro=true" \
     -v "${SRC_DIR}:${SRC_DIR}" \
     -v "${SRC_DIR}:/src" \
-    -v "${NVIM_STATE_PATH}:/home/user/.local/state/nvim" \
+    -v "${NVIM_STATE_PATH}:/home/user/.local/state/nvim:U" \
     -v "${RESOLV_CONF_PATH}:/etc/resolv.conf:ro" \
     -w "${CWD}" \
     --mount type=tmpfs,tmpfs-size=2G,destination=/tmp,tmpfs-mode=0777 \
