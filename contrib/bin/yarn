@@ -1,5 +1,11 @@
 #!/bin/bash
 export RUNNER_IMAGE=${YARN_RUNNER_IMAGE:-${NODE_RUNNER_IMAGE:-${RUNNER_IMAGE}}}
-export RUNNER_VOLS="${RUNNER_VOLS} ${HOME}/.local/share/l7ide/node-runner/yarn/cache/berry:/home/node/.yarn/cache/berry"
-export RUNNER_VOLS="${RUNNER_VOLS} ${HOME}/.local/share/l7ide/node-runner/yarn/cache/classic:/home/node/.cache/yarn"
-l7-run-node yarn ${@}
+export RUNNER_ENV="${RUNNER_ENV}"
+export RUNNER_OPTS="${RUNNER_OPTS}"
+export RUNNER_VOLS="${L7_NODE_CACHE_DIR}/yarn/cache/berry:/home/node/.yarn/cache/berry ${RUNNER_VOLS}"
+export RUNNER_VOLS="${L7_NODE_CACHE_DIR}/yarn/cache/classic:/home/node/.cache/yarn ${RUNNER_VOLS}"
+if [[ -n "${YARN_VERSION}" ]]; then
+  exec l7-run-node "/home/node/.cache/node/corepack/v1/yarn/${YARN_VERSION}/bin/yarn" ${@}
+else
+  exec l7-run-node yarn ${@}
+fi
