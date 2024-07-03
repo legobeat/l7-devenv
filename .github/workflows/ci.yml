@@ -197,6 +197,11 @@ jobs:
         ubuntu-version:
           - 24.04
     steps:
+      - name: check selinux
+        run: |
+          sudo apt-get install -y selinux-utils
+          sudo getenforce
+
       - name: Prep podman
         run: |
           mkdir -p ~/.config/containers/registries.conf.d
