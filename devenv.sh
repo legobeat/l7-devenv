@@ -81,7 +81,7 @@ runtime_config () {
 
   ### run args
   if [[ -n "${SSH_SOCKET}" ]]; then
-    RUN_ARGS="${RUN_ARGS} -v ${SSH_SOCKET}:${HOME}/.ssh/SSH_AUTH_SOCK:Z -e SSH_AUTH_SOCK=${HOME}/.ssh/SSH_AUTH_SOCK"
+    RUN_ARGS="${RUN_ARGS} -v ${SSH_SOCKET}:${HOME}/.ssh/SSH_AUTH_SOCK -e SSH_AUTH_SOCK=${HOME}/.ssh/SSH_AUTH_SOCK"
   fi
   if [[ -n "${NAME}" ]]; then
     RUN_ARGS="${RUN_ARGS} --name ${NAME} --hostname ${NAME}"
@@ -318,12 +318,12 @@ else
   ${cmd} run --rm -i \
     --user 1000:1000 --userns=keep-id:uid=1000,gid=1000 \
     --mount type=bind,source="${LOCAL_DIR},target=/home/user/.local" \
-    --mount type=bind,source="${CONF_DIR}/ssh.d,target=/home/user/.ssh/config.d,ro=true,Z" \
-    --mount type=bind,source="${CONF_DIR}/git,target=/home/user/.config/git,ro=true,Z" \
+    --mount type=bind,source="${CONF_DIR}/ssh.d,target=/home/user/.ssh/config.d,ro=true" \
+    --mount type=bind,source="${CONF_DIR}/git,target=/home/user/.config/git,ro=true" \
     -v "${SRC_DIR}:${SRC_DIR}" \
     -v "${SRC_DIR}:/src" \
-    -v "${NVIM_STATE_PATH}:/home/user/.local/state/nvim:z" \
-    -v "${RESOLV_CONF_PATH}:/etc/resolv.conf:ro,z" \
+    -v "${NVIM_STATE_PATH}:/home/user/.local/state/nvim" \
+    -v "${RESOLV_CONF_PATH}:/etc/resolv.conf:ro" \
     -w "${CWD}" \
     --mount type=tmpfs,tmpfs-size=2G,destination=/tmp,tmpfs-mode=0777 \
     -e "L7_COMPOSE_NETWORK_NAME_INTERNAL=${NETWORK_NAME}" \
