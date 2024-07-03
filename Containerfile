@@ -130,15 +130,6 @@ RUN for bin in ${NODE_BINS}; do ln -s l7-run-node "/usr/local/bin/${bin}"; done
 COPY skel/.config/containers/containers.conf /etc/containers/containers.conf
 COPY --chown=${UID}:${GID} skel/ /home/user/
 
-RUN cat /home/user/.env >> /etc/profile \
-  && chown -R ${UID}:${GID} \
-    /home/user \
-    # treesitter needs write to parsers dirs
-    /etc/xdg/nvim/pack/l7ide/start/nvim-treesitter/parser{-info,} \
-  && ln -s \
-    podman-remote /usr/bin/podman
-
-
 # default trust github.com known ssh key
 COPY contrib/data/ssh_known_hosts /etc/ssh/ssh_known_hosts
 # https://docs.fedoraproject.org/en-US/quick-docs/using-shared-system-certificates/
@@ -146,8 +137,18 @@ COPY --from=fwdproxy \
   --chmod=444 \
   /data/caddy/pki/authorities/local/root.crt \
   /etc/pki/ca-trust/source/anchors/l7-fwd-proxy.crt
-RUN update-ca-trust
+RUN update-ca-trust \
+  && cat /home/user/.env >> /etc/profile \
+  # podman quirk: `COPY --from` messes up ownership so rechown needs to come last
+  && chown -R ${UID}:${GID} \
+    /home/user \
+    # treesitter needs write to parsers dirs?
+    /etc/xdg/nvim/pack/l7ide/start/nvim-treesitter/parser{-info,} \
+  && ln -s \
+    podman-remote /usr/bin/podman
 
-USER ${UID}
+
+
+USER ${UID}:${GID}
 WORKDIR /src
 ENTRYPOINT ${SHELL}
