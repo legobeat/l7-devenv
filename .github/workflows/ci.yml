@@ -202,7 +202,6 @@ jobs:
 
   test-e2e-podman:
     runs-on: ubuntu-${{ matrix.ubuntu-version }}
-    #needs: test-make-all
     services:
       registry:
         image: registry:2
@@ -221,27 +220,21 @@ jobs:
         ubuntu-version:
           - 24.04
     steps:
-      - name: Allow cleartext http to localhost container registry (podman)
+      - name: Setup podman
         run: |
-          set -x
-          # sudo sed -E -i -e 's/^\s*runtime\s*=\s*"crun"/#\0/' -e 's/^#\s*(runtime\s*=\s*"runc")/\1/' /etc/containers/libpod.conf
-          # mkdir -p ~/.config/containers/registries.conf.d
-          # mkdir -p ~/.config/containers/storage.conf.d
-          # echo "[[registry]]
-          #   location = 'localhost:80'
-          # insecure = true" | tee ~/.config/containers/registries.conf.d/insecure-localhost.conf
-          # echo "[storage]
-          #   driver = 'overlay'
-          #   force_mask = 'shared'
-          # mount_program = '/usr/bin/fuse-overlayfs'" | tee ~/.config/containers/storage.conf.d/overlay-driver.conf
-          # podman info
-          # podman system migrate
-          # podman system reset -f
-          systemctl --user restart podman
+          mkdir -p ~/.config/containers/registries.conf.d
+          echo "[[registry]]
+            location = 'localhost:80'
+          insecure = true" | tee ~/.config/containers/registries.conf.d/insecure-localhost.conf
+          podman system migrate
+          systemctl --user restart podman.service
+          systemctl --user restart podman.socket
           podman info
       - uses: actions/checkout@v4
         with:
           submodules: true
+      - run: |
+          make -j6 images_test
       - name: set up user config
         run: |
           sudo chown -R $(id -u):$(id -g) "${HOME}"
