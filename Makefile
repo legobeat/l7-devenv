@@ -273,7 +273,7 @@ test_runner_node: IMAGE_NAME = ${RUNNER_IMAGE_NAME}
 test_runner_node: IMAGE_TAG = ${RUNNER_IMAGE_TAG}
 test_runner_node: # image_runner_node
 	${CMD} run --rm \
-		"${IMAGE_NAME}:${IMAGE_TAG}" \
+		"${IMAGE_NAME}:20-${IMAGE_TAG}" \
 		-c 'node --version'
 
 test_lsp_node: IMAGE_NAME = ${RUNNER_IMAGE_NAME}
