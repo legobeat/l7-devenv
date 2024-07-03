@@ -6,8 +6,9 @@ for pm in yarn pnpm npm; do
   if [[ -n "${DEBUG}" ]]; then
     export RUN_ARGS="${RUN_ARGS} -e DEBUG=${DEBUG}"
   fi
-  NAME=l7ide-test-runner-corepack find test/runner-node/fixtures/corepack -maxdepth 1 -name "${pm}*" \
-    -exec ./devenv.sh $(pwd)/test/runner-node/test-corepack-pm.sh {} ${pm} \;
+  for pmv in $(find test/runner-node/fixtures/corepack -maxdepth 1 -name "${pm}*") ; do
+    NAME=l7ide-test-runner-corepack ./devenv.sh $(pwd)/test/runner-node/test-corepack-pm.sh "${pmv}" "${pm}"
+  done
 done
 
 # test global shims
