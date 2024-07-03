@@ -56,7 +56,7 @@ fi
 podman run --pull=never --rm -i \
   --user 1000:1000 --userns=keep-id:uid=1000,gid=1000 \
   --network "${L7_COMPOSE_NETWORK_NAME_INTERNAL}" \
-  -v "${SRC_DIR}:${SRC_DIR}:z" -v "${SRC_DIR}:/src:z" -w "${PWD}" \
+  -v "${SRC_DIR}:${SRC_DIR}" -v "${SRC_DIR}:/src" -w "${PWD}" \
   -v "${L7_RESOLV_CONF_PATH}:/etc/resolv.conf:ro,z" \
   ${RUNNER_OPTS} \
   --entrypoint "${COMMAND}" -- $RUNNER_IMAGE ${ARGS}
