@@ -44,6 +44,9 @@ done
 if [ -t 1 ] ; then
   RUNNER_OPTS="${RUNNER_OPTS} -t "
 fi
+if [[ "${L7_DISABLE_SELINUX}" == "1" ]]; then
+  RUNNER_OPTS="${RUNNER_OPTS} --security-opt=label=disable -e L7_DISABLE_SELINUX=1"
+fi
 
 podman run --pull=never --rm -i \
   --user 1000:1000 --userns=keep-id:uid=1000,gid=1000 \

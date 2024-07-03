@@ -96,6 +96,9 @@ runtime_config () {
   if [[ -f "${CONF_DIR}/env" ]]; then
     RUN_ARGS="${RUN_ARGS} --env-file ${CONF_DIR}/env"
   fi
+  if [[ "${L7_DISABLE_SELINUX}" == "1" ]]; then
+    RUN_ARGS="${RUN_ARGS} --security-opt=label=disable -e L7_DISABLE_SELINUX=1"
+  fi
 
   # podman / netavark hijack both dns and/or resolv.conf no matter what, it seems...
   RESOLV_CONF_PATH="${L7_RESOLV_CONF_PATH:-$(mktemp)}"
@@ -285,6 +288,10 @@ if (( $? != 0 )) ; then
 fi
 
 container_id="$(${cmd} ps -f "name=${NAME}" -q || echo '')"
+
+if [[ -n "${DEBUG}" ]]; then
+  env | sort
+fi
 
 if [[ -n "${container_id}" ]]; then
   entrypoint=${1:-${SHELL}}
