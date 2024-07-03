@@ -28,15 +28,6 @@ RUN  bash -c "[ 1000 != \"1000\" ] && groupadd -g 1000 -U node userz || true" \
 WORKDIR /tmp/
 COPY sidecars/node-runner/package.json \
      sidecars/node-runner/package-lock.json \
-     .
-# remove bundled yarn1 to get corepack integration
-RUN rm -rf /usr/local/bin/yarn* /opt/yarn* \
-  && npm ci --omit=dev --ignore-scripts \
-  && mv node_modules/* node_modules/.bin /usr/local/lib/node_modules/ \
-  # seems strange that this is needed
-  && ln -s /usr/local/lib/node_modules/ /usr/local/bin/node_modules \
-  && mkdir -p /home/user/.config \
-  && chown -R node /home/user /home/node
 
 COPY --from=fwdproxy \
   --chmod=444 \
@@ -45,7 +36,15 @@ COPY --from=fwdproxy \
   /usr/local/share/ca-certificates/l7-fwd-proxy.crt
 ENV NODE_EXTRA_CA_CERTS=/usr/local/share/ca-certificates/l7-fwd-proxy.crt
 
-RUN DEBIAN_FRONTEND=noninteractive dpkg-reconfigure ca-certificates
+RUN DEBIAN_FRONTEND=noninteractive dpkg-reconfigure ca-certificates \
+  # remove bundled yarn1 to get corepack integration
+  && rm -rf /usr/local/bin/yarn* /opt/yarn* \
+  && npm ci --omit=dev --ignore-scripts \
+  && mv node_modules/* node_modules/.bin /usr/local/lib/node_modules/ \
+  # seems strange that this is needed
+  && ln -s /usr/local/lib/node_modules/ /usr/local/bin/node_modules \
+  && mkdir -p /home/user/.config \
+  && chown -R node /home/user /home/node
 
 # default trust github.com known ssh key
 COPY contrib/data/ssh_known_hosts /etc/ssh/ssh_known_hosts
