@@ -193,12 +193,22 @@ jobs:
           echo 'GITHUB_TOKEN=e2e-test-token' > env
           echo "export L7_USER_TOKEN_HASH=${usertokenhash}" > .env
           echo 'export L7_GITHUB_TOKEN=${{ github.token }}' > .env
-      - run: |
+      - name: Build images
+        run: |
+          make -j6 image_nvim image_runner_node
           make -j6 test_runner_node
         if: ${{ matrix.test == 'node_corepack' }}
-      - run: |
+      - name: Build images
+        run: |
+          make -j6 images_test
           make -j6 test_lsp_node
         if: ${{ matrix.test == 'lsp_typescript' }}
+      - run: |
+          make -j6 images
+        if: ${{ matrix.test == 'ghauth' }}
+      - run: |
+          make -j6 images
+        if: ${{ matrix.test == 'curl' }}
       - name: Run test ${{ matrix.test }}
         run: |
           podman network ls
