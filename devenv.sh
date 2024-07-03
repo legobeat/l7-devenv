@@ -314,9 +314,9 @@ if [[ -n "${container_id}" ]]; then
 else
   ${cmd} run --rm -i \
     --user 1000:1000 --userns=keep-id:uid=1000,gid=1000 \
-    --mount type=bind,source="${LOCAL_DIR},target=/home/user/.local,z,U" \
-    --mount type=bind,source="${CONF_DIR}/ssh.d,target=/home/user/.ssh/config.d,ro=true,Z,U" \
-    --mount type=bind,source="${CONF_DIR}/git,target=/home/user/.config/git,ro=true,Z,U" \
+    --mount type=bind,source="${LOCAL_DIR},target=/home/user/.local,z" \
+    --mount type=bind,source="${CONF_DIR}/ssh.d,target=/home/user/.ssh/config.d,ro=true,Z" \
+    --mount type=bind,source="${CONF_DIR}/git,target=/home/user/.config/git,ro=true,Z" \
     -v "${SRC_DIR}:${SRC_DIR}:z" \
     -v "${SRC_DIR}:/src:z" \
     -v "${NVIM_STATE_PATH}:/home/user/.local/state/nvim:z,U" \
