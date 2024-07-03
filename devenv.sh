@@ -16,7 +16,7 @@ user_config () {
     . "${CONF_DIR}/.env"
   fi
 
-  SRC_DIR="${SRC_DIR:-$(pwd)}"
+  SRC_DIR="${SRC_DIR:-${L7_SRC_DIR:-$(pwd)}}"
   LOG_DIR="${LOG_DIR:-${HOME}/.local/share/l7ide/logs}"
   XDG_RUNTIME_DIR="${XDG_RUNTIME_DIR:-/var/run/user/$(id -u)}"
   SSH_SOCKET="${SSH_SOCKET:-${SSH_AUTH_SOCK}}"
@@ -313,12 +313,12 @@ if [[ -n "${container_id}" ]]; then
 else
   ${cmd} run --rm -i \
     --user 1000:1000 --userns=keep-id:uid=1000,gid=1000 \
-    --mount type=bind,source="${LOCAL_DIR},target=/home/user/.local" \
-    --mount type=bind,source="${CONF_DIR}/ssh.d,target=/home/user/.ssh/config.d,ro=true" \
-    --mount type=bind,source="${CONF_DIR}/git,target=/home/user/.config/git,ro=true" \
+    --mount type=bind,source="${LOCAL_DIR},target=/home/user/.local,U" \
+    --mount type=bind,source="${CONF_DIR}/ssh.d,target=/home/user/.ssh/config.d,ro=true,U" \
+    --mount type=bind,source="${CONF_DIR}/git,target=/home/user/.config/git,ro=true,U" \
     -v "${SRC_DIR}:${SRC_DIR}:z" \
     -v "${SRC_DIR}:/src:z" \
-    -v "${NVIM_STATE_PATH}:/home/user/.local/state/nvim:z" \
+    -v "${NVIM_STATE_PATH}:/home/user/.local/state/nvim:z,U" \
     -v "${RESOLV_CONF_PATH}:/etc/resolv.conf:ro,z" \
     -w "${CWD}" \
     --mount type=tmpfs,tmpfs-size=2G,destination=/tmp,tmpfs-mode=0777 \
