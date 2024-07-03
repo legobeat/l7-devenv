@@ -106,47 +106,8 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: true
-
-      - name: Allow cleartext http to localhost container registry (podman)
-        run: |
-          mkdir -p ~/.config/containers/registries.conf.d
-          mkdir -p ~/.config/containers/storage.conf.d
-          echo "[[registry]]
-            location = 'localhost:80'
-          insecure = true" | tee ~/.config/containers/registries.conf.d/insecure-localhost.conf
-          echo "[storage]
-            driver = 'overlay'
-            force_mask = 'shared'
-          mount_program = '/usr/bin/fuse-overlayfs'" | tee ~/.config/containers/storage.conf.d/overlay-driver.conf
-          podman system migrate
-          podman system reset -f
-          systemctl --user restart podman
-          podman info
-
-      - run: make -j6 images_test
-
-      - name: Export images for cache
-        run: |
-          mkdir -p /tmp/ci-images
-          set -x
-          images=$(podman images --format=json \
-            | jq -r 'map(.Names)|flatten|map(select(.)|select(test("/l7[^/]*/")))|.[]' \
-            | sort \
-            | uniq
-          )
-          for img in ${images}; do
-            echo "exporting ${img}"
-            ${{ matrix.cmd }} save "${img}" -o "/tmp/ci-images/$(echo "${img}" | tr -d ':/').tar"
-          done
-        if: ${{ matrix.cmd == 'podman' }}
-
-      - name: Save image cache
-        uses: actions/cache/save@v4
-        with:
-          path: /tmp/ci-images
-          key: 'ci-test-${{ github.sha }}'
-        if: ${{ matrix.cmd == 'podman' }}
-
+      - name: Make all images
+        run: make -j6 images_test
     env:
       CMD: ${{ matrix.cmd }}
       CONTAINER_CMD: ${{ matrix.cmd }}
@@ -212,21 +173,7 @@ jobs:
         ubuntu-version:
           - 24.04
     steps:
-      # disabling selinux should not actually be required and works fine locally; something specific to GHA
-      - name: check selinux
-        run: |
-          sudo apt-get install -y selinux-utils
-          sudo getenforce
-          #sudo setenforce 0
-          #sudo getenforce
       - name: Setup podman
-        # sudo sed -E -i -e 's/^\s*runtime\s*=\s*"crun"/#\0/' -e 's/^#\s*(runtime\s*=\s*"runc")/\1/' /etc/containers/libpod.conf
-        # mkdir -p ~/.config/containers/registries.conf.d
-        # mkdir -p ~/.config/containers/storage.conf.d
-        # echo "[storage]
-        #   driver = 'overlay'
-        #   force_mask = 'shared'
-        # mount_program = '/usr/bin/fuse-overlayfs'" | tee ~/.config/containers/storage.conf.d/overlay-driver.conf
         run: |
           mkdir -p ~/.config/containers/registries.conf.d
           echo "[[registry]]
@@ -240,7 +187,8 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: true
-      - run: |
+      - name: Make images
+        run: |
           make -j6 images_test
       - name: set up user config
         run: |
