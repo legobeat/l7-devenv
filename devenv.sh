@@ -317,12 +317,12 @@ else
   ${cmd} run --rm -i \
     --user 1000:1000 --userns=keep-id:uid=1000,gid=1000 \
     --mount type=bind,source="${LOCAL_DIR},target=/home/user/.local" \
-    --mount type=bind,source="${CONF_DIR}/ssh.d,target=/home/user/.ssh/config.d,ro=true,U,Z" \
-    --mount type=bind,source="${CONF_DIR}/git,target=/home/user/.config/git,ro=true,U,Z" \
+    --mount type=bind,source="${CONF_DIR}/ssh.d,target=/home/user/.ssh/config.d,ro=true,Z" \
+    --mount type=bind,source="${CONF_DIR}/git,target=/home/user/.config/git,ro=true,Z" \
     -v "${SRC_DIR}:${SRC_DIR}" \
     -v "${SRC_DIR}:/src" \
     -v "${NVIM_STATE_PATH}:/home/user/.local/state/nvim:z" \
-    -v "${RESOLV_CONF_PATH}:/etc/resolv.conf:ro,z,U" \
+    -v "${RESOLV_CONF_PATH}:/etc/resolv.conf:ro,z" \
     -w "${CWD}" \
     --mount type=tmpfs,tmpfs-size=2G,destination=/tmp,tmpfs-mode=0777 \
     -e "L7_COMPOSE_NETWORK_NAME_INTERNAL=${NETWORK_NAME}" \
