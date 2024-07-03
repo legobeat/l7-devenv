@@ -16,10 +16,4 @@ else
   ARGS="${@}"
 fi
 
-## RVERTME
-id -a
-echo $HOME
-ls -la $HOME
-ls -la /home
-
 exec l7-cnt-run "${COMMAND}" ${ARGS}
