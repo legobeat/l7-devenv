@@ -242,7 +242,7 @@ test_caddy: # image_caddy
 
 test_nvim : IMAGE_NAME = ${NVIM_IMAGE_NAME}
 test_nvim : IMAGE_TAG = ${NVIM_IMAGE_TAG}
-test_nvim: # image_nvim
+test_nvim: test_devenv_dir_owner # image_nvim
 	${CMD} run --rm \
 		--entrypoint sh \
 		"${IMAGE_NAME}:${IMAGE_TAG}" \
@@ -441,3 +441,23 @@ test_e2e_lsp_typescript : IMAGE_TAG = ${NVIM_IMAGE_TAG}
 test_e2e_lsp_typescript : image_nvim_test
 	set -e
 	IMAGE=${IMAGE_NAME}-ht:${IMAGE_TAG} NAME=l7ide-test-runner-lsp ./devenv.sh /bin/bash -l -Ec test/lsp-js/ht-test-1-1.sh
+
+test_devenv_dir_owner:
+	@export NAME=l7ide-test-runner-de; \
+	 export SRC_DIR=$$(mktemp -d --tmpdir "l7test.XXXX"); \
+	for p in \
+		"/home/user" \
+		"/home/user/.config" \
+		"$${SRC_DIR}" \
+	; do \
+		owner=$$(./devenv.sh stat --format '%u:%g' "$${p}"); \
+		if [[ "$${owner}" != "1000:1000" ]]; then \
+			echo "Invalid ownership of $${p}: $${HOME_OWNER}"; \
+			export TESTFAIL=1; \
+		fi; \
+	done; \
+	rm -r "$${SRC_DIR}"; \
+	if [[ -n "${TESTFAIL}" ]]; then \
+		echo 4; \
+	fi; \
+	echo "perms test pass";
