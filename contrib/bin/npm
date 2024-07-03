@@ -1,5 +1,4 @@
 #!/bin/bash
-export RUNNER_OPTS="${RUNNER_OPTS} -t "
 export RUNNER_IMAGE=${NPM_RUNNER_IMAGE:-${NODE_RUNNER_IMAGE:-${RUNNER_IMAGE}}}
 export RUNNER_VOLS="${RUNNER_VOLS} ${L7_NODE_CACHE_DIR}/npm/cache:/home/node/.npm/_cacache"
 if [[ -n "${NPM_VERSION}" ]]; then
