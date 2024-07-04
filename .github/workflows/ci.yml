@@ -39,7 +39,7 @@ jobs:
               localhost/l7/node:latest
               localhost/l7/node:20-bookworm
           - name: nvim
-            file: Containerfile
+            file: Containerfile.nvim
             context: .
             tags: localhost/l7/nvim:latest
     steps:
@@ -75,6 +75,20 @@ jobs:
           context: sidecars/caddy
           file: sidecars/caddy/Containerfile
           tags: localhost/l7/caddy:latest
+          load: true
+          push: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build and load base image
+        if: ${{ matrix.name == 'nvim' || matrix.name == 'node' }}
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: Containerfile.slim
+          tags: localhost/l7/alpine:3.20
+          build-args: |
+            ALPINE_VERSION=3.20
           load: true
           push: true
           cache-from: type=gha

@@ -1,0 +1,68 @@
+# syntax=docker/dockerfile:1.4-labs
+ARG CADDY_IMAGE=localhost/l7/caddy:latest
+# this assumes we already have a locally built caddy image
+# the image contains a pregenerated ca root cert for mitm, which we copy here
+# TODO: provide a nicer way to manage the rootcert
+FROM ${CADDY_IMAGE} AS fwdproxy
+
+#######################
+##### FINAL IMAGE #####
+FROM alpine:3.20
+
+ARG EXTRA_BASE_PKGS=""
+ARG EXTRA_PKGS=""
+
+ARG HOME=/home/user
+ENV HOME=${HOME}
+ARG SHELL=/bin/bash
+ARG UID=1000
+ARG GID=1000
+
+RUN apk add --no-cache \
+    bash \
+    ca-certificates curl wget jq \
+    openssl \
+    envsubst \
+    ${EXTRA_BASE_PKGS} \
+    ${EXTRA_PKGS} \
+    # build-deps
+    shadow \
+  ### create user entry or podman might mess up /etc/passwd entry
+  && bash -c "groupadd -g ${GID} userz || true" \
+  && bash -c "useradd -u ${UID} -g ${GID} -d /home/user -m user -s "${SHELL}" && chown -R ${UID}:${GID} /home/user || true" \
+  && apk del shadow
+
+COPY --chmod=755 --chown=root \
+  contrib/bin/* contrib/*/bin/* \
+  /usr/local/bin/
+
+## user config and keys
+
+### default trust github.com known ssh key
+COPY contrib/data/ssh_known_hosts /etc/ssh/ssh_known_hosts
+
+COPY --from=fwdproxy \
+  --chmod=444 \
+  /data/caddy/pki/authorities/local/root.crt \
+  /usr/local/share/ca-certificates/l7-fwd-proxy.crt
+
+COPY --chown=${UID}:${GID} skel/ /home/user/
+
+### shim global node bins
+ARG NODE_BINS="npm7 npm9 npm10 pnpm9 yarn1 yarn3 yarn4     allow-scripts corepack glob lavamoat-ls mkdirp node-gyp node-which nopt npx pnpx resolve semver yarn-deduplicate"
+RUN for bin in ${NODE_BINS}; do ln -s l7-run-node "/usr/local/bin/${bin}"; done \
+
+  ### trust internal proxy ca cert
+  && cat /usr/local/share/ca-certificates/l7-fwd-proxy.crt >> /etc/ssl/certs/ca-certificates.crt \
+
+  ### user env vars
+  && cat /home/user/.env >> /etc/profile \
+
+  ### podman quirk: `COPY --from` may mess up ownership so rechown needs to come last
+  && chown -R ${UID}:${GID} \
+    /home/user
+
+USER ${UID}:${GID}
+WORKDIR /src
+ENTRYPOINT ${SHELL}
+

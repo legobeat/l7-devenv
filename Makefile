@@ -1,23 +1,24 @@
 SHELL := /bin/bash
 IMAGE_NAME :=
 IMAGE_TAG  :=
-NVIM_IMAGE_NAME := localhost/l7/nvim
+IMAGE_REPO := localhost/l7
+NVIM_IMAGE_NAME := ${IMAGE_REPO}/nvim
 NVIM_IMAGE_TAG  := latest
-GPG_IMAGE_NAME := localhost/l7/gpg-vault
+GPG_IMAGE_NAME := ${IMAGE_REPO}/gpg-vault
 GPG_IMAGE_TAG  := pk
-RUNNER_IMAGE_NAME := localhost/l7/node
+RUNNER_IMAGE_NAME := ${IMAGE_REPO}/node
 RUNNER_IMAGE_TAG  := bookworm
-AUTH_PROXY_IMAGE_NAME := localhost/l7/auth-proxy
+AUTH_PROXY_IMAGE_NAME := ${IMAGE_REPO}/auth-proxy
 AUTH_PROXY_IMAGE_TAG  := latest
-CONTAINER_PROXY_IMAGE_NAME := localhost/l7/container-socket-proxy
+CONTAINER_PROXY_IMAGE_NAME := ${IMAGE_REPO}/container-socket-proxy
 CONTAINER_PROXY_IMAGE_TAG  := latest
-CADDY_IMAGE_NAME := localhost/l7/caddy
+CADDY_IMAGE_NAME := ${IMAGE_REPO}/caddy
 CADDY_IMAGE_TAG  := latest
-DNSMASQ_IMAGE_NAME := localhost/l7/dnsmasq
+DNSMASQ_IMAGE_NAME := ${IMAGE_REPO}/dnsmasq
 DNSMASQ_IMAGE_TAG  := latest
-ACNG_IMAGE_NAME := localhost/l7/apt-cacher-ng
+ACNG_IMAGE_NAME := ${IMAGE_REPO}/apt-cacher-ng
 ACNG_IMAGE_TAG  := latest
-GO_RUNNER_IMAGE_NAME := localhost/l7/go
+GO_RUNNER_IMAGE_NAME := ${IMAGE_REPO}/go
 GO_RUNNER_IMAGE_TAG  := bookworm
 USER_SHELL ?= /usr/bin/zsh
 BUILD_OPTIONS :=
@@ -89,13 +90,13 @@ image_acng:
 
 image_nvim : IMAGE_NAME = ${NVIM_IMAGE_NAME}
 image_nvim : IMAGE_TAG = ${NVIM_IMAGE_TAG}
-image_nvim : submodules image_caddy
+image_nvim : submodules image_caddy image_alpine
 	${CMD} buildx build \
 		${BUILD_OPTIONS} \
 		--build-arg "EXTRA_PKGS=${EXTRA_PKGS}" \
 		--build-arg "SHELL=${USER_SHELL}" \
 		-t "${IMAGE_NAME}:${IMAGE_TAG}" \
-		-f './Containerfile' \
+		-f './Containerfile.nvim' \
 		.
 
 image_nvim_test : IMAGE_NAME = ${NVIM_IMAGE_NAME}
@@ -106,9 +107,31 @@ image_nvim_test : image_nvim image_bin_ht
 		-t "${IMAGE_NAME}-ht:${IMAGE_TAG}" \
 		-f test/lsp-js/Containerfile \
 		.
+
+image_alpine : submodules image_caddy
+	${CMD} buildx build \
+		${BUILD_OPTIONS} \
+		--build-arg "ALPINE_VERSION=3.20" \
+		--build-arg "EXTRA_PKGS=" \
+		--build-arg "SHELL=/bin/bash" \
+		-t "${IMAGE_REPO}/alpine:3.20" \
+		-f './Containerfile.slim' \
+		.
+
+image_nvim_fedora : IMAGE_NAME = ${NVIM_IMAGE_NAME}
+image_nvim_fedora : IMAGE_TAG = ${NVIM_IMAGE_TAG}
+image_nvim_fedora : submodules image_caddy
+	${CMD} buildx build \
+		${BUILD_OPTIONS} \
+		--build-arg "EXTRA_PKGS=" \
+		--build-arg "SHELL=/bin/bash" \
+		-t "${IMAGE_NAME}:${IMAGE_TAG}-fedora" \
+		-f './Containerfile.fedora;' \
+		.
+
 image_bin_ht :
 	${CMD} buildx build \
-		-t localhost/l7-test/ht:0.2.0 \
+		-t ${IMAGE_REPO}-test/ht:0.2.0 \
 		-f test/utils/ht/Containerfile
 
 ### GOLANG RUNNERS

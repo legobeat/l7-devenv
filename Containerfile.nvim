@@ -1,0 +1,102 @@
+# syntax=docker/dockerfile:1.4-labs
+ARG BASE_IMAGE=localhost/l7/alpine:3.20
+FROM ${BASE_IMAGE} as base
+
+###############################
+##### GO BINARIES BUILDER #####
+FROM docker.io/golang:1.22-alpine AS golang-builder
+WORKDIR /go/app
+RUN apk add --no-cache bash build-base git \
+  && mkdir -p /go/app/out out \
+  && chmod -R 777 /go/app
+USER 1234
+ARG HUB_COMMIT=5c547ed804368763064e51f3990851e267e88edd
+RUN git clone \
+    --single-branch \
+    --depth 100 \
+    --config transfer.fsckobjects=false \
+    --config receive.fsckobjects=false \
+    --config fetch.fsckobjects=false \
+    https://github.com/github/hub.git \
+  && cd hub \
+  && git checkout ${HUB_COMMIT} \
+  && HOME=/go ./script/build -o /go/app/out/hub
+
+#######################
+##### FINAL IMAGE #####
+FROM base
+
+# EXTRA_PKGS get installed in final image. examples of useful extra packages:
+### secrets injection
+## ARG EXTRA_PKGS='age pass gopass'
+### TUI file managers
+## ARG EXTRA_PKGS='ncdu ranger vifm'
+### open links in host browser
+## ARG EXTRA_PKGS='xdg-open'
+### yes, you can integrate with system clipboard
+## ARG EXTRA_PKGS='xsel xclip wl-clipboard'
+## ARG EXTRA_PKGS='terminus-fonts fontawesome-fonts-all gdouros-symbola-fonts'
+### monitoring etc, probably more useful on host
+## ARG EXTRA_PKGS='htop sysstat ncdu net-tools'
+##
+# nice-to-haves
+# EXTRA_PKGS='bat libnotify w3m'
+
+ARG EXTRA_PKGS='bat'
+
+ARG HOME=/home/user
+ENV HOME=${HOME}
+ARG SHELL=/bin/zsh
+ARG UID=1000
+ARG GID=1000
+
+USER root
+RUN apk add --no-cache \
+    neovim neovim-doc \
+    zsh \
+    tree-sitter tree-sitter-bash tree-sitter-cli tree-sitter-cmake tree-sitter-comment tree-sitter-css tree-sitter-embedded-template tree-sitter-html tree-sitter-ini tree-sitter-javascript tree-sitter-jsdoc tree-sitter-json tree-sitter-lua tree-sitter-python tree-sitter-regex tree-sitter-ruby tree-sitter-toml tree-sitter-typescript \
+    # tree-sitter-grammars \  # everything
+    # tree-sitter-go tree-sitter-go-mod tree-sitter-java tree-sitter-rust \
+    diffutils tree fzf ripgrep ripgrep-zsh-completion \
+    sshpass \
+    git-lfs github-cli github-cli-zsh-completion tig \
+    iproute2 openssl procps-ng psmisc \
+    mandoc \
+    markdown \
+
+    podman-remote podman-zsh-completion fuse-overlayfs containers-common openssh-client \
+    gettext-envsubst mkpasswd \
+    coreutils grep sed \
+    screen \
+    which \
+    zsh zsh-completions curl-zsh-completion \
+    ${EXTRA_PKGS} \
+  && apk add  --no-cache --repository=https://dl-cdn.alpinelinux.org/alpine/edge/testing tree-sitter-markdown \
+  && ln -sf nvim /usr/bin/vim \
+  && ln -sf podman-remote /usr/bin/podman \
+
+  # https://github.com/gabyx/container-nesting/blob/7efbd79707e1be366bee462f6200443ca23bc077/src/podman/container/Containerfile#L46
+  && mkdir -p /etc/containers .config/containers \
+  && sed -e 's|^#mount_program|mount_program|g' \
+         -e '/additionalimage.*/a "/var/lib/shared",' \
+         -e 's|^mountopt[[:space:]]*=.*$|mountopt = "nodev,fsync=0"|g' \
+         /usr/share/containers/storage.conf \
+         > /etc/containers/storage.conf \
+  && sed -e 's|^graphroot|#graphroot|g' \
+         -e 's|^runroot|#runroot|g' \
+         /etc/containers/storage.conf > .config/containers/storage.conf
+
+COPY --from=golang-builder --chown=2:2 \
+  /go/app/out/hub /usr/local/bin/
+
+COPY --chown=2:2 \
+  contrib/nvim-plugins /etc/xdg/nvim/pack/build-l7ide/start
+
+COPY --chmod=755 --chown=root \
+  contrib/bin/* contrib/*/bin/*       /usr/local/bin/
+
+COPY skel/.config/containers/containers.conf /etc/containers/containers.conf
+
+USER ${UID}:${GID}
+WORKDIR /src
+ENTRYPOINT /bin/zsh

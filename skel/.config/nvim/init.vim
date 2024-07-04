@@ -48,10 +48,6 @@ try
 catch
 endtry
 try
-  runtime s-treesitter.lua
-catch
-endtry
-try
   runtime s-neotree.lua
 catch
 endtry

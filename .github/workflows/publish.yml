@@ -77,8 +77,79 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-  publish-image:
+  publish-image-base:
     needs: publish-image-pre
+    runs-on: ubuntu-latest
+    services:
+      registry:
+        image: registry:2
+        ports:
+          - 80:5000
+    permissions:
+      contents: read
+      packages: write
+      attestations: write
+      id-token: write
+    strategy:
+      matrix:
+        include:
+          - name: slim
+            file: Containerfile.slim
+            context: .
+            tags:  |
+              localhost/l7/alpine:3.20
+              ghcr.io/legobeat/l7-devenv/alpine:latest
+              ghcr.io/legobeat/l7-devenv/alpine:3.20
+              ghcr.io/legobeat/l7-devenv/alpine:${{ github.ref_name }}
+              ghcr.io/legobeat/l7-devenv/alpine:3.20-${{ github.ref_name }}
+            build-args: |
+              CADDY_IMAGE=ghcr.io/legobeat/l7-devenv/caddy:${{ github.ref_name }}
+    # exact duplicate of publish steps for other images. yaml anchors not supported in gha
+    steps:
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@0d4c9c5ea7693da7b068278f7b52bda2a190a446 #v3.2.0
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@8e5442c4ef9f78752691e2d8f8d19755c6f78e81 #v5.5.1
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/${{ matrix.name }}
+
+      - name: allow cleartext http to localhost container registry
+        run: |
+          echo '{"insecure-registries" : [ "localhost" ]}' | sudo tee /etc/docker/daemon.json
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        with:
+          driver-opts: network=host
+
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Build and publish ${{ matrix.name }} image
+        uses: docker/build-push-action@v6
+        with:
+          context: ${{ matrix.context }}
+          file: '${{ matrix.file }}'
+          build-args: ${{ matrix.build-args }}
+          tags:  ${{ matrix.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          load: true
+          push: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  publish-image:
+    needs: publish-image-base
     runs-on: ubuntu-latest
     services:
       registry:
@@ -141,12 +212,13 @@ jobs:
             build-args: |
               CADDY_IMAGE=ghcr.io/legobeat/l7-devenv/caddy:${{ github.ref_name }}
           - name: nvim
-            file: Containerfile
+            file: Containerfile.nvim
             context: .
             tags: |
               ghcr.io/legobeat/l7-devenv/nvim:latest
               ghcr.io/legobeat/l7-devenv/nvim:${{ github.ref_name }}
             build-args: |
+              BASE_IMAGE=ghcr.io/legobeat/l7-devenv/alpine:${{ github.ref_name }}
               CADDY_IMAGE=ghcr.io/legobeat/l7-devenv/caddy:${{ github.ref_name }}
     steps:
       - name: Set up QEMU

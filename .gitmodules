@@ -1,9 +1,6 @@
 [submodule "contrib/l7-scripts"]
 	path = contrib/l7-scripts
 	url = https://github.com/legobeat/l7-scripts
-[submodule "nvim/plugins/nvim-treesitter"]
-	path = contrib/nvim-plugins/nvim-treesitter
-	url = https://github.com/nvim-treesitter/nvim-treesitter.git
 [submodule "nvim/plugins/nvim-lspconfig"]
 	path = contrib/nvim-plugins/nvim-lspconfig
 	url = https://github.com/neovim/nvim-lspconfig.git
