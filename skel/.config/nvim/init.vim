@@ -35,14 +35,39 @@ endif
 
 packloadall
 
-runtime theme.lua
-colorscheme tokyonight-moon
-
 runtime lib.lua
 runtime keys.lua
-runtime s-lualine.lua
-runtime s-neotree.lua
-runtime s-lsp.lua
-runtime s-bufferlinetabs.lua
-runtime s-treesitter.lua
-runtime s-octo.lua
+
+" silently ignore missing plugins
+try
+  runtime s-bufferlinetabs.lua
+catch
+endtry
+try
+  runtime s-lualine.lua
+catch
+endtry
+try
+  runtime s-treesitter.lua
+catch
+endtry
+try
+  runtime s-neotree.lua
+catch
+endtry
+try
+  runtime s-lsp.lua
+catch
+endtry
+try
+  runtime theme.lua
+catch
+endtry
+try
+  colorscheme tokyonight-moon
+catch
+endtry
+try
+  runtime s-octo.lua
+catch
+endtry
