@@ -34,7 +34,9 @@ RUN rm -rf /usr/local/bin/yarn* /opt/yarn* \
   && npm ci --omit=dev --ignore-scripts \
   && mv node_modules/* node_modules/.bin /usr/local/lib/node_modules/ \
   # seems strange that this is needed
-  && ln -s /usr/local/lib/node_modules/ /usr/local/bin/node_modules
+  && ln -s /usr/local/lib/node_modules/ /usr/local/bin/node_modules \
+  && mkdir -p /home/user/.config \
+  && chown -R node /home/user
 
 COPY --from=fwdproxy \
   --chmod=444 \
