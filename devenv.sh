@@ -289,16 +289,19 @@ if (( $? != 0 )) ; then
   exit 1
 fi
 
-container_id="$(${cmd} ps -f "name=${NAME}" -q || echo '')"
-
 if [[ -n "${DEBUG}" ]]; then
   env | sort
 fi
 
+container_id="$(${cmd} ps -f "name=${NAME}" -q || echo '')"
+
 if [[ -n "${container_id}" ]]; then
   entrypoint=${1:-${SHELL}}
+  EXEC_ARGS=${EXEC_ARGS:--it}
   ${cmd} exec -it \
-    -w "${CWD}" "${NAME}" \
+    -w "${CWD}" \
+    ${EXEC_ARGS} \
+    "${NAME}" \
     ${entrypoint} \
     "${@:2}"
 else
@@ -332,7 +335,7 @@ else
     --dns "${CONTAINER_DNS}" \
     ${RUN_ARGS} \
     "${IMAGE}" \
-    ${@:2}
+    "${@:2}"
 fi
 ###
 # --sysctl "net.ipv4.ping_group_range=1000 1000" \
