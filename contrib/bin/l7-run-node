@@ -2,6 +2,10 @@
 
 export RUNNER_IMAGE="${RUNNER_IMAGE:-${NODE_RUNNER_IMAGE}}"
 
+if [[ "${RUNNER_IMAGE}" != *:* ]]; then
+  export RUNNER_IMAGE=${RUNNER_IMAGE}:${L7_NODE_VERSION:-20}-bookworm
+fi
+
 export RUNNER_ENV="${RUNNER_ENV}
 NODE_OPTIONS=${NODE_OPTIONS}
 HOME=/home/node

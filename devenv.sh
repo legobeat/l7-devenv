@@ -54,7 +54,8 @@ runtime_config () {
   IMAGE=${IMAGE:-$IMAGE_NAME:$IMAGE_TAG}
 
   GO_RUNNER_IMAGE="${GO_RUNNER_IMAGE:-localhost/l7/go:1.20-bookworm}"
-  NODE_RUNNER_IMAGE="${NODE_RUNNER_IMAGE:-localhost/l7/node:20-bookworm}"
+  NODE_RUNNER_IMAGE="${NODE_RUNNER_IMAGE:-localhost/l7/node}"
+  NODE_VERSION="${NODE_VERSION:-20}"
   GPG_IMAGE="${GPG_IMAGE:-localhost/l7/gpg-vault:pk}"
 
   CONTAINER_DNS="${CONTAINER_DNS:-10.7.8.133}"
@@ -327,6 +328,7 @@ else
     -e "CONTAINER_HOST=tcp://10.7.9.2:2375" \
     -e "GO_RUNNER_IMAGE=${GO_RUNNER_IMAGE}" \
     -e "NODE_RUNNER_IMAGE=${NODE_RUNNER_IMAGE}" \
+    -e "L7_NODE_VERSION=${NODE_VERSION}" \
     -e "GPG_IMAGE=${GPG_IMAGE}" \
     -e HOME=/home/user \
     -e "SRC_DIR=${SRC_DIR}" \

@@ -1,3 +1,2 @@
 #!/bin/bash
-export RUNNER_IMAGE=${NODE_RUNNER_IMAGE:-${RUNNER_IMAGE}}
 l7-run-node node ${@}

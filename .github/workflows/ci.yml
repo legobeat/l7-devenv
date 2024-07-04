@@ -171,6 +171,7 @@ jobs:
           - ghauth
           - node_corepack
           - lsp_typescript
+          - node_majors
         ubuntu-version:
           - 24.04
     steps:
@@ -198,6 +199,10 @@ jobs:
           make -j6 image_nvim image_runner_node
           make -j6 test_runner_node
         if: ${{ matrix.test == 'node_corepack' }}
+      - name: Build images
+        run: |
+          make -j6 image_nvim image_runner_node_all
+        if: ${{ matrix.test == 'node_majors' }}
       - name: Build images
         run: |
           make -j6 images_test

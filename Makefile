@@ -151,6 +151,7 @@ image_runner_node_20: submodules image_caddy
 		--build-arg "SHELL=${USER_SHELL}" \
 		--build-arg "NODE_VERSION=20" \
 		-t "${IMAGE_NAME}:20-${IMAGE_TAG}" \
+		-t "${IMAGE_NAME}:latest" \
 		-f './sidecars/node-runner/Containerfile' \
 		.
 image_runner_node_22 : IMAGE_NAME = ${RUNNER_IMAGE_NAME}
@@ -437,6 +438,12 @@ test_e2e_node_corepack: IMAGE_TAG = ${RUNNER_IMAGE_TAG}
 test_e2e_node_corepack: # image_nvim
 	set -e
 	./test/runner-node/test-corepack-pms.sh
+
+test_e2e_node_majors: IMAGE_NAME = ${RUNNER_IMAGE_NAME}
+test_e2e_node_majors: IMAGE_TAG = ${RUNNER_IMAGE_TAG}
+test_e2e_node_majors: # image_nvim
+	set -e
+	./test/runner-node/test-node-majors.sh
 
 test_e2e_lsp_typescript : IMAGE_NAME = ${NVIM_IMAGE_NAME}
 test_e2e_lsp_typescript : IMAGE_TAG = ${NVIM_IMAGE_TAG}
