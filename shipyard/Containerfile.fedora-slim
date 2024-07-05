@@ -1,0 +1,91 @@
+# syntax=docker/dockerfile:1.4-labs
+ARG CADDY_IMAGE=localhost/l7/caddy:latest
+FROM registry.fedoraproject.org/fedora-minimal:40 AS base
+
+
+# EXTRA_BASE_PKGS get installed in both build and runtime. Example of useful packages:
+### golang LSP support
+## ARG EXTRA_PKGS='go golang-x-tools-gopls'
+ARG EXTRA_BASE_PKGS=''
+
+RUN microdnf -y update \
+  && microdnf -y install --nodocs --setopt=install_weak_deps=False \
+     curl wget jq tar \
+     git \
+     neovim \
+     $EXTRA_BASE_PKGS \
+  && ln -sf nvim /usr/bin/vim
+
+# this assumes we already have a locally built caddy image
+# the image contains a pregenerated ca root cert for mitm, which we copy here
+# TODO: provide a nicer way to manage the rootcert
+FROM ${CADDY_IMAGE} AS fwdproxy
+#######################
+##### FINAL IMAGE #####
+FROM base
+
+# EXTRA_PKGS get installed in final image. examples of useful extra packages:
+### golang LSP support
+## ARG EXTRA_PKGS='go golang-x-tools-gopls'
+### secrets injection
+## ARG EXTRA_PKGS='age pass gopass'
+### TUI file managers
+## ARG EXTRA_PKGS='ranger vifm'
+### open links in host browser
+## ARG EXTRA_PKGS='xdg-open'
+### yes, you can integrate with system clipboard
+## ARG EXTRA_PKGS='xsel xclip wl-clipboard'
+## ARG EXTRA_PKGS='terminus-fonts fontawesome-fonts-all gdouros-symbola-fonts'
+### monitoring etc, probably more useful on host
+## ARG EXTRA_PKGS='htop sysstat ncdu net-tools'
+### wip / not working / notes
+## ARG EXTRA_PKGS='tree-sitter-cli' # repo version errors right now? try again later
+
+ARG EXTRA_PKGS=
+
+ARG HOME=/home/user
+ENV HOME=${HOME}
+ARG SHELL=/usr/bin/bash
+ARG UID=1000
+ARG GID=1000
+
+WORKDIR ${HOME}
+
+RUN microdnf -y install --nodocs --setopt=install_weak_deps=False \
+    ip openssl \
+    gettext-envsubst mkpasswd \
+    which \
+    ${EXTRA_PKGS} \
+  && ln -sf nvim /usr/bin/vim \
+
+  # create user entry or podman will mess up /etc/passwd entry
+  && bash -c "groupadd -g ${GID} userz || true" \
+  && bash -c "useradd -u ${UID} -g ${GID} -d /home/user -m user -s "${SHELL}" && chown -R ${UID}:${GID} /home/user || true" \
+  && microdnf clean all
+
+
+COPY --chmod=755 --chown=root contrib/bin/* contrib/*/bin/*       /usr/local/bin/
+ARG NODE_BINS="npm7 npm9 npm10 pnpm9 yarn1 yarn3 yarn4     allow-scripts corepack glob lavamoat-ls mkdirp node-gyp node-which nopt npx pnpx resolve semver yarn-deduplicate"
+RUN for bin in ${NODE_BINS}; do ln -s l7-run-node "/usr/local/bin/${bin}"; done
+
+COPY --chown=${UID}:${GID} skel/ /home/user/
+
+# default trust github.com known ssh key
+COPY contrib/data/ssh_known_hosts /etc/ssh/ssh_known_hosts
+# https://docs.fedoraproject.org/en-US/quick-docs/using-shared-system-certificates/
+COPY --from=fwdproxy \
+  --chmod=444 \
+  /data/caddy/pki/authorities/local/root.crt \
+  /etc/pki/ca-trust/source/anchors/l7-fwd-proxy.crt
+RUN update-ca-trust \
+  && cat /home/user/.env >> /etc/profile \
+  # podman quirk: `COPY --from` messes up ownership so rechown needs to come last
+  && chown -R ${UID}:${GID} \
+    /home/user \
+  && rm -rf /usr/lib64/python*/__pycache__
+
+
+
+USER ${UID}:${GID}
+WORKDIR /src
+ENTRYPOINT ${SHELL}
