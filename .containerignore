@@ -1,5 +1,11 @@
 .git
+.github
 Containerfile*
 .containerignore
 skel/README.md
 node_modules
+
+contrib/nvim-plugins/*/doc
+contrib/nvim-plugins/*/test
+contrib/nvim-plugins/*/tests
+contrib/nvim-plugins/telescope.nvim/data/memes
