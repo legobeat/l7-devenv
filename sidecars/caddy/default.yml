@@ -19,9 +19,28 @@ apps:
               - 'registry.npmjs.org'
               - 'registry.yarnpkg.com'
               - 'registry.npmmirror.com'
-              #- 'replicate.npmjs.com'
             # TODO: Reject publish (note: audit is still POST/PUT)
             # TODO: forward non-publish non-GET to upstream (audit)
+              path_regexp:
+                pattern: '^/-/[^/]*/v[0-9]*/security/(advisories|audits)/'
+            handle:
+              - handler: reverse_proxy
+                upstreams:
+                  - dial: 'registry.npmjs.org:443'
+                transport:
+                  protocol: http
+                  tls:
+                    server_name: 'registry.npmjs.org'
+                    renegotiation: once
+            terminal: true
+            group: pkgs
+          - match:
+            - method:
+              - GET
+              host:
+              - 'registry.npmjs.org'
+              - 'registry.yarnpkg.com'
+              - 'registry.npmmirror.com'
             handle:
               - handler: rewrite
                 uri: '{http.request.host}{http.request.uri}/'
@@ -39,12 +58,29 @@ apps:
                     #versions: ['1.1']
                     #terminal: true
             terminal: true
-          - handle:
+            group: pkgs
+          - match:
+            - not:
+              - method:
+                - GET
+              host:
+              - 'registry.npmjs.org'
+              - 'registry.yarnpkg.com'
+              - 'registry.npmmirror.com'
+            handle:
+              - handler: static_response
+                status_code: '405'
+                body: 'Read-only mirror'
+            terminal: true
+          - match:
+            handle:
               - handler: rewrite
                 uri: '{http.request.host}{http.request.uri}'
               - handler: reverse_proxy
                 upstreams:
                   - dial: '{env.PKG_PROXY_HOST}:{env.PKG_PROXY_PORT}'
+            terminal: true
+            group: pkgs
       http:
         listen:
           - ":80"
