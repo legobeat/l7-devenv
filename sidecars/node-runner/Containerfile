@@ -20,7 +20,7 @@ ARG NODE_OPTIONS="--no-network-family-autoselection --trace-warnings"
 
 ARG UID=1000
 ARG GID=1000
-ARG SHELL=/usr/bin/zsh
+ARG SHELL=/bin/zsh
 # if UID differs from default: create new user/group; take over /home/node
 RUN  bash -c "[ ${GID} != \"1000\" ] && groupadd -g ${GID} -U node userz || true" \
   && bash -c "[ ${UID} != \"1000\" ] && useradd -u ${UID} -g ${GID} -s ${SHELL} -d /home/node user && chown -R ${UID}:${GID} /home/node || true"

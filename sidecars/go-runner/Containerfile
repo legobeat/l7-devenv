@@ -14,7 +14,7 @@ ENV GOPROXY="https://goproxy.io,https://proxy.golang.org,direct"
 
 ARG UID=1000
 ARG GID=1000
-ARG SHELL=/usr/bin/zsh
+ARG SHELL=/bin/zsh
 # create user entry and GOPATH
 RUN bash -c "groupadd -g ${GID} userz || true" \
   && bash -c "useradd -u ${UID} -g ${GID} -d /home/user -m user -s "${SHELL}" && chown -R ${UID}:${GID} /home/user || true" \

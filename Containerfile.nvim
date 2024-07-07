@@ -74,6 +74,8 @@ RUN apk add --no-cache \
   && apk add  --no-cache --repository=https://dl-cdn.alpinelinux.org/alpine/edge/testing tree-sitter-markdown \
   && ln -sf nvim /usr/bin/vim \
   && ln -sf podman-remote /usr/bin/podman \
+  && ln -s /bin/bash /usr/bin/bash \
+  && ln -s /bin/zsh /usr/bin/zsh \
 
   # https://github.com/gabyx/container-nesting/blob/7efbd79707e1be366bee462f6200443ca23bc077/src/podman/container/Containerfile#L46
   && mkdir -p /etc/containers .config/containers \
