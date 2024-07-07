@@ -78,7 +78,7 @@ services:
     cap_add:
       - NET_ADMIN
     # todo: dynamic for subnets
-    command: --address="/#/10.7.8.132"
+    command: --address="/#/10.7.8.132" --log-facility=-
     networks:
       internal:
         ipv4_address: 10.7.8.133
