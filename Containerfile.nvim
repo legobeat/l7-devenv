@@ -61,12 +61,12 @@ RUN apk add --no-cache \
     sshpass \
     git-lfs github-cli github-cli-zsh-completion tig \
     iproute2 openssl procps-ng psmisc \
-    mandoc \
+    mandoc busybox-doc git-doc less-doc grep-doc sed-doc file file-doc \
     markdown \
 
     podman-remote podman-zsh-completion fuse-overlayfs containers-common openssh-client \
     gettext-envsubst mkpasswd \
-    coreutils grep sed \
+    coreutils less grep sed \
     screen \
     which \
     zsh zsh-completions curl-zsh-completion \
