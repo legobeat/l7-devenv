@@ -76,6 +76,10 @@ ENV SHELL=${SHELL}
 
 COPY contrib/l*-scripts/bin/*    /usr/local/bin/
 COPY --chown=${UID}:${GID} skel/ /home/node/
+RUN sed -Ei \
+    -e 's#url "git@github.com:"#url "https://github.com"#' \
+    -e 's#insteadOf = "https://github.com/"#insteadOf = "git@github.com:"#' \
+    /home/node/.gitconfig
 
 ENV PATH=/home/node/.corepack/bin:/usr/local/lib/node_modules/.bin:${PATH}
 
