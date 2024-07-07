@@ -147,6 +147,7 @@ networks:
     ipam:
       config:
         - subnet: 10.7.8.0/24
+          ip_range: 10.7.8.0/27
     driver: bridge
     driver_opts:
       inhibit_ipv4: 1

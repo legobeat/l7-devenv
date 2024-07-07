@@ -16,13 +16,15 @@ apps:
         routes:
           - match:
             - host:
+              - 'registry.npmjs.com'
               - 'registry.npmjs.org'
               - 'registry.yarnpkg.com'
               - 'registry.npmmirror.com'
-            # TODO: Reject publish (note: audit is still POST/PUT)
-            # TODO: forward non-publish non-GET to upstream (audit)
               path_regexp:
                 pattern: '^/-/[^/]*/v[0-9]*/security/(advisories|audits)/'
+              header:
+                'Npm-Command':
+                  - audit
             handle:
               - handler: reverse_proxy
                 upstreams:
@@ -34,6 +36,29 @@ apps:
                     renegotiation: once
             terminal: true
             group: pkgs
+          - match:
+            - header:
+                'Npm-Command':
+                  - login
+                  - adduser
+            - path:
+              - '/-/v1/login'
+              host:
+              - 'registry.npmjs.org'
+              - 'registry.yarnpkg.com'
+              - 'registry.npmmirror.com'
+            - not:
+              - method:
+                - GET
+              host:
+              - 'registry.npmjs.org'
+              - 'registry.yarnpkg.com'
+              - 'registry.npmmirror.com'
+            handle:
+              - handler: static_response
+                status_code: '405'
+                body: 'Read-only mirror'
+            terminal: true
           - match:
             - method:
               - GET
@@ -53,25 +78,8 @@ apps:
               - handler: reverse_proxy
                 upstreams:
                   - dial: '{env.PKG_PROXY_HOST}:{env.PKG_PROXY_PORT}'
-                  #transport:
-                    #protocol: http
-                    #versions: ['1.1']
-                    #terminal: true
             terminal: true
             group: pkgs
-          - match:
-            - not:
-              - method:
-                - GET
-              host:
-              - 'registry.npmjs.org'
-              - 'registry.yarnpkg.com'
-              - 'registry.npmmirror.com'
-            handle:
-              - handler: static_response
-                status_code: '405'
-                body: 'Read-only mirror'
-            terminal: true
           - match:
             handle:
               - handler: rewrite
@@ -89,9 +97,14 @@ apps:
         routes:
           - match:
               - host:
-                - 'registry.npmjs.org'
-                - 'registry.yarnpkg.com'
-                - 'registry.npmmirror.com'
+                  - deb.debian.org
+                  - dl-cdn.alpinelinux.org
+                  - registry.npmjs.com
+                  - registry.npmjs.org
+                  - registry.yarnpkg.com
+                  - registry.npmmirror.com
+                  - archive.ubuntu.com
+                  - security.ubuntu.com
             handle:
               - handler: reverse_proxy
                 upstreams:
@@ -135,22 +148,32 @@ apps:
                   - dial:
                       - "github.com:22"
 
+      http_acng_passthrough:
+        listen:
+         - ":3142"
+        routes:
+          - handle:
+              - handler: proxy
+                upstreams:
+                  - dial:
+                    - "#{ $PKG_PROXY_HOST }:#{ $PKG_PROXY_PORT }"
       https:
         listen:
          - ":443"
         routes:
           - match:
              - tls:
-                  sni:
-                    - deb.debian.org
-                    - dl-cdn.alpinelinux.org
-                    # todo
-                    #- mirrors.fedoraproject.org
-                    - registry.npmjs.org
-                    - registry.yarnpkg.com
-                    - registry.npmmirror.com
-                    - archive.ubuntu.com
-                    - security.ubuntu.com
+                 sni:
+                   - registry.npmjs.com
+                   - registry.npmjs.org
+                   - registry.yarnpkg.com
+                   - registry.npmmirror.com
+                   - deb.debian.org
+                   - dl-cdn.alpinelinux.org
+                   - archive.ubuntu.com
+                   - security.ubuntu.com
+                   # todo
+                   #- mirrors.fedoraproject.org
             handle:
               - handler: tls
                 connection_policies:
@@ -207,6 +230,10 @@ apps:
                     - '*.github.com'
                     - 'ghcr.io'
                     - '*.ghcr.io'
+                # restrict access to authorized endpoint
+                ip:
+                  ranges:
+                    - 10.7.8.0/27
             handle:
               - handler: tls
                 connection_policies:
@@ -221,13 +248,7 @@ apps:
                     - "#{ $GITHUB_PROXY_HOST }:#{ $GITHUB_PROXY_PORT }"
                     #tls:
                     #  renegotiation: once
-          - match:
-             - tls:
-                  alpn:
-                    - http/1.0
-                    - http/1.1
-                    - http/2
-            handle:
+          - handle:
               - handler: tls
                 connection_policies:
                   - alpn:

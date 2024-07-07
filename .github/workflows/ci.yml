@@ -206,8 +206,9 @@ jobs:
           sudo apt install -y whois
           usertokenhash="$(mkpasswd -m sha512crypt 'e2e-test-token')"
           echo 'GITHUB_TOKEN=e2e-test-token' > env
-          echo "export L7_USER_TOKEN_HASH=${usertokenhash}" > .env
-          echo 'export L7_GITHUB_TOKEN=${{ github.token }}' > .env
+          echo 'GH_TOKEN=e2e-test-token' >> env
+          echo "export L7_USER_TOKEN_HASH='${usertokenhash}'" > .env
+          echo 'export L7_GITHUB_TOKEN=${{ github.token }}' >> .env
       - name: Build images
         run: |
           make -j6 image_nvim image_runner_node
