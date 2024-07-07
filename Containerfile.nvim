@@ -69,7 +69,8 @@ RUN apk add --no-cache \
     coreutils less grep sed \
     screen \
     which \
-    zsh zsh-completions curl-zsh-completion \
+    zsh zsh-completions curl-zsh-completion zsh-vcs \
+    zsh-doc zsh-syntax-highlighting zsh-syntax-highlighting-doc zsh-histdb zsh-histdb \
     ${EXTRA_PKGS} \
   && apk add  --no-cache --repository=https://dl-cdn.alpinelinux.org/alpine/edge/testing tree-sitter-markdown \
   && ln -sf nvim /usr/bin/vim \
