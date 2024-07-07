@@ -1,4 +1,4 @@
-ARG GO_VERSION=1.20
+ARG GO_VERSION=1.22
 FROM localhost/l7/go:${GO_VERSION}-bookworm
 
 USER root
