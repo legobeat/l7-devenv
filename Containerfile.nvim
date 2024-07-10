@@ -61,7 +61,7 @@ RUN apk add --no-cache \
     sshpass \
     git-lfs github-cli github-cli-zsh-completion tig \
     iproute2 openssl procps-ng psmisc \
-    mandoc busybox-doc git-doc less-doc grep-doc sed-doc file-doc findutils-doc \
+    mandoc busybox-doc coreutils-doc git-doc less-doc grep-doc sed-doc file-doc findutils-doc \
     markdown \
 
     podman-remote podman-zsh-completion fuse-overlayfs containers-common openssh-client \
