@@ -75,6 +75,8 @@ apps:
                     replace: '$0/'
                   - find: '(\.t?gz)/$'
                     replace: '$1'
+                  - find: '([^/]*/[^/]*/[0-9.]*)/$'
+                    replace: '$1'
               - handler: reverse_proxy
                 upstreams:
                   - dial: '{env.PKG_PROXY_HOST}:{env.PKG_PROXY_PORT}'
@@ -199,19 +201,11 @@ apps:
             #TODO: caching
           - match:
              - tls:
-                alpn:
-                  - http/1.0
-                  - http/1.1
-                  - http/2
                 sni:
                   - 'codeload.github.com'
+                  - '*.codeload.github.com'
             handle:
              - handler: tls
-               connection_policies:
-                - alpn:
-                  - http/1.0
-                  - http/1.1
-                  - http/2
              - handler: proxy
                upstreams:
                  - dial:
