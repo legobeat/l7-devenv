@@ -71,6 +71,8 @@ RUN apk add --no-cache \
     which \
     zsh zsh-completions curl-zsh-completion zsh-vcs \
     zsh-doc zsh-syntax-highlighting zsh-syntax-highlighting-doc zsh-histdb zsh-histdb \
+    # build-deps
+    shadow \
     ${EXTRA_PKGS} \
   && apk add  --no-cache --repository=https://dl-cdn.alpinelinux.org/alpine/edge/testing tree-sitter-markdown \
   && ln -sf nvim /usr/bin/vim \
@@ -87,7 +89,9 @@ RUN apk add --no-cache \
          > /etc/containers/storage.conf \
   && sed -e 's|^graphroot|#graphroot|g' \
          -e 's|^runroot|#runroot|g' \
-         /etc/containers/storage.conf > .config/containers/storage.conf
+         /etc/containers/storage.conf > .config/containers/storage.conf \
+  && chsh user -s "${SHELL}" \
+  && apk del shadow
 
 COPY --from=golang-builder --chown=2:2 \
   /go/app/out/hub /usr/local/bin/
