@@ -7,6 +7,15 @@ HOME=/home/user
 PATH=/go/bin:/home/user/.go/bin:/home/user/go/bin:/usr/local/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 GOPATH=/home/user/.go
 "
-export RUNNER_VOLS="${RUNNER_VOLS} ${HOME}/.local/share/l7ide/go-runner/go:/home/user/.go:z"
 
-exec l7-cnt-run "${@}"
+export RUNNER_VOLS="${L7_GO_HOME_DIR:-${L7_GO_HOME_VOLUME:-${HOME}/.local/share/l7ide/go-runner/go}}:/home/user/.go:z ${RUNNER_VOLS}"
+
+if [[ "$(basename $0)" = "l7-run-go" ]]; then
+  COMMAND="$1"
+  ARGS="${@:2}"
+else
+  COMMAND="$(basename $0)"
+  ARGS="${@}"
+fi
+
+exec l7-cnt-run "${COMMAND}" ${ARGS}

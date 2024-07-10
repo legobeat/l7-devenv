@@ -1,9 +1,24 @@
 #!/bin/bash
 export RUNNER_IMAGE=${TS_LSP_IMAGE:-localhost/l7/node:lsp-bookworm}
 export RUNNER_VOLS="${L7_NVIM_STATE_PATH}:/home/user/.local/state/nvim:ro ${RUNNER_VOLS}"
-export RUNNER_VOLS="${L7_NODE_CACHE_DIR}/yarn/cache/berry:/home/node/.yarn/cache/berry:ro ${RUNNER_VOLS}"
-export RUNNER_VOLS="${L7_NODE_CACHE_DIR}/yarn/cache/classic:/home/node/.cache/yarn:ro ${RUNNER_VOLS}"
-export RUNNER_VOLS="${L7_NODE_CACHE_DIR}/pnpm/cache:/home/node/.cache/pnpm:ro ${RUNNER_VOLS}"
-export RUNNER_VOLS="${L7_NODE_CACHE_DIR}/npm/cache:/home/node/.npm/_cacache:ro ${RUNNER_VOLS}"
+if [[ -n "${L7_NODE_CACHE_DIR}" ]]; then
+  export RUNNER_VOLS="${L7_NODE_CACHE_DIR}/npm/cache:/home/node/.npm/_cacache:ro ${RUNNER_VOLS}"
+  export RUNNER_VOLS="${L7_NODE_CACHE_DIR}/pnpm/cache:/home/node/.cache/pnpm:ro ${RUNNER_VOLS}"
+  export RUNNER_VOLS="${L7_NODE_CACHE_DIR}/yarn/cache/berry:/home/node/.yarn/cache/berry:ro ${RUNNER_VOLS}"
+  export RUNNER_VOLS="${L7_NODE_CACHE_DIR}/yarn/cache/classic:/home/node/.cache/yarn:ro ${RUNNER_VOLS}"
+else
+  if [[ -n "${L7_NPM_CACHE_VOLUME}" ]]; then
+    export RUNNER_VOLS="${L7_NPM_CACHE_VOLUME}:/home/node/.npm/_cacache:ro ${RUNNER_VOLS}"
+  fi
+  if [[ -n "${L7_PNPM_CACHE_VOLUME}" ]]; then
+    export RUNNER_VOLS="${L7_PNPM_CACHE_VOLUME}:/home/node/.cache/pnpm:ro ${RUNNER_VOLS}"
+  fi
+  if [[ -n "${L7_YARN_BERRY_CACHE_VOLUME}" ]]; then
+    export RUNNER_VOLS="${L7_YARN_BERRY_CACHE_VOLUME}:/home/node/.yarn/cache/berry:ro ${RUNNER_VOLS}"
+  fi
+  if [[ -n "${L7_YARN_CLASSIC_CACHE_VOLUME}" ]]; then
+    export RUNNER_VOLS="${L7_YARN_CLASSIC_CACHE_VOLUME}:/home/node/.cache/yarn:ro ${RUNNER_VOLS}"
+  fi
+fi
 export RUNNER_OPTS="${RUNNER_OPTS} -i "
 l7-run-node typescript-language-server ${@}
