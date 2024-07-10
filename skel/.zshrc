@@ -18,6 +18,12 @@ prompt pure
 export PURE_GIT_PULL=0
 zstyle :prompt:pure:git:fetch only_upstream yes
 
+if [ -x /usr/bin/dircolors ]; then
+  test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
+  alias ls='ls --color=auto'
+  alias grep='grep --color=auto'
+fi
+
 # sudo autocomplete
 zstyle ':completion::complete:*' gain-privileges 1
 setopt notify incappendhistory autocd extendedglob sharehistory extendedhistory HIST_REDUCE_BLANKS interactive_comments HIST_IGNORE_SPACE HIST_IGNORE_DUPS
