@@ -40,7 +40,7 @@ services:
     privileged: true
     volumes:
       #- /run/user/1000/podman/podman.sock:/var/run/docker.sock
-      - ${CONTAINER_SOCKET}:/var/run/docker.sock:Z
+      - ${CONTAINER_SOCKET:-${XDG_RUNTIME_DIR}/podman/podman.sock}:/var/run/docker.sock:Z
       #- /run/user/${UID}/podman/podman.sock:/var/run/docker.sock:ro
     restart: unless-stopped
     #read_only: true
