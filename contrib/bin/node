@@ -1,2 +1,0 @@
-#!/bin/bash
-l7-run-node node ${@}
