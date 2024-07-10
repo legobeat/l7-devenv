@@ -1,5 +1,3 @@
-lspcontainers = require('lspcontainers')
-
 -- Use an on_attach function to only map the following keys
 -- after the language server attaches to the current buffer
 local on_attach = function(client, bufnr)
@@ -62,12 +60,6 @@ require('lspconfig')['tsserver'].setup{
     before_init = function(params)
       params.processId = vim.NIL
     end,
-    -- cmd = require'lspcontainers'.command('tsserver'),
-    cmd = lspcontainers.command('tsserver', {
-      container_runtime = 'podman',
-      image = 'localhost/l7/node:lsp-bookworm',
-    }),
-    root_dir = require'lspconfig/util'.root_pattern(".git", vim.fn.getcwd()),
 }
 -- terraform
 require('lspconfig')['tflint'].setup{
