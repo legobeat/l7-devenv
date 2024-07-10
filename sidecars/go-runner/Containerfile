@@ -1,4 +1,7 @@
+# syntax=docker/dockerfile:1
+ARG CADDY_IMAGE=localhost/l7/caddy:latest
 ARG GO_VERSION=1.22
+FROM ${CADDY_IMAGE} AS fwdproxy
 FROM docker.io/golang:${GO_VERSION}-bookworm
 RUN apt-get update \
   && apt-get install -y --no-install-recommends \
@@ -15,11 +18,19 @@ ENV GOPROXY="https://goproxy.io,https://proxy.golang.org,direct"
 ARG UID=1000
 ARG GID=1000
 ARG SHELL=/bin/zsh
+
+COPY --from=fwdproxy \
+  --chmod=444 \
+  /data/caddy/pki/authorities/local/root.crt \
+  # note: the .crt ending is important
+  /usr/local/share/ca-certificates/l7-fwd-proxy.crt
+
 # create user entry and GOPATH
 RUN bash -c "groupadd -g ${GID} userz || true" \
   && bash -c "useradd -u ${UID} -g ${GID} -d /home/user -m user -s "${SHELL}" && chown -R ${UID}:${GID} /home/user || true" \
   && mkdir -p /home/user/go \
-  && chown -R "${UID}:${GID}" /home/user/go
+  && chown -R "${UID}:${GID}" /home/user/go \
+  && update-ca-certificates
 
 USER ${UID}:${GID}
 ENV HOME=/home/user
