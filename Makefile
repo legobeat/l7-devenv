@@ -152,6 +152,34 @@ image_runner_go: image_runner_go_1.20
 		"${IMAGE_NAME}:1.20-${IMAGE_TAG} \
 	    "${IMAGE_NAME}:${IMAGE_TAG}"
 
+image_runner_go_1.22 : IMAGE_NAME = ${GO_RUNNER_IMAGE_NAME}
+image_runner_go_1.22 : IMAGE_TAG = ${GO_RUNNER_IMAGE_TAG}
+image_runner_go_1.22: submodules
+	${CMD} buildx build \
+		${BUILD_OPTIONS} \
+		--build-arg "SHELL=${USER_SHELL}" \
+		--build-arg "GO_VERSION=1.22" \
+		-t "${IMAGE_NAME}:1.22-${IMAGE_TAG}" \
+		-f './sidecars/go-runner/Containerfile' \
+
+image_runner_go_1.22 : IMAGE_NAME = ${GO_RUNNER_IMAGE_NAME}
+image_runner_go_1.22 : IMAGE_TAG = ${GO_RUNNER_IMAGE_TAG}
+image_runner_go: image_runner_go_1.22
+	${CMD tag \
+		"${IMAGE_NAME}:1.22-${IMAGE_TAG} \
+	    "${IMAGE_NAME}:${IMAGE_TAG}"
+
+image_lsp_go : IMAGE_NAME = ${GO_RUNNER_IMAGE_NAME}
+image_lsp_go : IMAGE_TAG = ${GO_RUNNER_IMAGE_TAG}
+image_lsp_go: image_runner_go
+	${CMD} buildx build \
+		${BUILD_OPTIONS} \
+		--build-arg "SHELL=${USER_SHELL}" \
+		--build-arg "UID=${UID}" \
+		--build-arg "GID=${GID}" \
+		-t "${IMAGE_NAME}:lsp-${IMAGE_TAG}" \
+		-f './sidecars/go-runner/Containerfile.lsp' \
+
 
 ### NODE RUNNERS
 

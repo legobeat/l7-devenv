@@ -48,9 +48,11 @@ COPY --from=fwdproxy \
 
 COPY --chown=${UID}:${GID} skel/ /home/user/
 
-### shim global node bins
-ARG NODE_BINS="npm7 npm9 npm10 pnpm9 yarn1 yarn3 yarn4     allow-scripts corepack glob lavamoat-ls mkdirp node-gyp node-which nopt npx pnpx resolve semver yarn-deduplicate"
-RUN for bin in ${NODE_BINS}; do ln -s l7-run-node "/usr/local/bin/${bin}"; done \
+### shim global bins
+ARG NODE_BINS="node  npm7 npm9 npm10 pnpm9 yarn1 yarn3 yarn4     allow-scripts corepack glob lavamoat-ls mkdirp node-gyp node-which nopt npx pnpx resolve semver yarn-deduplicate"
+ARG GO_BINS="go gopls"
+RUN  for bin in ${NODE_BINS}; do ln -s l7-run-node "/usr/local/bin/${bin}"; done \
+  && for bin in ${GO_BINS};   do ln -s l7-run-go   "/usr/local/bin/${bin}"; done \
 
   ### trust internal proxy ca cert
   && cat /usr/local/share/ca-certificates/l7-fwd-proxy.crt >> /etc/ssl/certs/ca-certificates.crt \

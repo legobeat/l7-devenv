@@ -53,7 +53,7 @@ runtime_config () {
   IMAGE_NAME=${IMAGE_NAME:-localhost/l7/nvim}
   IMAGE=${IMAGE:-$IMAGE_NAME:$IMAGE_TAG}
 
-  GO_RUNNER_IMAGE="${GO_RUNNER_IMAGE:-localhost/l7/go:1.20-bookworm}"
+  GO_RUNNER_IMAGE="${GO_RUNNER_IMAGE:-localhost/l7/go:1.22-bookworm}"
   NODE_RUNNER_IMAGE="${NODE_RUNNER_IMAGE:-localhost/l7/node}"
   NODE_VERSION="${NODE_VERSION:-20}"
   GPG_IMAGE="${GPG_IMAGE:-localhost/l7/gpg-vault:pk}"
