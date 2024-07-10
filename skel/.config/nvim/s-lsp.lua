@@ -49,10 +49,18 @@ require('lspconfig')['gopls'].setup{
         staticcheck = true,
       },
       ["logVerbosity"] = 'verbose'
-    }
+    },
+    before_init = function(params)
+      -- lspcontainers: disable process id detection
+      params.processId = vim.NIL
+    end,
+    cmd = lspcontainers.command('gopls', {
+      container_runtime = 'podman',
+      image = 'localhost/l7/go:lsp-bookworm',
+    }),
+    root_dir = require'lspconfig/util'.root_pattern(".git", vim.fn.getcwd()),
 }
 -- typescript
--- require('lspconfig')['denols'].setup{
 require('lspconfig')['tsserver'].setup{
     on_attach = on_attach,
     flags = lsp_flags,
@@ -60,9 +68,9 @@ require('lspconfig')['tsserver'].setup{
       ["logVerbosity"] = 'verbose'
     },
     before_init = function(params)
+      -- lspcontainers: disable process id detection
       params.processId = vim.NIL
     end,
-    -- cmd = require'lspcontainers'.command('tsserver'),
     cmd = lspcontainers.command('tsserver', {
       container_runtime = 'podman',
       image = 'localhost/l7/node:lsp-bookworm',
