@@ -14,11 +14,11 @@ USER 1002:1002
 
 # build, pack, and install typescript-language-server
 RUN set -x &&  cd /build/typescript-language-server \
-  && yarn install --frozen-lockfile \
-  && yarn build \
-  && yarn pack \
+  && yarn1 install --frozen-lockfile \
+  && yarn1 build \
+  && yarn1 pack \
   && cd /out \
-  && npm i /build/typescript-language-server/*.t*gz \
+  && npm10 i /build/typescript-language-server/*.t*gz \
   && rm -rf /tmp/1002-home /build/typescript-language-server/*.t*gz
 
 FROM ${BASE_IMAGE}
