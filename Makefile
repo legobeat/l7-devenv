@@ -417,39 +417,7 @@ test: test_nvim test_runner_node test_gpg_pk
 
 test_e2e_curl:
 	set -e
-	for url in \
-		"https://google.com/" \
-		"https://google.com" \
-		"https://github.com/" \
-		"https://github.com" \
-		"https://github.com/lspcontainers/lspcontainers.nvim" \
-		"https://github.com/actions/example-services/pulls" \
-		"https://codeload.github.com/legobeat/mermaid-cli/tar.gz/02153e234a876c95b44e1af84d02bca65681f6d1" \
-		"https://registry.npmjs.org/xtend/" \
-		"https://registry.npmjs.org/xtend" \
-		"https://registry.yarnpkg.com/xtend/" \
-		"https://registry.yarnpkg.com/xtend" \
-		"https://registry.npmjs.org/npm/9.9.3" \
-		"https://registry.npmjs.org/xtend/-/xtend-2.0.4.tgz" \
-		"https://registry.yarnpkg.com/xtend/-/xtend-2.0.4.tgz" \
-		"https://deb.debian.org/debian/dists/bookworm/InRelease" \
-		"http://deb.debian.org/debian/dists/bookworm/InRelease" \
-		"http://product-details.mozilla.org/1.0/firefox_versions.json" \
-		"https://product-details.mozilla.org/1.0/firefox_versions.json" \
-		"http://archive.ubuntu.com/ubuntu/dists/noble/InRelease" \
-		"http://product-details.mozilla.org/1.0/firefox_versions.json" \
-		"https://product-details.mozilla.org/1.0/firefox_versions.json" \
-	; do \
-		result=$$(export NAME=l7ide-test-runner; ./devenv.sh \
-			curl -f -sSL --tlsv1.2 "$${url}" -o/dev/null \
-			-w '%{exitcode}:%{response_code}:%{ssl_verify_result}___%{certs}' \
-			| head -n4 \
-		); \
-		echo "$$result" | grep -Ez --quiet "^0:200:0___(.*Issuer:.*Caddy.*)?\s*\$$" \
-			&& echo "pass $$url" \
-			|| echo "fail $$url $$(echo "$$result" | head -n3)"; \
-		sleep 0.1; \
-	done
+	./test/proxy/test-proxy-curl.sh
 
 test_e2e_ghauth:
 	set -e
