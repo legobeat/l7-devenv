@@ -24,7 +24,6 @@ shim_pm_versions () {
 }
 
 echo "${COREPACK_PMS}" | \
-  xargs -P8 -I{} sh -c \
-    'corepack install -g --cache-only {} && corepack install -g {}'
+  xargs -P8 -n1 corepack install -g
 
 shim_pm_versions
