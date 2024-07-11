@@ -67,7 +67,7 @@ RUN apk add --no-cache \
     podman-remote podman-zsh-completion fuse-overlayfs containers-common openssh-client \
     gettext-envsubst mkpasswd \
     coreutils less grep sed findutils file make \
-    screen \
+    screen tmux \
     which \
     zsh zsh-completions curl-zsh-completion zsh-vcs \
     zsh-doc zsh-syntax-highlighting zsh-syntax-highlighting-doc zsh-histdb zsh-histdb \
