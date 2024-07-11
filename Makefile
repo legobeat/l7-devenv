@@ -459,6 +459,7 @@ test_devenv_dir_owner:
 		"/home/user/.config" \
 		"$${SRC_DIR}" \
 	; do \
+		podman compose up -d; \
 		owner=$$(./devenv.sh stat --format '%u:%g' "$${p}"); \
 		if [[ "$${owner}" != "1000:1000" ]]; then \
 			echo "Invalid ownership of $${p}: $${HOME_OWNER}"; \
