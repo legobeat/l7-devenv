@@ -227,6 +227,10 @@ image_lsp_node: image_runner_node_20
 		.
 #### Tests
 
+test_compose_run:
+	podman compose run --build --rm \
+		--entrypoint /bin/sh -e DEBUG=1 dev-shell -c 'id' | grep -F --quiet 'uid=1000(user) gid=1000(userz) groups=1000(userz)' && echo pass
+
 test_auth_proxy: IMAGE_NAME = ${AUTH_PROXY_IMAGE_NAME}
 test_auth_proxy: IMAGE_TAG = ${AUTH_PROXY_IMAGE_TAG}
 test_auth_proxy: # image_auth_proxy

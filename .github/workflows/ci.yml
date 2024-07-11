@@ -162,10 +162,44 @@ jobs:
         run: |
           make -j6 CMD=${{ matrix.cmd }} images
           make -j4 CMD=${{ matrix.cmd }} test_extra_${{ matrix.image }}
-
     env:
       CMD: ${{ matrix.cmd }}
       CONTAINER_CMD: ${{ matrix.cmd }}
+      L7_DISABLE_SELINUX: '1'
+
+  test-compose:
+    runs-on: ${{ matrix.os }}
+    services:
+      registry:
+        image: registry:2
+        ports:
+          - 80:5000
+    strategy:
+      fail-fast: false
+      matrix:
+        test:
+          - test_compose_run
+        os:
+          - ubuntu-24.04
+    steps:
+      - name: Setup podman
+        run: |
+          mkdir -p ~/.config/containers/registries.conf.d
+          echo "[[registry]]
+            location = 'localhost:80'
+          insecure = true" | tee ~/.config/containers/registries.conf.d/insecure-localhost.conf
+          systemctl --user restart podman.socket
+          podman info
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+      - name: Prep
+        run: |
+          sudo apt-get install -y whois --no-install-recommends
+          make -j4 image_alpine
+      - run: make -j4 ${{ matrix.test }}
+    env:
+      DEBUG: ''
       L7_DISABLE_SELINUX: '1'
 
   test-e2e-podman:
