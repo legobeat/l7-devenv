@@ -416,30 +416,30 @@ images_test: images image_nvim_test
 test: test_nvim test_runner_node test_gpg_pk
 
 test_e2e_curl:
-	set -e
+	set -e; \
 	./test/proxy/test-proxy-curl.sh
 
 test_e2e_ghauth:
-	set -e
+	set -e; \
 	NAME=l7ide-test-runner-ghauth ./devenv.sh gh auth status
 	NAME=l7ide-test-runner-ghauth ./devenv.sh gh auth status
 
 test_e2e_node_corepack: IMAGE_NAME = ${RUNNER_IMAGE_NAME}
 test_e2e_node_corepack: IMAGE_TAG = ${RUNNER_IMAGE_TAG}
 test_e2e_node_corepack: # image_nvim
-	set -e
+	set -e; \
 	./test/runner-node/test-corepack-pms.sh
 
 test_e2e_node_majors: IMAGE_NAME = ${RUNNER_IMAGE_NAME}
 test_e2e_node_majors: IMAGE_TAG = ${RUNNER_IMAGE_TAG}
 test_e2e_node_majors: # image_nvim
-	set -e
+	set -e; \
 	./test/runner-node/test-node-majors.sh
 
 test_e2e_lsp_typescript : IMAGE_NAME = ${NVIM_IMAGE_NAME}
 test_e2e_lsp_typescript : IMAGE_TAG = ${NVIM_IMAGE_TAG}
 test_e2e_lsp_typescript : image_nvim_test test_lsp_node
-	set -e
+	set -e; \
 	IMAGE=${IMAGE_NAME}-ht:${IMAGE_TAG} \
 		  NAME=l7ide-test-runner-lsp \
 		  SRC_DIR=$$(pwd)/test/lsp-js \
@@ -447,8 +447,9 @@ test_e2e_lsp_typescript : image_nvim_test test_lsp_node
 		  ./devenv.sh /bin/bash -l -Ec ./ht-test-1-1.sh
 
 test_devenv_dir_owner:
-	@export NAME=l7ide-test-runner-de; \
-	 export SRC_DIR=$$(mktemp -d --tmpdir "l7test.XXXX"); \
+	set -e; \
+	export NAME=l7ide-test-runner-de; \
+	export SRC_DIR=$$(mktemp -d --tmpdir "l7test.XXXX"); \
 	for p in \
 		"/home/user" \
 		"/home/user/.config" \
@@ -462,6 +463,6 @@ test_devenv_dir_owner:
 	done; \
 	rm -r "$${SRC_DIR}"; \
 	if [[ -n "${TESTFAIL}" ]]; then \
-		echo 4; \
+		exit 4; \
 	fi; \
 	echo "perms test pass";

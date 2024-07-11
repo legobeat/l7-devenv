@@ -32,8 +32,19 @@ for url in ${urls[@]}; do
       -w '%{exitcode}:%{response_code}:%{ssl_verify_result}___%{certs}' \
       | head -n4
   );
-  echo "$result" | grep -Ez --quiet "^0:200:0___(.*Issuer:.*Caddy.*)?\s*\$" \
-    && echo "pass $url" \
-    || echo "fail $url $(echo "$result" | head -n3)";
+  if (echo "$result" | grep -Ez --quiet "^0:200:0___(.*Issuer:.*Caddy.*)?\s*\$"); then
+    echo "pass $url"
+    continue
+  fi
+  export TESTFAIL=1
+  echo "fail $url $(echo "$result" | head -n3)";
+  #  && echo "pass $url" \
+  #  || echo "fail $url $(echo "$result" | head -n3)";
+  #echo "$result" | grep -Ez --quiet "^0:200:0___(.*Issuer:.*Caddy.*)?\s*\$" \
+  #  && echo "pass $url" \
+  #  || echo "fail $url $(echo "$result" | head -n3)";
   sleep 0.1;
 done
+if [[ -n "${TESTFAIL}" ]]; then
+  exit 4
+fi
