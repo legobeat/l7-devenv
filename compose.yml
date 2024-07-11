@@ -87,7 +87,7 @@ services:
     build:
       context: sidecars/caddy
       dockerfile: Containerfile
-    image: localhost/l7/caddy
+    image: 'localhost/l7/caddy:latest'
     environment:
       GITHUB_PROXY_HOST: 10.7.7.135
       GITHUB_PROXY_PORT: '8080'
@@ -99,16 +99,16 @@ services:
       svcs:
         ipv4_address: 10.7.7.132
       public:
-    ports:
-      - 18780:80
-      - 18743:443
     volumes:
-      - ${HOME}/.config/l7ide/config/caddy:/config:Z,ro
+      - 'caddy_conf:/config:Z,ro'
       #- ./sidecars/caddy/default.yml:/etc/caddy/default.yml:ro
-      #- ${HOME}/.local/share/l7ide/caddy/data:/data
     tmpfs:
       - /data/caddy/certificates
       - /data/caddy/pki
+
+volumes:
+  caddy_conf:
+    name: l7_caddy_fwd_config
 
 networks:
   svcs:
