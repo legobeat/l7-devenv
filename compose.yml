@@ -4,7 +4,7 @@ services:
     build:
       context: sidecars/container-socket-proxy
       dockerfile: Dockerfile
-    image: localhost/l7/container-socket-proxy:latest
+    image: 'localhost/l7/container-socket-proxy:latest'
     networks:
       container-control:
         ipv4_address: 10.7.9.2
@@ -12,11 +12,9 @@ services:
     # TODO: Fix SElinux privileges of podman socket such that privileged-workaround for proxy not needed
     privileged: true
     volumes:
-      #- /run/user/1000/podman/podman.sock:/var/run/docker.sock
       - ${CONTAINER_SOCKET:-${XDG_RUNTIME_DIR}/podman/podman.sock}:/var/run/docker.sock:Z
       #- /run/user/${UID}/podman/podman.sock:/var/run/docker.sock:ro
     restart: unless-stopped
-    #read_only: true
     tmpfs:
       - /run
 
@@ -24,34 +22,35 @@ services:
     build:
       context: sidecars/git-auth-proxy
       dockerfile: Dockerfile
-    image: localhost/l7/auth-proxy:latest
+    image: 'localhost/l7/auth-proxy:latest'
     networks:
       svcs:
         ipv4_address: 10.7.7.135
       public:
     ports:
-      - 18774:8080
+      - '18774:8080'
     volumes:
-      - ${HOME}/.config/l7ide/config/git-auth-proxy:/etc/git-auth-proxy:Z
+      - ${HOME}/.config/l7ide/config/git-auth-proxy:/etc/git-auth-proxy:Z,ro
     command:
       - --config
       - /etc/git-auth-proxy/config.json
       - --addr
-      - 0.0.0.0:8080
+      - '0.0.0.0:8080'
+
   dns:
     build:
       context: sidecars/dnsmasq
       dockerfile: Containerfile
-    image: localhost/l7/dnsmasq:latest
+    image: 'localhost/l7/dnsmasq:latest'
     ports:
-      - "18753:53/tcp"
-      - "18753:53/udp"
-      #- "18767:67/udp"
-      #- "18769:69/udp"
+      - '18753:53/tcp'
+      - '18753:53/udp'
+      #- '18767:67/udp'
+      #- '18769:69/udp'
     cap_add:
       - NET_ADMIN
     # todo: dynamic for subnets
-    command: --address="/#/10.7.8.132" --log-facility=-
+    command: '--address="/#/10.7.8.132" --log-facility=-'
     networks:
       internal:
         ipv4_address: 10.7.8.133
@@ -64,7 +63,7 @@ services:
     build:
       context: sidecars/apt-cacher-ng
       dockerfile: Containerfile
-    image: localhost/l7/apt-cacher-ng
+    image: 'localhost/l7/apt-cacher-ng:latest'
     restart: always
     init: true
     #command: 'apt-cacher-ng -v PassThroughPattern=.*'
@@ -74,7 +73,7 @@ services:
       svcs:
         ipv4_address: 10.7.7.136
     ports:
-    - "13142:13142"
+    - '13142:13142'
     volumes:
     - ${HOME}/.local/share/l7ide/apt-cacher-ng/cache:/var/cache/apt-cacher-ng:Z
     - ${HOME}/.local/share/l7ide/apt-cacher-ng/log:/var/log/apt-cacher-ng:Z
