@@ -107,6 +107,10 @@ services:
     - ${HOME}/.local/share/l7ide/apt-cacher-ng/log:/var/log/apt-cacher-ng:Z
 
   http-proxy:
+    depends_on:
+      - apt-cacher-ng
+      - auth-proxy
+      - dns
     build:
       context: sidecars/caddy
       dockerfile: Containerfile
