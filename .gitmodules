@@ -52,3 +52,6 @@
 [submodule "docker-socket-proxy"]
 	path = sidecars/container-socket-proxy
 	url = https://github.com/legobeat/container-socket-proxy
+[submodule "contrib/nvim-plugins/toggleterm.nvim"]
+	path = contrib/nvim-plugins/toggleterm.nvim
+	url = https://github.com/akinsho/toggleterm.nvim

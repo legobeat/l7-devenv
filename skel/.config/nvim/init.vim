@@ -56,6 +56,10 @@ try
 catch
 endtry
 try
+  runtime s-toggleterm.lua
+catch
+endtry
+try
   runtime theme.lua
 catch
 endtry
