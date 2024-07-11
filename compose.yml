@@ -198,6 +198,7 @@ networks:
     driver_opts:
       inhibit_ipv4: 1
   internal:
+    name: l7_dev_internal
     attachable: true
     ipam:
       config:
@@ -208,6 +209,7 @@ networks:
       inhibit_ipv4: 1
       disable_dns: 1
   container-control:
+    name: l7_dev_container_control
     attachable: true
     ipam:
       config:

@@ -71,14 +71,8 @@ runtime_config () {
   # used to run de itself. should be separate from CONTAINER_HOST inside de itself
   export DOCKER_HOST="${DOCKER_HOST:-unix://${CONTAINER_SOCKET}}"
 
-  if [[ -z "${NETWORK_NAME}" ]]; then
-    COMPOSE_NETWORK_NAME="${COMPOSE_NETWORK_NAME:-internal}"
-    NETWORK_NAME=${NETWORK_NAME:-$(get_compose_network_name "${COMPOSE_NETWORK_NAME}")}
-  fi
-  if [[ -z "${CONTROL_NETWORK_NAME}" ]]; then
-    CONTROL_COMPOSE_NETWORK_NAME="${CONTROL_COMPOSE_NETWORK_NAME:-container-control}"
-    CONTROL_NETWORK_NAME=${CONTROL_NETWORK_NAME:-$(get_compose_network_name "${CONTROL_COMPOSE_NETWORK_NAME}")}
-  fi
+  NETWORK_NAME="${NETWORK_NAME:-${COMPOSE_NETWORK_NAME:-l7_dev_internal}}"
+  CONTROL_NETWORK_NAME="${CONTROL_NETWORK_NAME:-${CONTROL_COMPOSE_NETWORK_NAME:-l7_dev_container_control}}"
 
   ### run args
   if [[ -n "${SSH_SOCKET}" ]]; then
@@ -138,22 +132,6 @@ detect_compose_command() {
   echo "${composecmd}"
 }
 
-get_compose_name() {
-  basename "${ROOT_DIR}"
-}
-
-get_compose_network_name() {
-  name="$1"
-  cn="$(get_compose_name)"
-  echo -n "${cn}_${name}"
-}
-
-get_compose_container_name() {
-  name="$1"
-  cn="$(get_compose_name)"
-  echo -n "${cn}-${name}-1"
-}
-
 # set value in shell env file
 envfile_upsert_shell() {
   envcfg="${1}"
@@ -207,13 +185,13 @@ configure_gh_token() {
     if [[ -n "${L7_GITHUB_TOKEN_CMD}" ]] ; then
       export L7_GITHUB_TOKEN="$(L7_GITHUB_TOKEN_CMD)"
       # TODO: diff with old value, only restart if different
-      SHOULD_RESTART_HTTP_PROXY=1
+      SHOULD_RESTART_AUTH_PROXY=1
     fi
     if [[ -z "${L7_USER_TOKEN_HASH}" ]]; then
       export L7_USER_TOKEN="$(head -c 1000 /dev/random | base32 | head -c32)"
       msg="${msg}Generated new internal gh auth token. " >&2
       export L7_USER_TOKEN_HASH="$(mkpasswd -m sha512crypt "${L7_USER_TOKEN}")"
-      SHOULD_RESTART_HTTP_PROXY=1
+      SHOULD_RESTART_AUTH_PROXY=1
     fi
     [[ -n "${msg}" ]] && echo "${msg}" >&2
     # todo: use podman secrets or sth instead of passing around env vars and files
@@ -237,10 +215,9 @@ configure_gh_token() {
     unset L7_GITHUB_TOKEN
     unset L7_GITHUB_TOKEN_HASH
 
-    if [[ -n "${SHOULD_RESTART_HTTP_PROXY}" ]]; then
-      # restart auth-proxy if already running
-      auth_proxy_name=$(get_compose_container_name 'auth-proxy')
-      "${cmd}" restart --running "${auth_proxy_name}" >/dev/null 2>/dev/null || true
+    if [[ -n "${SHOULD_RESTART_AUTH_PROXY}" ]]; then
+      "${composecmd}" restart --no-deps 'auth-proxy'  >/dev/null 2>/dev/null || true
+      unset  SHOULD_RESTART_AUTH_PROXY
     fi
 
   fi
