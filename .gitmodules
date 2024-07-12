@@ -55,3 +55,7 @@
 [submodule "contrib/nvim-plugins/toggleterm.nvim"]
 	path = contrib/nvim-plugins/toggleterm.nvim
 	url = https://github.com/akinsho/toggleterm.nvim
+[submodule "contrib/nvim-plugins/mini.completion"]
+	path = contrib/nvim-plugins/mini.completion
+	url = https://github.com/echasnovski/mini.completion
+	branch = stable

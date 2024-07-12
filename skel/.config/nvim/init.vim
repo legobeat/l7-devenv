@@ -60,6 +60,10 @@ try
 catch
 endtry
 try
+  runtime s-completion.lua
+catch
+endtry
+try
   runtime theme.lua
 catch
 endtry
