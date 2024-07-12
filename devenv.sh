@@ -3,6 +3,7 @@
 ########## FUNCTIONS
 
 user_config () {
+  set -a # export variables
   ### dirs
   CONF_DIR="${CONF_DIR:-${HOME}/.config/l7ide/config}"
   LOCAL_DIR="${LOCAL_DIR:-${HOME}/.local/share/l7ide/local}"
@@ -35,6 +36,7 @@ user_config () {
 }
 
 runtime_config () {
+  set -a # export variables
   if [[ "$(id -u)" -eq "0"  || "${cmd}" == sudo\ * ]]; then
     if [[ -z "${L7_FORCE_UNSAFE_ROOT}" ]]; then
       echo "ERROR: Running as superuser is unsupported. Do not run as root."
@@ -66,10 +68,9 @@ runtime_config () {
   if [[ -z "${CONTAINER_SOCKET}" || ! -f "${CONTAINER_SOCKET}" ]]; then
     CONTAINER_SOCKET="${CONTAINER_SOCKET:-/var/run/docker.sock}"
   fi
-  export CONTAINER_SOCKET
 
   # used to run de itself. should be separate from CONTAINER_HOST inside de itself
-  export DOCKER_HOST="${DOCKER_HOST:-unix://${CONTAINER_SOCKET}}"
+  DOCKER_HOST="${DOCKER_HOST:-unix://${CONTAINER_SOCKET}}"
 
   NETWORK_NAME="${NETWORK_NAME:-${COMPOSE_NETWORK_NAME:-l7_dev_internal}}"
   CONTROL_NETWORK_NAME="${CONTROL_NETWORK_NAME:-${CONTROL_COMPOSE_NETWORK_NAME:-l7_dev_container_control}}"
