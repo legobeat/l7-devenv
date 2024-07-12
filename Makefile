@@ -254,6 +254,8 @@ test_caddy: # image_caddy
 		-e GITHUB_PROXY_PORT=456 \
 		-e PKG_PROXY_HOST=foo \
 		-e PKG_PROXY_PORT=1234 \
+		-e NPMPKG_REGISTRY_HOST=foo \
+		-e NPMPKG_REGISTRY_PORT=1234 \
 		"${IMAGE_NAME}:${IMAGE_TAG}" \
 		caddy validate --config /etc/caddy/default.yml  --adapter yaml
 	# simply test that expected hostport placeholders appear in config output
@@ -263,6 +265,8 @@ test_caddy: # image_caddy
 		-e GITHUB_PROXY_PORT=456 \
 		-e PKG_PROXY_HOST=foo \
 		-e PKG_PROXY_PORT=1234 \
+		-e NPMPKG_REGISTRY_HOST=foo \
+		-e NPMPKG_REGISTRY_PORT=1234 \
 		"${IMAGE_NAME}:${IMAGE_TAG}" \
 		caddy adapt --config /etc/caddy/default.yml  --adapter yaml \
 			| jq -r '.apps|map(select(.servers))|map(.servers|map(.routes|map(.handle|map(.upstreams|select(.)|map(.dial)))))|flatten|.[]' \

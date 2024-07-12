@@ -59,3 +59,7 @@
 	path = contrib/nvim-plugins/mini.completion
 	url = https://github.com/echasnovski/mini.completion
 	branch = stable
+[submodule "sidecars/verdaccio"]
+	path = sidecars/verdaccio
+	url = https://github.com/legobeat/verdaccio
+	branch = 5.x
