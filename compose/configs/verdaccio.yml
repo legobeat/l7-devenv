@@ -1,0 +1,149 @@
+storage: /verdaccio/storage/data
+plugins: /verdaccio/plugins
+
+# https://verdaccio.org/docs/webui
+web:
+  title: Verdaccio
+  gravatar: false
+  darkMode: true
+  html_cache: true
+  login: true
+  showInfo: true
+  showSettings: true
+  showThemeSwitch: true
+  showFooter: true
+  showSearch: true
+  showRaw: true
+  showDownloadTarball: true
+  #  HTML tags injected after manifest <scripts/>
+  # scriptsBodyAfter:
+  #    - '<script type="text/javascript" src="https://my.company.com/customJS.min.js"></script>'
+  #  HTML tags injected before ends </head>
+  #  metaScripts:
+  #    - '<script type="text/javascript" src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>'
+  #    - '<script type="text/javascript" src="https://browser.sentry-cdn.com/5.15.5/bundle.min.js"></script>'
+  #    - '<meta name="robots" content="noindex" />'
+  #  HTML tags injected first child at <body/>
+  #  bodyBefore:
+  #    - '<div id="myId">html before webpack scripts</div>'
+  #  Public path for template manifest scripts (only manifest)
+  #  publicPath: http://somedomain.org/
+
+# https://verdaccio.org/docs/configuration#authentication
+auth:
+  htpasswd:
+    file: /verdaccio/storage/htpasswd
+    # Maximum amount of users allowed to register, defaults to "+infinity".
+    # You can set this to -1 to disable registration.
+    # max_users: 1000
+    # Hash algorithm, possible options are: "bcrypt", "md5", "sha1", "crypt".
+    algorithm: bcrypt
+
+# uplinks are available but not enabled - by default acng handles forward-proxying
+uplinks:
+  acng:
+    url: 'http://10.7.7.136:13142'
+    maxage: 1s
+  npmjscom:
+    url: 'https://registry.npmjs.com/'
+    maxage: 60s
+  npmjsorg:
+    url: 'https://registry.npmjs.org/'
+    maxage: 60s
+  yarnpkg:
+    url: 'https://registry.yarnpkg.com/'
+    maxage: 60s
+
+# TODO: Secure
+# https://verdaccio.org/docs/protect-your-dependencies/
+# https://verdaccio.org/docs/configuration#packages
+packages:
+  '@*/*':
+    access: $all
+    publish: $authenticated
+    unpublish: $authenticated
+    proxy: npmjs
+
+  '**':
+    access: $all
+    publish: $authenticated
+    unpublish: $authenticated
+    #proxy: npmjscom npmjsorg acng yarnpkg
+
+server:
+  keepAliveTimeout: 60
+  trustProxy: '10.7.7.132'
+
+publish:
+  allow_offline: true
+
+# VERDACCIO_PUBLIC_URL='https://example.com';
+
+# https://verdaccio.org/docs/configuration#security
+#security:
+#  api:
+#     legacy: true
+#     jwt:
+#       sign:
+#         expiresIn: 29d
+#       verify:
+#         someProp: [value]
+#    web:
+#      sign:
+#        expiresIn: 1h # 1 hour by default
+#      verify:
+#         someProp: [value]
+
+# https://verdaccio.org/docs/configuration#user-rate-limit
+userRateLimit:
+  windowMs: 50000
+  max: 100000
+
+max_body_size: 1000mb
+
+# https://verdaccio.org/docs/configuration#listen-port
+listen:
+- 0.0.0.0:4873              # listen on all addresses (INADDR_ANY)
+# - unix:/tmp/verdaccio.sock    # unix socket
+
+# The HTTPS configuration is useful if you do not consider use a HTTP Proxy
+# https://verdaccio.org/docs/configuration#https
+# https:
+#   key: ./path/verdaccio-key.pem
+#   cert: ./path/verdaccio-cert.pem
+#   ca: ./path/verdaccio-csr.pem
+
+# https://verdaccio.org/docs/configuration#proxy
+# http_proxy: http://something.local/
+# https_proxy: https://something.local/
+
+# https://verdaccio.org/docs/configuration#notifications
+# notify:
+#   method: POST
+#   headers: [{ "Content-Type": "application/json" }]
+#   endpoint: https://usagge.hipchat.com/v2/room/3729485/notification?auth_token=mySecretToken
+#   content: '{"color":"green","message":"New package published: * {{ name }}*","notify":true,"message_format":"text"}'
+
+middlewares:
+  audit:
+    enabled: true
+
+# https://verdaccio.org/docs/logger
+# log settings
+log: { type: stdout, format: pretty, level: http }
+#experiments:
+#  # support for npm token command
+#  token: false
+#  # enable tarball URL redirect for hosting tarball with a different server, the tarball_url_redirect can be a template string
+#  tarball_url_redirect: 'https://mycdn.com/verdaccio/${packageName}/${filename}'
+#  # the tarball_url_redirect can be a function, takes packageName and filename and returns the url, when working with a js configuration file
+#  tarball_url_redirect(packageName, filename) {
+#    const signedUrl = // generate a signed url
+#    return signedUrl;
+#  }
+
+# translate your registry, api i18n not available yet
+# i18n:
+# list of the available translations https://github.com/verdaccio/verdaccio/blob/master/packages/plugins/ui-theme/src/i18n/ABOUT_TRANSLATIONS.md
+#   web: en-US
+

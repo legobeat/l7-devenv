@@ -90,8 +90,11 @@ services:
     environment:
       GITHUB_PROXY_HOST: 10.7.7.135
       GITHUB_PROXY_PORT: '8080'
+      NPMPKG_REGISTRY_HOST: 10.7.7.137
+      NPMPKG_REGISTRY_PORT: '4873'
       PKG_PROXY_HOST: 10.7.7.136
       PKG_PROXY_PORT: '13142'
+
     networks:
       internal:
         ipv4_address: 10.7.8.132
@@ -104,6 +107,29 @@ services:
     tmpfs:
       - /data/caddy/certificates
       - /data/caddy/pki
+
+  verdaccio:
+    profiles:
+      - beta
+    image: 'localhost/l7/verdaccio:latest'
+    build:
+      context: sidecars/verdaccio
+      dockerfile: Dockerfile
+    configs:
+      - source: verdaccio_cfg
+        target: /verdaccio/conf/config.yaml
+        mode: 0444
+    networks:
+      svcs:
+        ipv4_address: 10.7.7.137
+    volumes:
+      - 'verdaccio_storage:/verdaccio/storage'
+
+##########
+
+configs:
+  verdaccio_cfg:
+    file: ./compose/configs/verdaccio.yml
 
 volumes:
   caddy_conf:

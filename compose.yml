@@ -86,6 +86,8 @@ volumes:
     name: l7_nvim_state
   gpgvault_pk:
     name: l7_gpgvault_pk
+  verdaccio_storage:
+    name: l7_dev_verdaccio_storage
 
 networks:
   internal:

@@ -164,6 +164,18 @@ apps:
           - match:
              - tls:
                  sni:
+                   - npmpkg.internal
+                   - verdaccio
+                   - verdaccio.internal
+            handle:
+              - handler: tls
+              - handler: proxy
+                upstreams:
+                  - dial:
+                    - "#{ $NPMPKG_REGISTRY_HOST }:#{ $NPMPKG_REGISTRY_PORT }"
+          - match:
+             - tls:
+                 sni:
                    - registry.npmjs.com
                    - registry.npmjs.org
                    - registry.yarnpkg.com
