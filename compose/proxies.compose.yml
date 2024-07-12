@@ -1,0 +1,124 @@
+---
+services:
+  container-socket-proxy:
+    build:
+      context: sidecars/container-socket-proxy
+      dockerfile: Dockerfile
+    image: 'localhost/l7/container-socket-proxy:latest'
+    networks:
+      container-control:
+        ipv4_address: 10.7.9.2
+    env_file: compose/container-socket-proxy.env
+    # TODO: Fix SElinux privileges of podman socket such that privileged-workaround for proxy not needed
+    privileged: true
+    volumes:
+      - ${CONTAINER_SOCKET:-${XDG_RUNTIME_DIR}/podman/podman.sock}:/var/run/docker.sock:Z
+      #- /run/user/${UID}/podman/podman.sock:/var/run/docker.sock:ro
+    restart: unless-stopped
+    tmpfs:
+      - /run
+
+  auth-proxy:
+    build:
+      context: sidecars/git-auth-proxy
+      dockerfile: Dockerfile
+    image: 'localhost/l7/auth-proxy:latest'
+    networks:
+      svcs:
+        ipv4_address: 10.7.7.135
+      public:
+    ports:
+      - '18774:8080'
+    volumes:
+      - ${HOME}/.config/l7ide/config/git-auth-proxy:/etc/git-auth-proxy:Z,ro
+    command:
+      - --config
+      - /etc/git-auth-proxy/config.json
+      - --addr
+      - '0.0.0.0:8080'
+
+  dns:
+    build:
+      context: sidecars/dnsmasq
+      dockerfile: Containerfile
+    image: 'localhost/l7/dnsmasq:latest'
+    ports:
+      - '18753:53/tcp'
+      - '18753:53/udp'
+      #- '18767:67/udp'
+      #- '18769:69/udp'
+    cap_add:
+      - NET_ADMIN
+    # todo: dynamic for subnets
+    command: '--address="/#/10.7.8.132" --log-facility=-'
+    networks:
+      internal:
+        ipv4_address: 10.7.8.133
+      svcs:
+        ipv4_address: 10.7.7.133
+      public:
+
+  # package cache
+  apt-cacher-ng:
+    build:
+      context: sidecars/apt-cacher-ng
+      dockerfile: Containerfile
+    image: 'localhost/l7/apt-cacher-ng:latest'
+    restart: always
+    init: true
+    #command: 'apt-cacher-ng -v PassThroughPattern=.*'
+    #cap_drop:
+    #  - all
+    networks:
+      svcs:
+        ipv4_address: 10.7.7.136
+    ports:
+    - '13142:13142'
+    volumes:
+    - ${HOME}/.local/share/l7ide/apt-cacher-ng/cache:/var/cache/apt-cacher-ng:Z
+    - ${HOME}/.local/share/l7ide/apt-cacher-ng/log:/var/log/apt-cacher-ng:Z
+
+  http-proxy:
+    depends_on:
+      - apt-cacher-ng
+      - auth-proxy
+      - dns
+    build:
+      context: sidecars/caddy
+      dockerfile: Containerfile
+    image: 'localhost/l7/caddy:latest'
+    environment:
+      GITHUB_PROXY_HOST: 10.7.7.135
+      GITHUB_PROXY_PORT: '8080'
+      PKG_PROXY_HOST: 10.7.7.136
+      PKG_PROXY_PORT: '13142'
+    networks:
+      internal:
+        ipv4_address: 10.7.8.132
+      svcs:
+        ipv4_address: 10.7.7.132
+      public:
+    volumes:
+      - 'caddy_conf:/config:Z'
+      #- ./sidecars/caddy/default.yml:/etc/caddy/default.yml:ro
+    tmpfs:
+      - /data/caddy/certificates
+      - /data/caddy/pki
+
+volumes:
+  caddy_conf:
+    name: l7_caddy_fwd_config
+
+networks:
+  svcs:
+    attachable: false
+    ipam:
+      config:
+        - subnet: 10.7.7.0/24
+    driver: bridge
+    driver_opts:
+      inhibit_ipv4: 1
+  # has external network gateway = internet access
+  public:
+    attachable: false
+    driver: bridge
