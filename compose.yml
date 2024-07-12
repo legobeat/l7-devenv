@@ -48,6 +48,7 @@ services:
       - path: "${HOME}/.config/l7ide/config/env"
         required: false
     environment:
+      CONTAINER_DNS:     '${CONTAINER_DNS:-10.7.8.133}'
       CONTAINER_HOST:    'tcp://10.7.9.2:2375'
       GO_RUNNER_IMAGE:   'localhost/l7/go:1.20-bookworm'
       GPG_IMAGE:         'localhost/l7/gpg-vault:pk'
@@ -62,7 +63,7 @@ services:
       L7_YARN_CLASSIC_CACHE_VOLUME: 'l7_cache_node_yarn_classic'
       GPG_PK_VOLUME: 'l7_gpgvault_pk'
       L7_COMPOSE_NETWORK_NAME_INTERNAL: 'l7_dev_internal'
-    dns: 10.7.8.133
+    dns: '${CONTAINER_DNS:-10.7.8.133}'
     entrypoint: /bin/sh
     command: -c 'sleep 36000000000'
 

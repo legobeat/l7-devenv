@@ -52,6 +52,9 @@ fi
 if [[ "${L7_DISABLE_SELINUX}" == "1" ]]; then
   RUNNER_OPTS="${RUNNER_OPTS} --security-opt=label=disable -e L7_DISABLE_SELINUX=1"
 fi
+if [ -n "${CONTAINER_DNS}" ]; then
+  RUNNER_OPTS="${RUNNER_OPTS} --dns ${CONTAINER_DNS} "
+fi
 
 podman run --pull=never --rm \
   --user 1000:1000 --userns=keep-id:uid=1000,gid=1000 \
