@@ -85,7 +85,6 @@
   sh   = show
   sm   = submodule
   sma  = submodule add
-  sml  = submodule list
   smu  = submodule update
   smuc   = submodule update --checkout
   smuic  = submodule update --init --checkout
