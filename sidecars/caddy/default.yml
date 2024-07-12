@@ -196,7 +196,7 @@ apps:
                     ##- 127.0.0.1:3142
                     # working except url part
                     #- "#{ $PKG_PROXY_HOST }:#{ $PKG_PROXY_PORT }"
-            #TODO: caching
+          #TODO: caching for static content
           - match:
              - tls:
                 alpn:
@@ -205,6 +205,7 @@ apps:
                   - http/2
                 sni:
                   - 'codeload.github.com'
+                  - 'raw.githubusercontent.com'
             handle:
              - handler: tls
                connection_policies:
