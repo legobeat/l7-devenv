@@ -6,7 +6,7 @@
   "author": "legobeat",
   "license": "AGPL-3.0",
   "dependencies": {
-    "@lavamoat/allow-scripts": ">=3.0.4",
+    "@lavamoat/allow-scripts": ">=3.1.0",
     "@lavamoat/preinstall-always-fail": ">=2.1.0",
     "semver": "^7.6.3",
     "ts-node": "^10.9.2",
