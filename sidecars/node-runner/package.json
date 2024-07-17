@@ -7,7 +7,7 @@
   "license": "AGPL-3.0",
   "dependencies": {
     "@lavamoat/allow-scripts": ">=3.0.4",
-    "@lavamoat/preinstall-always-fail": ">=2.0.0",
+    "@lavamoat/preinstall-always-fail": ">=2.1.0",
     "semver": "^7.6.2",
     "ts-node": "^10.9.2",
     "typescript": "^5.5.3",
