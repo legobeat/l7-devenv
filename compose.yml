@@ -8,15 +8,24 @@ include:
 services:
   dev-shell:
     profiles:
-      - dev
+      - nvim
+      - podman
+      - alpine
     depends_on:
       - container-socket-proxy
       - dns
       - http-proxy
+      - build-dev-shell
+    image: 'localhost/l7/dev-shell:nvim'
     build:
       context: .
-      dockerfile: imags/nvim/Containerfile
-    image: 'localhost/l7/nvim:latest'
+      dockerfile: imags/dev-shell/Containerfile
+      args:
+        BASE_IMAGE: 'localhost/l7/nvim:podman-remote'
+      tags:
+        - 'localhost/l7/nvim:latest'
+        - 'localhost/l7/dev-shell:latest'
+        - 'localhost/l7/dev-shell:nvim'
     hostname: dev
     restart: always
     user: '1000:1000'

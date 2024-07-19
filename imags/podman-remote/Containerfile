@@ -16,8 +16,7 @@ RUN apk add --no-cache \
     coreutils less grep sed findutils file \
     which \
     ${EXTRA_PKGS} \
-  && ln -sf podman-remote /usr/bin/podman
-
+  && ln -sf podman-remote /usr/bin/podman \
   # https://github.com/gabyx/container-nesting/blob/7efbd79707e1be366bee462f6200443ca23bc077/src/podman/container/Containerfile#L46
   && mkdir -p /etc/containers .config/containers \
   && sed -e 's|^#mount_program|mount_program|g' \
@@ -29,10 +28,7 @@ RUN apk add --no-cache \
          -e 's|^runroot|#runroot|g' \
          /etc/containers/storage.conf > .config/containers/storage.conf
 
-COPY --chmod=755 --chown=root \
-  contrib/bin/* contrib/*/bin/*       /usr/local/bin/
-
-COPY skel/.config/containers/containers.conf /etc/containers/containers.conf
+COPY containers.conf /etc/containers/containers.conf
 
 USER ${UID}:${GID}
 WORKDIR /src

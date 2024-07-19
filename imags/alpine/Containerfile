@@ -36,8 +36,9 @@ COPY --chmod=755 --chown=root \
   contrib/bin/* contrib/*/bin/* \
   /usr/local/bin/
 
-## user config and keys
+COPY contrib/nvim-plugins/tokyonight.nvim/extras/ /etc/themes/tokyonight
 
+## user config and keys
 ### default trust github.com known ssh key
 COPY contrib/data/ssh_known_hosts /etc/ssh/ssh_known_hosts
 
@@ -51,6 +52,12 @@ COPY --chown=${UID}:${GID} skel/ /home/user/
 ### shim global node bins
 ARG NODE_BINS="npm7 npm9 npm10 pnpm9 yarn1 yarn3 yarn4     allow-scripts corepack glob lavamoat-ls mkdirp node-gyp node-which nopt npx pnpx resolve semver yarn-deduplicate"
 RUN for bin in ${NODE_BINS}; do ln -s l7-run-node "/usr/local/bin/${bin}"; done \
+
+  # caus some scripts can be silly
+  && ln -s /bin/bash /usr/bin/bash \
+
+  # theming
+  && mv /etc/themes/tokyonight/fzf/tokyonight_moon.sh /etc/profile.d/90-fzf-theme.sh \
 
   ### trust internal proxy ca cert
   && cat /usr/local/share/ca-certificates/l7-fwd-proxy.crt >> /etc/ssl/certs/ca-certificates.crt \

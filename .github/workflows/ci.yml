@@ -15,23 +15,23 @@ jobs:
       matrix:
         include:
           - name: auth-proxy
-            file: sidecars/git-auth-proxy/Dockerfile
-            context: sidecars/git-auth-proxy
+            file: imags/git-auth-proxy/Dockerfile
+            context: imags/git-auth-proxy
             tags: localhost/l7/auth-proxy:latest
           - name: container-socket-proxy
-            context: sidecars/container-socket-proxy
-            file: sidecars/container-socket-proxy/Dockerfile
+            context: imags/container-socket-proxy
+            file: imags/container-socket-proxy/Dockerfile
             tags: localhost/l7/container-socket-proxy:latest
           - name: dnsmasq
-            file: sidecars/dnsmasq/Containerfile
-            context: sidecars/dnsmasq
+            file: imags/dnsmasq/Containerfile
+            context: imags/dnsmasq
             tags: localhost/l7/dnsmasq:latest
           - name: gpg-vault
-            file: sidecars/gpg-vault-pk/Containerfile
+            file: imags/gpg-vault-pk/Containerfile
             context: .
             tags: localhost/l7/gpg-vault:latest
           - name: node
-            file: sidecars/node-runner/Containerfile
+            file: imags/node-runner/Containerfile
             context: .
             tags: |
               localhost/l7/node:latest
@@ -40,6 +40,8 @@ jobs:
             file: imags/nvim/Containerfile
             context: .
             tags: localhost/l7/nvim:latest
+            build-args: |
+              BASE_IMAGE=localhost/l7/podman-remote:latest
     steps:
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -47,7 +49,6 @@ jobs:
       - name: Allow cleartext http to localhost container registry (docker)
         run: |
           echo '{"insecure-registries" : [ "localhost" ]}' | sudo tee /etc/docker/daemon.json
-        if: ${{ matrix.cmd == 'docker' }}
       - name: Allow cleartext http to localhost container registry (podman)
         run: |
           mkdir -p ~/.config/containers/registries.conf.d
@@ -55,7 +56,6 @@ jobs:
             location = 'localhost:80'
           insecure = true" | tee ~/.config/containers/registries.conf.d/insecure-localhost.conf
           systemctl --user restart podman
-        if: ${{ matrix.cmd != 'docker' }}
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -70,8 +70,8 @@ jobs:
         if: ${{ matrix.name == 'nvim' || matrix.name == 'node' }}
         uses: docker/build-push-action@v6
         with:
-          context: sidecars/caddy
-          file: sidecars/caddy/Containerfile
+          context: imags/caddy
+          file: imags/caddy/Containerfile
           tags: localhost/l7/caddy:latest
           load: true
           push: true
@@ -87,6 +87,20 @@ jobs:
           tags: localhost/l7/alpine:3.20
           build-args: |
             ALPINE_VERSION=3.20
+          load: true
+          push: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build and load podman-remote image
+        if: ${{ matrix.name == 'nvim' || matrix.name == 'node' }}
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: imags/alpine/Containerfile
+          tags: localhost/l7/podman-remote:latest
+          build-args: |
+            BASE_IMAGE=localhost/l7/alpine:3.20
           load: true
           push: true
           cache-from: type=gha
