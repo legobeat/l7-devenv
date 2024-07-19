@@ -93,6 +93,7 @@ networks:
   internal:
     name: l7_dev_internal
     attachable: true
+    internal: true
     ipam:
       config:
         - subnet: 10.7.8.0/24
@@ -104,6 +105,7 @@ networks:
   container-control:
     name: l7_dev_container_control
     attachable: true
+    internal: true
     ipam:
       config:
         - subnet: 10.7.9.0/29

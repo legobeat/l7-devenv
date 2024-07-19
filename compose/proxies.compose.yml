@@ -24,9 +24,9 @@ services:
       dockerfile: Dockerfile
     image: 'localhost/l7/auth-proxy:latest'
     networks:
+      public:
       svcs:
         ipv4_address: 10.7.7.135
-      public:
     ports:
       - '18774:8080'
     volumes:
@@ -56,7 +56,6 @@ services:
         ipv4_address: 10.7.8.133
       svcs:
         ipv4_address: 10.7.7.133
-      public:
 
   # package cache
   apt-cacher-ng:
@@ -70,6 +69,7 @@ services:
     #cap_drop:
     #  - all
     networks:
+      public:
       svcs:
         ipv4_address: 10.7.7.136
     ports:
@@ -94,7 +94,6 @@ services:
       NPMPKG_REGISTRY_PORT: '4873'
       PKG_PROXY_HOST: 10.7.7.136
       PKG_PROXY_PORT: '13142'
-
     networks:
       internal:
         ipv4_address: 10.7.8.132
@@ -138,6 +137,7 @@ volumes:
 networks:
   svcs:
     attachable: false
+    internal: true
     ipam:
       config:
         - subnet: 10.7.7.0/24
