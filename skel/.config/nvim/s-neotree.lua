@@ -20,10 +20,10 @@ require('neo-tree').setup({
     icon = {
       folder_closed = "",
       folder_open = "",
-      folder_empty = "ﰊ",
-      default = "-",
-      -- highlight = "NeoTreeFileIcon"
-      highlight = ""
+      -- The next two settings are only a fallback, if you use nvim-web-devicons and configure default icons there
+      -- then these will never be used.
+      default = "*",
+      highlight = "NeoTreeFileIcon"
     },
     bind_to_cwd = false, -- true creates a 2-way binding between vim's cwd and neo-tree's root
     name = {
