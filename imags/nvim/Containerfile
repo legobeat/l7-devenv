@@ -25,20 +25,19 @@ ARG EXTRA_PKGS='bat'
 
 ARG HOME=/home/user
 ENV HOME=${HOME}
-ARG SHELL=/bin/zsh
+ARG SHELL=/bin/bash
 ARG UID=1000
 ARG GID=1000
 
 USER root
 RUN apk add --no-cache \
     neovim neovim-doc \
-    zsh \
     tree-sitter tree-sitter-bash tree-sitter-cli tree-sitter-cmake tree-sitter-comment tree-sitter-css tree-sitter-embedded-template tree-sitter-html tree-sitter-ini tree-sitter-javascript tree-sitter-jsdoc tree-sitter-json tree-sitter-lua tree-sitter-python tree-sitter-regex tree-sitter-ruby tree-sitter-toml tree-sitter-typescript \
     # tree-sitter-grammars \  # everything
     # tree-sitter-go tree-sitter-go-mod tree-sitter-java tree-sitter-rust \
-    diffutils tree fzf ripgrep ripgrep-zsh-completion \
+    diffutils tree fzf ripgrep \
     sshpass \
-    git-lfs github-cli github-cli-zsh-completion tig \
+    git-lfs github-cli tig \
     iproute2-minimal openssl procps-ng psmisc psutils \
     losetup dosfstools \
     netcat-openbsd netcat-openbsd-doc \
@@ -48,17 +47,9 @@ RUN apk add --no-cache \
     coreutils less grep sed findutils file make \
     screen tmux \
     which \
-    zsh zsh-completions curl-zsh-completion zsh-vcs \
-    zsh-doc zsh-syntax-highlighting zsh-syntax-highlighting-doc zsh-histdb zsh-histdb \
-    # build-deps
-    shadow \
     ${EXTRA_PKGS} \
   && apk add  --no-cache --repository=https://dl-cdn.alpinelinux.org/alpine/edge/testing tree-sitter-markdown \
-  && ln -sf nvim /usr/bin/vim \
-  && ln -s /bin/bash /usr/bin/bash \
-  && ln -s /bin/zsh /usr/bin/zsh \
-
-  && chsh user -s "${SHELL}" \
+  && ln -sf nvim /usr/bin/vim
 
 ARG HUB_BUILD_IMAGE=localhost/l7/hub:latest
 COPY --from=${HUB_BUILD_IMAGE} --chown=2:2 \
