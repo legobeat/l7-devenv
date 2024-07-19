@@ -88,6 +88,7 @@ image_acng:
 		-f './imags/apt-cacher-ng/Containerfile' \
 		./imags/apt-cacher-ng
 
+# aka dev-shell
 image_nvim : IMAGE_NAME = ${NVIM_IMAGE_NAME}
 image_nvim : IMAGE_TAG = ${NVIM_IMAGE_TAG}
 image_nvim : submodules image_podman_remote
@@ -96,6 +97,8 @@ image_nvim : submodules image_podman_remote
 		--build-arg "EXTRA_PKGS=${EXTRA_PKGS}" \
 		--build-arg "SHELL=${USER_SHELL}" \
 		-t "${IMAGE_NAME}:${IMAGE_TAG}" \
+		-t "${IMAGE_REPO}/dev-shell:${IMAGE_TAG}" \
+		-t "${IMAGE_REPO}/dev-shell:latest" \
 		-f './imags/nvim/Containerfile' \
 		.
 

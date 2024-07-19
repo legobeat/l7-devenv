@@ -52,7 +52,7 @@ runtime_config () {
   composecmd="${COMPOSE_CMD:-$(detect_compose_command)}"
   NAME="${NAME:-l7-nvim}"
   IMAGE_TAG=${IMAGE_TAG:-latest}
-  IMAGE_NAME=${IMAGE_NAME:-localhost/l7/nvim}
+  IMAGE_NAME=${IMAGE_NAME:-localhost/l7/dev-shell}
   IMAGE=${IMAGE:-$IMAGE_NAME:$IMAGE_TAG}
 
   GO_RUNNER_IMAGE="${GO_RUNNER_IMAGE:-localhost/l7/go:1.20-bookworm}"
