@@ -133,6 +133,8 @@ configs:
 volumes:
   caddy_conf:
     name: l7_caddy_fwd_config
+  verdaccio_storage:
+    name: l7_dev_verdaccio_storage
 
 networks:
   svcs:

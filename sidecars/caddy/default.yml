@@ -169,12 +169,20 @@ apps:
                    - verdaccio.internal
             handle:
               - handler: tls
+                connection_policies:
+                  - alpn:
+                    - http/1.0
+                    - http/1.1
               - handler: proxy
                 upstreams:
                   - dial:
                     - "#{ $NPMPKG_REGISTRY_HOST }:#{ $NPMPKG_REGISTRY_PORT }"
           - match:
              - tls:
+                 alpn:
+                   - http/1.0
+                   - http/1.1
+                   - http/2
                  sni:
                    - registry.npmjs.com
                    - registry.npmjs.org

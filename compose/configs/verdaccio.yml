@@ -42,6 +42,7 @@ auth:
 # uplinks are available but not enabled - by default acng handles forward-proxying
 uplinks:
   acng:
+    # TODO: template
     url: 'http://10.7.7.136:13142'
     maxage: 1s
   npmjscom:
@@ -62,17 +63,18 @@ packages:
     access: $all
     publish: $authenticated
     unpublish: $authenticated
-    proxy: npmjs
+    proxy: npmjscom npmjsorg acng yarnpkg
 
   '**':
     access: $all
     publish: $authenticated
     unpublish: $authenticated
-    #proxy: npmjscom npmjsorg acng yarnpkg
+    proxy: npmjscom npmjsorg acng yarnpkg
 
 server:
   keepAliveTimeout: 60
   trustProxy: '10.7.7.132'
+    # TODO: template
 
 publish:
   allow_offline: true
