@@ -163,6 +163,9 @@ apps:
         routes:
           - match:
              - tls:
+               #alpn:
+               #    - http/1.0
+               #    - http/1.1
                  sni:
                    - npmpkg.internal
                    - verdaccio
@@ -179,10 +182,9 @@ apps:
                     - "#{ $NPMPKG_REGISTRY_HOST }:#{ $NPMPKG_REGISTRY_PORT }"
           - match:
              - tls:
-                 alpn:
-                   - http/1.0
-                   - http/1.1
-                   - http/2
+               #alpn:
+               #    - http/1.0
+               #    - http/1.1
                  sni:
                    - registry.npmjs.com
                    - registry.npmjs.org
@@ -219,10 +221,10 @@ apps:
           #TODO: caching for static content
           - match:
              - tls:
-                alpn:
-                  - http/1.0
-                  - http/1.1
-                  - http/2
+               #alpn:
+               #   - http/1.0
+               #   - http/1.1
+               #   - http/2
                 sni:
                   - 'codeload.github.com'
                   - 'raw.githubusercontent.com'
@@ -269,13 +271,17 @@ apps:
                     - "#{ $GITHUB_PROXY_HOST }:#{ $GITHUB_PROXY_PORT }"
                     #tls:
                     #  renegotiation: once
-          - handle:
+          - match:
+            #- tls:
+            #    alpn:
+            #      - http/1.0
+            #      - http/1.1
+            handle:
               - handler: tls
                 connection_policies:
                   - alpn:
                     - http/1.0
                     - http/1.1
-                    - http/2
               - handler: proxy
                 upstreams:
                   - dial:
