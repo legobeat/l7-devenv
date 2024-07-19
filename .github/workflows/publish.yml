@@ -94,7 +94,7 @@ jobs:
       matrix:
         include:
           - name: slim
-            file: Containerfile.slim
+            file: imags/alpine/Containerfile
             context: .
             tags:  |
               localhost/l7/alpine:3.20
@@ -212,7 +212,7 @@ jobs:
             build-args: |
               CADDY_IMAGE=ghcr.io/legobeat/l7-devenv/caddy:${{ github.ref_name }}
           - name: nvim
-            file: Containerfile.nvim
+            file: imags/nvim/Containerfile
             context: .
             tags: |
               ghcr.io/legobeat/l7-devenv/nvim:latest

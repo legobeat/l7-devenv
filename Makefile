@@ -96,7 +96,7 @@ image_nvim : submodules image_alpine # image_caddy
 		--build-arg "EXTRA_PKGS=${EXTRA_PKGS}" \
 		--build-arg "SHELL=${USER_SHELL}" \
 		-t "${IMAGE_NAME}:${IMAGE_TAG}" \
-		-f './Containerfile.nvim' \
+		-f './imags/nvim/Containerfile' \
 		.
 
 image_nvim_test : IMAGE_NAME = ${NVIM_IMAGE_NAME}
@@ -115,7 +115,7 @@ image_alpine : submodules image_caddy
 		--build-arg "EXTRA_PKGS=" \
 		--build-arg "SHELL=/bin/bash" \
 		-t "${IMAGE_REPO}/alpine:3.20" \
-		-f './Containerfile.slim' \
+		-f './imags/alpine/Containerfile' \
 		.
 
 image_bin_ht :

@@ -37,7 +37,7 @@ jobs:
               localhost/l7/node:latest
               localhost/l7/node:20-bookworm
           - name: nvim
-            file: Containerfile.nvim
+            file: imags/nvim/Containerfile
             context: .
             tags: localhost/l7/nvim:latest
     steps:
@@ -83,7 +83,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: Containerfile.slim
+          file: imags/alpine/Containerfile
           tags: localhost/l7/alpine:3.20
           build-args: |
             ALPINE_VERSION=3.20

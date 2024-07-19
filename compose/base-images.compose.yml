@@ -1,0 +1,22 @@
+---
+# These services are not actually started
+# Just for the sake of being able to do self-contained compose builds
+services:
+  base-alpine:
+    profiles:
+      - build
+    build:
+      context: .
+      dockerfile: imags/alpine/Containerfile
+      args:
+        EXTRA_PKGS: ''
+    image: 'localhost/l7/alpine:latest'
+  podman-remote:
+    profiles:
+      - build
+    build:
+      context: .
+      dockerfile: imags/podman-remote/Containerfile
+      args:
+        EXTRA_PKGS: ''
+    image: 'localhost/l7/podman-remote:latest'
