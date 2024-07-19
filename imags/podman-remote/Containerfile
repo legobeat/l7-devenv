@@ -1,0 +1,44 @@
+# syntax=docker/dockerfile:1.4-labs
+# base image for images with capabilities to spawn new containers
+ARG BASE_IMAGE=localhost/l7/alpine:3.20
+FROM ${BASE_IMAGE} as base
+ARG EXTRA_PKGS=''
+
+ARG HOME=/home/user
+ENV HOME=${HOME}
+ARG UID=1000
+ARG GID=1000
+
+USER root
+RUN apk add --no-cache \
+    podman-remote podman-zsh-completion fuse-overlayfs containers-common openssh-client \
+    gettext-envsubst mkpasswd \
+    coreutils less grep sed findutils file \
+    which \
+    zsh zsh-completions curl-zsh-completion zsh-vcs \
+    zsh-doc zsh-syntax-highlighting zsh-syntax-highlighting-doc zsh-histdb zsh-histdb \
+    # build-deps
+    ${EXTRA_PKGS} \
+  && ln -sf podman-remote /usr/bin/podman \
+  && ln -sf /bin/bash /usr/bin/bash \
+  && ln -sf /bin/zsh /usr/bin/zsh \
+
+  # https://github.com/gabyx/container-nesting/blob/7efbd79707e1be366bee462f6200443ca23bc077/src/podman/container/Containerfile#L46
+  && mkdir -p /etc/containers .config/containers \
+  && sed -e 's|^#mount_program|mount_program|g' \
+         -e '/additionalimage.*/a "/var/lib/shared",' \
+         -e 's|^mountopt[[:space:]]*=.*$|mountopt = "nodev,fsync=0"|g' \
+         /usr/share/containers/storage.conf \
+         > /etc/containers/storage.conf \
+  && sed -e 's|^graphroot|#graphroot|g' \
+         -e 's|^runroot|#runroot|g' \
+         /etc/containers/storage.conf > .config/containers/storage.conf
+
+COPY --chmod=755 --chown=root \
+  contrib/bin/* contrib/*/bin/*       /usr/local/bin/
+
+COPY skel/.config/containers/containers.conf /etc/containers/containers.conf
+
+USER ${UID}:${GID}
+WORKDIR /src
+ENTRYPOINT /bin/zsh

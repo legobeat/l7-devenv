@@ -1,5 +1,7 @@
 ---
 include:
+  - path: compose/base-images.compose.yml
+    project_directory: .
   - path: compose/proxies.compose.yml
     project_directory: .
 
@@ -13,7 +15,7 @@ services:
       - http-proxy
     build:
       context: .
-      dockerfile: Containerfile.nvim
+      dockerfile: imags/nvim/Containerfile
     image: 'localhost/l7/nvim:latest'
     hostname: dev
     restart: always

@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1.4-labs
-ARG BASE_IMAGE=localhost/l7/alpine:3.20
+ARG BASE_IMAGE=localhost/l7/podman-remote:latest
 FROM ${BASE_IMAGE} as base
 
 ###############################
@@ -67,7 +67,6 @@ RUN apk add --no-cache \
     netcat-openbsd netcat-openbsd-doc \
     mandoc busybox-doc coreutils-doc git-doc less-doc grep-doc sed-doc file-doc findutils-doc \
     markdown \
-    podman-remote podman-zsh-completion fuse-overlayfs containers-common openssh-client \
     gettext-envsubst mkpasswd \
     coreutils less grep sed findutils file make \
     screen tmux \
@@ -79,22 +78,10 @@ RUN apk add --no-cache \
     ${EXTRA_PKGS} \
   && apk add  --no-cache --repository=https://dl-cdn.alpinelinux.org/alpine/edge/testing tree-sitter-markdown \
   && ln -sf nvim /usr/bin/vim \
-  && ln -sf podman-remote /usr/bin/podman \
   && ln -s /bin/bash /usr/bin/bash \
   && ln -s /bin/zsh /usr/bin/zsh \
 
-  # https://github.com/gabyx/container-nesting/blob/7efbd79707e1be366bee462f6200443ca23bc077/src/podman/container/Containerfile#L46
-  && mkdir -p /etc/containers .config/containers \
-  && sed -e 's|^#mount_program|mount_program|g' \
-         -e '/additionalimage.*/a "/var/lib/shared",' \
-         -e 's|^mountopt[[:space:]]*=.*$|mountopt = "nodev,fsync=0"|g' \
-         /usr/share/containers/storage.conf \
-         > /etc/containers/storage.conf \
-  && sed -e 's|^graphroot|#graphroot|g' \
-         -e 's|^runroot|#runroot|g' \
-         /etc/containers/storage.conf > .config/containers/storage.conf \
   && chsh user -s "${SHELL}" \
-  && apk del shadow
 
 COPY --from=golang-builder --chown=2:2 \
   /go/app/out/hub /usr/local/bin/
