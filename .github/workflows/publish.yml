@@ -176,6 +176,7 @@ jobs:
               ghcr.io/legobeat/l7-devenv/podman-remote:alpine-${{ github.ref_name }}
             build-args: |
               CADDY_IMAGE=ghcr.io/legobeat/l7-devenv/caddy:${{ github.ref_name }}
+              BASE_IMAGE=ghcr.io/legobeat/l7-devenv/alpine:${{ github.ref_name }}
     # exact duplicate of publish steps for other images. yaml anchors not supported in gha
     steps:
       - name: Set up QEMU
@@ -291,7 +292,7 @@ jobs:
               ghcr.io/legobeat/l7-devenv/nvim:latest
               ghcr.io/legobeat/l7-devenv/nvim:${{ github.ref_name }}
             build-args: |
-              BASE_IMAGE=ghcr.io/legobeat/l7-devenv/alpine:${{ github.ref_name }}
+              BASE_IMAGE=ghcr.io/legobeat/l7-devenv/podman-remote:${{ github.ref_name }}
               CADDY_IMAGE=ghcr.io/legobeat/l7-devenv/caddy:${{ github.ref_name }}
     steps:
       - name: Set up QEMU
