@@ -80,7 +80,8 @@ jobs:
         if: ${{ matrix.name == 'nvim' || matrix.name == 'node' }}
         run: |
           set -x
-          podman compose --parallel=1 build --with-dependencies http-proxy build-base-alpine podman-remote build-nvim-on-podman-remote dev-shell
+          podman compose --parallel=1 build --with-dependencies http-proxy
+          podman compose --parallel=1 build build-base-alpine podman-remote build-nvim-on-podman-remote dev-shell
 
           podman images --format '{{.Repository}}:{{.Tag}}' | grep l7 | xargs -n1 podman push
       - name: Build and load ${{ matrix.name }} image
