@@ -20,3 +20,12 @@ services:
       args:
         EXTRA_PKGS: ''
     image: 'localhost/l7/podman-remote:latest'
+  hub:
+    profiles:
+      - build
+    build:
+      context: imags/hub
+      dockerfile: ./Containerfile
+      args:
+        EXTRA_PKGS: ''
+    image: 'localhost/l7/hub:latest'
