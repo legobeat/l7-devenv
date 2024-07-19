@@ -1,0 +1,22 @@
+ARG GO_VERSION=1.22
+FROM docker.io/golang:${GO_VERSION}-alpine
+WORKDIR /go/app
+RUN apk add --no-cache bash build-base git \
+  && mkdir -p /go/app/out out \
+  && chmod -R 777 /go/app
+USER 1234
+ARG HUB_COMMIT=5c547ed804368763064e51f3990851e267e88edd
+RUN git clone \
+    --single-branch \
+    --depth 100 \
+    --config transfer.fsckobjects=false \
+    --config receive.fsckobjects=false \
+    --config fetch.fsckobjects=false \
+    https://github.com/github/hub.git \
+  && cd hub \
+  && git checkout ${HUB_COMMIT} \
+  && HOME=/go ./script/build -o /go/app/out/hub
+USER root
+RUN mv /go/app/out/hub /usr/local/bin/hub
+
+
