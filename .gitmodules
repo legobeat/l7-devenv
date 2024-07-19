@@ -47,10 +47,10 @@
 	path = contrib/nvim-plugins/bclose.vim
 	url = https://github.com/rbgrouleff/bclose.vim
 [submodule "sidecars/git-auth-proxy"]
-	path = sidecars/git-auth-proxy
+	path = imags/git-auth-proxy
 	url = https://github.com/legobeat/git-auth-proxy.git
 [submodule "docker-socket-proxy"]
-	path = sidecars/container-socket-proxy
+	path = imags/container-socket-proxy
 	url = https://github.com/legobeat/container-socket-proxy
 [submodule "contrib/nvim-plugins/toggleterm.nvim"]
 	path = contrib/nvim-plugins/toggleterm.nvim
@@ -60,6 +60,6 @@
 	url = https://github.com/echasnovski/mini.completion
 	branch = stable
 [submodule "sidecars/verdaccio"]
-	path = sidecars/verdaccio
+	path = imags/verdaccio
 	url = https://github.com/legobeat/verdaccio
 	branch = 5.x

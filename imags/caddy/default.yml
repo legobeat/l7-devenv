@@ -113,6 +113,7 @@ apps:
                   protocol: http
                   versions: ['1.1']
             terminal: true
+          # todo: passthrough www.github.com to github.com as escape-hatch and rewrite host-header
           - match:
               - host:
                   - 'github.com'

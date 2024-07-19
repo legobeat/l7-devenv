@@ -62,9 +62,9 @@ runtime_config () {
 
   export CONTAINER_DNS="${CONTAINER_DNS:-10.7.8.133}"
 
-  # compose, used for sidecars and leaked into de
+  # compose, used for imags and leaked into de
   export CONTAINER_SOCKET="${CONTAINER_SOCKET:-${XDG_RUNTIME_DIR}/podman/podman.sock}"
-  # CONTAINER_SOCKET is leaked into the container and used by de container to run sidecars
+  # CONTAINER_SOCKET is leaked into the container and used by de container to run imags
   if [[ -z "${CONTAINER_SOCKET}" || ! -f "${CONTAINER_SOCKET}" ]]; then
     CONTAINER_SOCKET="${CONTAINER_SOCKET:-/var/run/docker.sock}"
   fi

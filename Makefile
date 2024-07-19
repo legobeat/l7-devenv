@@ -34,8 +34,8 @@ image_auth_proxy:
 	${CMD} buildx build \
 		${BUILD_OPTIONS} \
 		-t "${IMAGE_NAME}:${IMAGE_TAG}" \
-		-f './sidecars/git-auth-proxy/Dockerfile' \
-		./sidecars/git-auth-proxy
+		-f './imags/git-auth-proxy/Dockerfile' \
+		./imags/git-auth-proxy
 
 image_container_proxy : IMAGE_NAME = ${CONTAINER_PROXY_IMAGE_NAME}
 image_container_proxy : IMAGE_TAG = ${CONTAINER_PROXY_IMAGE_TAG}
@@ -43,8 +43,8 @@ image_container_proxy:
 	${CMD} buildx build \
 		${BUILD_OPTIONS} \
 		-t "${IMAGE_NAME}:${IMAGE_TAG}" \
-		-f './sidecars/container-socket-proxy/Dockerfile' \
-		./sidecars/container-socket-proxy
+		-f './imags/container-socket-proxy/Dockerfile' \
+		./imags/container-socket-proxy
 
 image_caddy : IMAGE_NAME = ${CADDY_IMAGE_NAME}
 image_caddy : IMAGE_TAG = ${CADDY_IMAGE_TAG}
@@ -52,8 +52,8 @@ image_caddy:
 	${CMD} buildx build \
 		${BUILD_OPTIONS} \
 		-t "${IMAGE_NAME}:${IMAGE_TAG}" \
-		-f './sidecars/caddy/Containerfile' \
-		./sidecars/caddy
+		-f './imags/caddy/Containerfile' \
+		./imags/caddy
 
 image_dnsmasq: IMAGE_NAME = ${DNSMASQ_IMAGE_NAME}
 image_dnsmasq: IMAGE_TAG = ${DNSMASQ_IMAGE_TAG}
@@ -61,8 +61,8 @@ image_dnsmasq:
 	${CMD} buildx build \
 		${BUILD_OPTIONS} \
 		-t "${IMAGE_NAME}:${IMAGE_TAG}" \
-		-f './sidecars/dnsmasq/Containerfile' \
-		./sidecars/dnsmasq
+		-f './imags/dnsmasq/Containerfile' \
+		./imags/dnsmasq
 
 image_gpg_pk : IMAGE_NAME = ${GPG_IMAGE_NAME}
 image_gpg_pk : IMAGE_TAG = ${GPG_IMAGE_TAG}
@@ -71,13 +71,13 @@ image_gpg_pk:
 		${BUILD_OPTIONS} \
 		-t "${IMAGE_NAME}:${IMAGE_TAG}" \
 		-t "${IMAGE_NAME}:latest" \
-		-f './sidecars/gpg-vault-pk/Containerfile' \
+		-f './imags/gpg-vault-pk/Containerfile' \
 		.
 	${CMD} buildx build \
 		${BUILD_OPTIONS} \
 		-t "${IMAGE_NAME}:${IMAGE_TAG}" \
 		-t "${IMAGE_NAME}:${IMAGE_TAG}-debian" \
-		-f './sidecars/gpg-vault-pk/Containerfile.debian' \
+		-f './imags/gpg-vault-pk/Containerfile.debian' \
 		.
 image_acng: IMAGE_NAME = ${ACNG_IMAGE_NAME}
 image_acng: IMAGE_TAG = ${ACNG_IMAGE_TAG}
@@ -85,8 +85,8 @@ image_acng:
 	${CMD} buildx build \
 		${BUILD_OPTIONS} \
 		-t "${IMAGE_NAME}:${IMAGE_TAG}" \
-		-f './sidecars/apt-cacher-ng/Containerfile' \
-		./sidecars/apt-cacher-ng
+		-f './imags/apt-cacher-ng/Containerfile' \
+		./imags/apt-cacher-ng
 
 image_nvim : IMAGE_NAME = ${NVIM_IMAGE_NAME}
 image_nvim : IMAGE_TAG = ${NVIM_IMAGE_TAG}
@@ -132,7 +132,7 @@ image_runner_go_1.20: submodules
 		--build-arg "SHELL=${USER_SHELL}" \
 		--build-arg "GO_VERSION=1.20" \
 		-t "${IMAGE_NAME}:1.20-${IMAGE_TAG}" \
-		-f './sidecars/go-runner/Containerfile' \
+		-f './imags/go-runner/Containerfile' \
 
 image_runner_go_1.20 : IMAGE_NAME = ${GO_RUNNER_IMAGE_NAME}
 image_runner_go_1.20 : IMAGE_TAG = ${GO_RUNNER_IMAGE_TAG}
@@ -153,7 +153,7 @@ image_runner_node_18: submodules #image_caddy
 		--build-arg "NODE_VERSION=18" \
 		--build-arg "NODE_OPTIONS='--trace-warnings'" \
 		-t "${IMAGE_NAME}:18-${IMAGE_TAG}" \
-		-f './sidecars/node-runner/Containerfile' \
+		-f './imags/node-runner/Containerfile' \
 		.
 image_runner_node_20 : IMAGE_NAME = ${RUNNER_IMAGE_NAME}
 image_runner_node_20 : IMAGE_TAG = ${RUNNER_IMAGE_TAG}
@@ -164,7 +164,7 @@ image_runner_node_20: submodules #image_caddy
 		--build-arg "NODE_VERSION=20" \
 		-t "${IMAGE_NAME}:20-${IMAGE_TAG}" \
 		-t "${IMAGE_NAME}:latest" \
-		-f './sidecars/node-runner/Containerfile' \
+		-f './imags/node-runner/Containerfile' \
 		.
 image_runner_node_22 : IMAGE_NAME = ${RUNNER_IMAGE_NAME}
 image_runner_node_22 : IMAGE_TAG = ${RUNNER_IMAGE_TAG}
@@ -174,7 +174,7 @@ image_runner_node_22: submodules #image_caddy
 		--build-arg "SHELL=${USER_SHELL}" \
 		--build-arg "NODE_VERSION=22" \
 		-t "${IMAGE_NAME}:22-${IMAGE_TAG}" \
-		-f './sidecars/node-runner/Containerfile' \
+		-f './imags/node-runner/Containerfile' \
 		.
 
 # with CocoaPods for iOS React Native dev
@@ -186,7 +186,7 @@ image_runner_node_ios: submodules image_runner_node
 		--build-arg "SHELL=${USER_SHELL}" \
 		--build-arg "NODE_VERSION=20" \
 		-t "${IMAGE_NAME}:ios-${IMAGE_TAG}" \
-		-f './sidecars/node-runner/Containerfile.ios' \
+		-f './imags/node-runner/Containerfile.ios' \
 		.
 
 image_runner_node_all: IMAGE_NAME = ${RUNNER_IMAGE_NAME}
@@ -212,7 +212,7 @@ image_lsp_node: image_runner_node_20
 		--build-arg "SHELL=${USER_SHELL}" \
 		--build-arg "NODE_VERSION=20" \
 		-t "${IMAGE_NAME}:lsp-${IMAGE_TAG}" \
-		-f './sidecars/node-runner/Containerfile.lsp' \
+		-f './imags/node-runner/Containerfile.lsp' \
 		.
 #### Tests
 

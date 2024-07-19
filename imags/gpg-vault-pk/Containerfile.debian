@@ -8,8 +8,8 @@ RUN apt-get update \
   && rm -rf /var/{cache,lib}/apt \
   && ln -sf pinentry-tty /usr/bin/pinentry
 
-COPY sidecars/gpg-vault-pk/gpg*.conf /root/.gnupg/
-COPY sidecars/gpg-vault-pk/*.sh /usr/local/bin/
+COPY imags/gpg-vault-pk/gpg*.conf /root/.gnupg/
+COPY imags/gpg-vault-pk/*.sh /usr/local/bin/
 #    scdaemon
 
 # https://imil.net/blog/posts/2020/testing-gpg-keys-with-docker/
