@@ -164,8 +164,8 @@ jobs:
     strategy:
       matrix:
         include:
-          - name: slim
-            file: imags/alpine/Containerfile
+          - name: podman-remote
+            file: imags/podman-remote/Containerfile
             context: .
             tags:  |
               localhost/l7/podman-remote:latest
@@ -174,6 +174,8 @@ jobs:
               ghcr.io/legobeat/l7-devenv/podman-remote:alpine
               ghcr.io/legobeat/l7-devenv/podman-remote:${{ github.ref_name }}
               ghcr.io/legobeat/l7-devenv/podman-remote:alpine-${{ github.ref_name }}
+            build-args: |
+              CADDY_IMAGE=ghcr.io/legobeat/l7-devenv/caddy:${{ github.ref_name }}
     # exact duplicate of publish steps for other images. yaml anchors not supported in gha
     steps:
       - name: Set up QEMU
