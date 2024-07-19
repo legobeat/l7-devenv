@@ -5,7 +5,7 @@ FROM ${CADDY_IMAGE} AS fwdproxy
 FROM docker.io/golang:${GO_VERSION}-bookworm
 RUN apt-get update \
   && apt-get install -y --no-install-recommends \
-    git curl ca-certificates gnupg ssh-client less psmisc jq time zsh \
+    git curl ca-certificates gnupg ssh-client less psmisc jq time \
     fakeroot \
     build-essential ccache cmake cmake-format distcc zlib1g-dev libzlcore-dev libffi-dev libssl-dev libyaml-dev \
   && rm -rf /var/{cache,lib}/apt
@@ -17,7 +17,7 @@ ENV GOPROXY="https://goproxy.io,https://proxy.golang.org,direct"
 
 ARG UID=1000
 ARG GID=1000
-ARG SHELL=/bin/zsh
+ARG SHELL=/bin/bash
 
 COPY --from=fwdproxy \
   --chmod=444 \
