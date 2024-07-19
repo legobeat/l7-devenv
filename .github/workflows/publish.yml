@@ -25,8 +25,8 @@ jobs:
       matrix:
         include:
           - name: caddy
-            file: 'sidecars/caddy/Containerfile'
-            context: "sidecars/caddy"
+            file: 'imags/caddy/Containerfile'
+            context: "imags/caddy"
             tags:  |
               localhost/l7/caddy:latest
               ghcr.io/legobeat/l7-devenv/caddy:latest
@@ -237,35 +237,35 @@ jobs:
       matrix:
         include:
           - name: apt-cacher-ng
-            file: sidecars/apt-cacher-ng/Containerfile
-            context: sidecars/apt-cacher-ng
+            file: imags/apt-cacher-ng/Containerfile
+            context: imags/apt-cacher-ng
             tags: |
               ghcr.io/legobeat/l7-devenv/apt-cacher-ng:latest
               ghcr.io/legobeat/l7-devenv/apt-cacher-ng:bookworm
               ghcr.io/legobeat/l7-devenv/apt-cacher-ng:${{ github.ref_name }}
               ghcr.io/legobeat/l7-devenv/apt-cacher-ng:bookworm-${{ github.ref_name }}
           - name: auth-proxy
-            file: sidecars/git-auth-proxy/Dockerfile
-            context: sidecars/git-auth-proxy
+            file: imags/git-auth-proxy/Dockerfile
+            context: imags/git-auth-proxy
             tags: |
               ghcr.io/legobeat/l7-devenv/auth-proxy:latest
               ghcr.io/legobeat/l7-devenv/auth-proxy:${{ github.ref_name }}
           - name: container-socket-proxy
-            file: sidecars/container-socket-proxy/Dockerfile
-            context: sidecars/container-socket-proxy
+            file: imags/container-socket-proxy/Dockerfile
+            context: imags/container-socket-proxy
             tags: |
               ghcr.io/legobeat/l7-devenv/container-socket-proxy:latest
               ghcr.io/legobeat/l7-devenv/container-socket-proxy:${{ github.ref_name }}
           - name: dnsmasq
-            file: sidecars/dnsmasq/Containerfile
-            context: sidecars/dnsmasq
+            file: imags/dnsmasq/Containerfile
+            context: imags/dnsmasq
             tags: |
               ghcr.io/legobeat/l7-devenv/dnsmasq:latest
               ghcr.io/legobeat/l7-devenv/dnsmasq:alpine
               ghcr.io/legobeat/l7-devenv/dnsmasq:${{ github.ref_name }}
               ghcr.io/legobeat/l7-devenv/dnsmasq:alpine-${{ github.ref_name }}
           - name: gpg-vault
-            file: sidecars/gpg-vault-pk/Containerfile
+            file: imags/gpg-vault-pk/Containerfile
             context: .
             tags: |
               ghcr.io/legobeat/l7-devenv/gpg-vault:latest
@@ -273,7 +273,7 @@ jobs:
               ghcr.io/legobeat/l7-devenv/gpg-vault:${{ github.ref_name }}
               ghcr.io/legobeat/l7-devenv/gpg-vault:alpine-${{ github.ref_name }}
           - name: node
-            file: sidecars/node-runner/Containerfile
+            file: imags/node-runner/Containerfile
             context: .
             tags: |
               localhost/l7/node:20-bookworm
@@ -348,7 +348,7 @@ jobs:
       matrix:
         include:
           - name: lsp-typescript
-            file: sidecars/node-runner/Containerfile.lsp
+            file: imags/node-runner/Containerfile.lsp
             context: .
             tags: |
               ghcr.io/legobeat/l7-devenv/lsp/typescript:latest
