@@ -10,7 +10,7 @@ env:
 jobs:
   # build caddy first because it generates tls root cert. rest run in parallel
   publish-image-pre:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     services:
       registry:
         image: registry:2
@@ -79,7 +79,7 @@ jobs:
 
   publish-image-base:
     needs: publish-image-pre
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     services:
       registry:
         image: registry:2
@@ -150,7 +150,7 @@ jobs:
 
   publish-image:
     needs: publish-image-base
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     services:
       registry:
         image: registry:2
@@ -261,7 +261,7 @@ jobs:
   # node-runner is used as base for lsp
   publish-image-post:
     needs: publish-image
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     services:
       registry:
         image: registry:2
