@@ -41,6 +41,8 @@ FROM base
 ##
 # nice-to-haves
 # EXTRA_PKGS='bat libnotify w3m'
+# gpg hardware tokens ssh
+## ARG EXTRA_PKGS='openssh-sk-helper'
 
 ARG EXTRA_PKGS='bat'
 
@@ -60,10 +62,11 @@ RUN apk add --no-cache \
     diffutils tree fzf ripgrep ripgrep-zsh-completion \
     sshpass \
     git-lfs github-cli github-cli-zsh-completion tig \
-    iproute2 openssl procps-ng psmisc \
+    iproute2-minimal openssl procps-ng psmisc psutils \
+    losetup dosfstools \
+    netcat-openbsd netcat-openbsd-doc \
     mandoc busybox-doc coreutils-doc git-doc less-doc grep-doc sed-doc file-doc findutils-doc \
     markdown \
-
     podman-remote podman-zsh-completion fuse-overlayfs containers-common openssh-client \
     gettext-envsubst mkpasswd \
     coreutils less grep sed findutils file make \
