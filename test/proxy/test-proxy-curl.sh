@@ -26,7 +26,7 @@ urls+=("http://product-details.mozilla.org/1.0/firefox_versions.json")
 urls+=("https://product-details.mozilla.org/1.0/firefox_versions.json")
 
 for url in ${urls[@]}; do
-  result=$(export NAME=l7ide-test-runner; ./devenv.sh \
+  result=$(export NAME=l7ide-test-runner-curl; ./devenv.sh \
     curl \
       -f -sSL --tlsv1.2 "${url}" -o/dev/null \
       -w '%{exitcode}:%{response_code}:%{ssl_verify_result}___%{certs}' \
