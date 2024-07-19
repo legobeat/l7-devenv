@@ -72,6 +72,7 @@ services:
       L7_YARN_CLASSIC_CACHE_VOLUME: 'l7_cache_node_yarn_classic'
       GPG_PK_VOLUME: 'l7_gpgvault_pk'
       L7_COMPOSE_NETWORK_NAME_INTERNAL: 'l7_dev_internal'
+      SSH_AUTH_SOCK: '/home/user/.ssh/SSH_AUTH_SOCK'
     dns: '${CONTAINER_DNS:-10.7.8.133}'
     entrypoint: /bin/sh
     command: -c 'sleep 36000000000'
@@ -107,8 +108,7 @@ networks:
           ip_range: 10.7.8.0/27
     driver: bridge
     driver_opts:
-      inhibit_ipv4: 1
-      disable_dns: 1
+      inhibit_ipv4: '1'
   container-control:
     name: l7_dev_container_control
     attachable: true
@@ -119,5 +119,4 @@ networks:
           ip_range: 10.7.9.4/30
     driver: bridge
     driver_opts:
-      disable_dns:  1
-      inhibit_ipv4: 1
+      inhibit_ipv4: '1'
