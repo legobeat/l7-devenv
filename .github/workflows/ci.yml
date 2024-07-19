@@ -119,7 +119,9 @@ jobs:
         with:
           submodules: true
       - name: Make all images
-        run: make -j6 images_test
+        run: |
+          make image_caddy
+          make -j6 images_test
     env:
       CMD: ${{ matrix.cmd }}
       CONTAINER_CMD: ${{ matrix.cmd }}
@@ -160,6 +162,9 @@ jobs:
       - name: Prep
         run: sudo apt-get install -y whois --no-install-recommends
 
+      - name: Make deps
+        if: ${{ matrix.image == 'nvim' || matrix.image == 'runner_node' }}
+        run: make CMD=${{ matrix.cmd }} image_caddy
       - run: make -j4 CMD=${{ matrix.cmd }} image_${{ matrix.image }}
       - run: make CMD=${{ matrix.cmd }} inspect_${{ matrix.image }}
       - run: make -j4 CMD=${{ matrix.cmd }} test_${{ matrix.image }}
@@ -251,22 +256,27 @@ jobs:
           echo 'export L7_GITHUB_TOKEN=${{ github.token }}' >> .env
       - name: Build images
         run: |
+          make image_caddy
           make -j6 image_nvim image_runner_node
           make -j6 test_runner_node
         if: ${{ matrix.test == 'node_corepack' }}
       - name: Build images
         run: |
+          make image_caddy
           make -j6 image_nvim image_runner_node_all
         if: ${{ matrix.test == 'node_majors' }}
       - name: Build images
         run: |
+          make image_caddy
           make -j6 images_test
           make -j6 test_lsp_node
         if: ${{ matrix.test == 'lsp_typescript' }}
       - run: |
+          make image_caddy
           make -j6 images
         if: ${{ matrix.test == 'ghauth' }}
       - run: |
+          make image_caddy
           make -j6 images
         if: ${{ matrix.test == 'curl' }}
       - name: Run test ${{ matrix.test }}
