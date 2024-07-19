@@ -108,6 +108,14 @@ image_nvim_test : image_nvim image_bin_ht
 		-f test/lsp-js/Containerfile \
 		.
 
+image_podman_remote : submodules image_alpine
+	${CMD} buildx build \
+		${BUILD_OPTIONS} \
+		-t "${IMAGE_REPO}/podman-remote:latest" \
+		-t "${IMAGE_REPO}/podman-remote:alpine" \
+		-f './imags/podman-remote/Containerfile' \
+		./imags/podman-remote
+
 image_alpine : submodules image_caddy
 	${CMD} buildx build \
 		${BUILD_OPTIONS} \
@@ -406,7 +414,7 @@ export_runner_node: # image_runner_node
 submodules:
 	@git submodule update --checkout --init --recursive --rebase
 
-images: image_caddy image_dnsmasq image_nvim image_runner_node image_gpg_pk image_acng image_auth_proxy image_container_proxy image_lsp_node
+images: image_caddy image_podman_remote image_dnsmasq image_nvim image_runner_node image_gpg_pk image_acng image_auth_proxy image_container_proxy image_lsp_node
 
 images_test: images image_nvim_test
 
