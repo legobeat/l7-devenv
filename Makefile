@@ -22,7 +22,7 @@ GO_RUNNER_IMAGE_NAME := ${IMAGE_REPO}/go
 GO_RUNNER_IMAGE_TAG  := bookworm
 USER_SHELL ?= /bin/zsh
 BUILD_OPTIONS :=
-EXTRA_PKGS := zsh podman-remote
+EXTRA_PKGS :=
 CMD := $(shell which podman || which docker)
 
 install:
@@ -90,7 +90,7 @@ image_acng:
 
 image_nvim : IMAGE_NAME = ${NVIM_IMAGE_NAME}
 image_nvim : IMAGE_TAG = ${NVIM_IMAGE_TAG}
-image_nvim : submodules image_alpine # image_caddy
+image_nvim : submodules image_podman_remote
 	${CMD} buildx build \
 		${BUILD_OPTIONS} \
 		--build-arg "EXTRA_PKGS=${EXTRA_PKGS}" \
