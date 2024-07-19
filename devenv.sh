@@ -60,10 +60,10 @@ runtime_config () {
   NODE_VERSION="${NODE_VERSION:-20}"
   GPG_IMAGE="${GPG_IMAGE:-localhost/l7/gpg-vault:pk}"
 
-  CONTAINER_DNS="${CONTAINER_DNS:-10.7.8.133}"
+  export CONTAINER_DNS="${CONTAINER_DNS:-10.7.8.133}"
 
   # compose, used for sidecars and leaked into de
-  CONTAINER_SOCKET="${CONTAINER_SOCKET:-${XDG_RUNTIME_DIR}/podman/podman.sock}"
+  export CONTAINER_SOCKET="${CONTAINER_SOCKET:-${XDG_RUNTIME_DIR}/podman/podman.sock}"
   # CONTAINER_SOCKET is leaked into the container and used by de container to run sidecars
   if [[ -z "${CONTAINER_SOCKET}" || ! -f "${CONTAINER_SOCKET}" ]]; then
     CONTAINER_SOCKET="${CONTAINER_SOCKET:-/var/run/docker.sock}"
@@ -99,6 +99,12 @@ runtime_config () {
   fi
 
   # podman / netavark hijack both dns and/or resolv.conf no matter what, it seems...
+  RESOLV_CONF_PATH="${L7_RESOLV_CONF_PATH:-$(mktemp -t l7-resolvconf.XXX --tmpdir)}"
+  cat <<EOT > "${RESOLV_CONF_PATH}"
+options no-aaaa
+options single-request
+nameserver ${CONTAINER_DNS}
+EOT
   NVIM_STATE_PATH="${L7_NVIM_STATE_PATH:-$(mktemp -d -t l7-nvim-state.XXXX --tmpdir)}"
 
   # detect tty
@@ -290,6 +296,7 @@ else
     -v "${SRC_DIR}:${SRC_DIR}${SRC_DIR_OPTS}" \
     -v "${SRC_DIR}:/src${SRC_DIR_OPTS}" \
     -v "${NVIM_STATE_PATH}:/home/user/.local/state/nvim:z" \
+    -v "${RESOLV_CONF_PATH}:/etc/resolv.conf:ro" \
     -v "${NODE_CACHE_DIR}/yarn/cache/berry:/home/node/.yarn/cache/berry:z,ro" \
     -v "${NODE_CACHE_DIR}/yarn/cache/classic:/home/node/.cache/yarn:z,ro" \
     -v "${NODE_CACHE_DIR}/pnpm/cache:/home/node/.cache/pnpm:z,ro" \
@@ -299,7 +306,9 @@ else
     -e "L7_COMPOSE_NETWORK_NAME_INTERNAL=${NETWORK_NAME}" \
     -e "L7_NVIM_STATE_PATH=${NVIM_STATE_PATH}" \
     -e "L7_NODE_CACHE_DIR=${NODE_CACHE_DIR}" \
+    -e "L7_RESOLV_CONF_PATH=${RESOLV_CONF_PATH}" \
     -e "CONTAINER_HOST=tcp://10.7.9.2:2375" \
+    -e "CONTAINER_DNS=${CONTAINER_DNS}" \
     -e "GO_RUNNER_IMAGE=${GO_RUNNER_IMAGE}" \
     -e "NODE_RUNNER_IMAGE=${NODE_RUNNER_IMAGE}" \
     -e "L7_NODE_VERSION=${NODE_VERSION}" \

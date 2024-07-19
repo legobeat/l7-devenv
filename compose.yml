@@ -41,7 +41,16 @@ services:
         tmpfs:
           size: 2G
           mode: 0777
-      - '${SSH_SOCKET:-${SSH_AUTH_SOCK:-/dev/null}}:${HOME}/.ssh/SSH_AUTH_SOCK'
+      - '${SSH_SOCKET:-${SSH_AUTH_SOCK:-/dev/null}}:/home/user/.ssh/SSH_AUTH_SOCK'
+      # ugly hack around compose insisting on overriding DNS:
+      # https://github.com/docker/compose/issues/2847
+      # obviates need for custom entrypoint at cost of hardcoding DNS IP and an extra mount
+      - './compose/mounts/resolv-internal.conf:/etc/resolv.conf:ro'
+    #configs:
+    #  - source: resolv_conf_internal
+    #    target:   /etc/myresolv.conf
+    #    uid: '0'
+    #    gid: '0'
     env_file:
       - path: env
         required: false

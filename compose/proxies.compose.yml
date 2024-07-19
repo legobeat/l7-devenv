@@ -50,7 +50,8 @@ services:
     cap_add:
       - NET_ADMIN
     # todo: dynamic for subnets
-    command: '--address="/#/10.7.8.132" --log-facility=-'
+    #command: '--address=/#/10.7.8.132 --log-facility=- --no-resolv --no-hosts --local=/#/ --filter-AAAA --log-queries --log-debug'
+    command: '--address=/#/10.7.8.132 --log-facility=- --no-resolv --no-hosts --local=/#/ --filter-AAAA'
     networks:
       internal:
         ipv4_address: 10.7.8.133
@@ -106,6 +107,9 @@ services:
     tmpfs:
       - /data/caddy/certificates
       - /data/caddy/pki
+#    sysctls:
+#      net.core.rmem_max: 7500000
+#      net.core.wmem_max: 500000
 
   verdaccio:
     profiles:
