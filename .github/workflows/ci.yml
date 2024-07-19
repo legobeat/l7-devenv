@@ -80,7 +80,7 @@ jobs:
         if: ${{ matrix.name == 'nvim' || matrix.name == 'node' }}
         run:
           set -x
-          compose build dev-shell
+          podman compose build dev-shell
           podman images --format '{{.Repository}}:{{.Tag}}' | grep l7 | xargs -n1 podman push
       - name: Build and load ${{ matrix.name }} image
         uses: docker/build-push-action@v6
