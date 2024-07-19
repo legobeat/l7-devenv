@@ -1,31 +1,95 @@
 ---
 # These services are not actually started
-# Just for the sake of being able to do self-contained compose builds
+# Just for the sake of being able to do self-contained compose builds,
+# either by copying assets from them, or using them as base images.
+# Some of these may be usable independently
 services:
-  base-alpine:
+  build-base-alpine:
     profiles:
       - build
+      - alpine
     build:
       context: .
       dockerfile: imags/alpine/Containerfile
       args:
+        ALPINE_VERSION: '3.20'
         EXTRA_PKGS: ''
+      tags:
+        - 'localhost/l7/alpine:latest'
+        - 'localhost/l7/alpine:3.20'
     image: 'localhost/l7/alpine:latest'
-  podman-remote:
+
+  build-hub:
     profiles:
       - build
-    build:
-      context: .
-      dockerfile: imags/podman-remote/Containerfile
-      args:
-        EXTRA_PKGS: ''
-    image: 'localhost/l7/podman-remote:latest'
-  hub:
-    profiles:
-      - build
+      - alpine
     build:
       context: imags/hub
       dockerfile: ./Containerfile
       args:
         EXTRA_PKGS: ''
+      tags:
+        - 'localhost/l7/hub:latest'
     image: 'localhost/l7/hub:latest'
+
+## derived
+
+  nvim-slim:
+    profiles:
+      - build
+      - alpine
+    depends_on:
+      - build-base-alpine
+    build:
+      context: .
+      dockerfile: imags/nvim/Containerfile
+      args:
+        EXTRA_PKGS: ''
+    image: 'localhost/l7/nvim:slim'
+
+  podman-remote:
+    profiles:
+      - build
+      - podman
+      - alpine
+    depends_on:
+      - build-base-alpine
+    build:
+      context: imags/podman-remote
+      dockerfile: ./Containerfile
+      args:
+        EXTRA_PKGS: ''
+    image: 'localhost/l7/podman-remote:latest'
+
+## mixins/combos
+  build-nvim-on-podman-remote:
+    profiles:
+      - build
+      - nvim
+      - alpine
+    depends_on:
+      - podman-remote
+      #- build-nvim
+    build:
+      context: .
+      dockerfile: imags/nvim/Containerfile
+      args:
+        EXTRA_PKGS: ''
+        BASE_IMAGE: 'localhost/l7/podman-remote:latest'
+    image: 'localhost/l7/nvim:podman-remote'
+
+  build-dev-shell:
+    profiles:
+      - build
+      - nvim
+      - alpine
+    depends_on:
+      - build-nvim-on-podman-remote
+      - build-hub
+    build:
+      context: .
+      dockerfile: imags/nvim/Containerfile
+      args:
+        EXTRA_PKGS: ''
+        BASE_IMAGE: 'localhost/l7/podman-remote:latest'
+    image: 'localhost/l7/nvim:podman-remote'

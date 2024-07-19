@@ -1,5 +1,6 @@
 # syntax=docker/dockerfile:1.4-labs
-ARG BASE_IMAGE=localhost/l7/podman-remote:latest
+ARG BASE_IMAGE=localhost/l7/alpine:3.20
+#ARG BASE_IMAGE=localhost/l7/podman-remote:latest
 
 FROM ${BASE_IMAGE}
 
@@ -36,33 +37,23 @@ RUN apk add --no-cache \
     # tree-sitter-grammars \  # everything
     # tree-sitter-go tree-sitter-go-mod tree-sitter-java tree-sitter-rust \
     diffutils tree fzf ripgrep \
-    sshpass \
-    git-lfs github-cli tig \
-    iproute2-minimal openssl procps-ng psmisc psutils \
-    losetup dosfstools \
-    netcat-openbsd netcat-openbsd-doc \
-    mandoc busybox-doc coreutils-doc git-doc less-doc grep-doc sed-doc file-doc findutils-doc \
+    github-cli tig \
     markdown \
-    gettext-envsubst mkpasswd \
-    coreutils less grep sed findutils file make \
+    coreutils less grep sed findutils file \
     screen tmux \
     which \
     ${EXTRA_PKGS} \
   && apk add  --no-cache --repository=https://dl-cdn.alpinelinux.org/alpine/edge/testing tree-sitter-markdown \
   && ln -sf nvim /usr/bin/vim
 
-ARG HUB_BUILD_IMAGE=localhost/l7/hub:latest
-COPY --from=${HUB_BUILD_IMAGE} --chown=2:2 \
-  /usr/local/bin/hub /usr/local/bin/
-
 COPY --chown=2:2 \
   contrib/nvim-plugins /etc/xdg/nvim/pack/build-l7ide/start
 
-COPY --chmod=755 --chown=root \
-  contrib/bin/* contrib/*/bin/*       /usr/local/bin/
+RUN cat /etc/xdg/nvim/pack/build-l7ide/start/tokyonight.nvim/extras/fzf/tokyonight_moon.sh >> /home/user/.env
 
-COPY skel/.config/containers/containers.conf /etc/containers/containers.conf
+ARG TMUX_THEME_PATH="/home/user/.config/tmux/tokyonight/tokyonight_night.tmux"
+ENV TMUX_THEME_PATH="${TMUX_THEME_PATH}"
 
 USER ${UID}:${GID}
 WORKDIR /src
-ENTRYPOINT /bin/zsh
+ENTRYPOINT /usr/bin/nvim

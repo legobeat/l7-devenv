@@ -1,0 +1,64 @@
+# syntax=docker/dockerfile:1.4-labs
+#ARG BASE_IMAGE=localhost/l7/alpine:3.20
+ARG BASE_IMAGE=localhost/l7/nvim:podman
+
+FROM ${BASE_IMAGE}
+
+# EXTRA_PKGS get installed in final image. examples of useful extra packages:
+### secrets injection
+## ARG EXTRA_PKGS='age pass gopass'
+### TUI file managers
+## ARG EXTRA_PKGS='ncdu ranger vifm'
+### open links in host browser
+## ARG EXTRA_PKGS='xdg-open'
+### yes, you can integrate with system clipboard
+## ARG EXTRA_PKGS='xsel xclip wl-clipboard'
+## ARG EXTRA_PKGS='terminus-fonts fontawesome-fonts-all gdouros-symbola-fonts'
+### monitoring etc, probably more useful on host
+## ARG EXTRA_PKGS='htop sysstat ncdu net-tools'
+##
+# nice-to-haves
+# EXTRA_PKGS='bat libnotify w3m'
+# gpg hardware tokens ssh
+## ARG EXTRA_PKGS='openssh-sk-helper'
+
+ARG EXTRA_PKGS='bat'
+
+ARG HOME=/home/user
+ENV HOME=${HOME}
+ARG SHELL=/bin/zsh
+ARG UID=1000
+ARG GID=1000
+
+USER root
+RUN apk add --no-cache \
+    fd \
+    curl-zsh-completion bat-zsh-completion git-zsh-completion github-cli-zsh-completion ripgrep-zsh-completion util-linux-bash-completion gojq-zsh-completion tmux-zsh-completion \
+    sshpass \
+    git-lfs git-lfs-zsh-completion git-lfs-doc \
+    iproute2-minimal openssl procps-ng psmisc psutils util-linux-misc \
+    losetup dosfstools \
+    netcat-openbsd netcat-openbsd-doc \
+    mandoc busybox-doc coreutils-doc git-doc less-doc grep-doc sed-doc file-doc findutils-doc fzf-doc util-linux-doc zsh-doc \
+    gettext-envsubst mkpasswd pwgen \
+    zsh zsh-vcs zsh-completions zsh-syntax-highlighting zsh-syntax-highlighting-doc \
+    make \
+    ${EXTRA_PKGS} \
+    # build-deps
+    shadow \
+  && chsh user -s "${SHELL}" \
+  && ln -s /bin/zsh /usr/bin/zsh \
+  && apk del shadow \
+  && chown -R ${UID}:${GID} \
+    /home/user
+
+ARG HUB_BUILD_IMAGE=localhost/l7/hub:latest
+COPY --from=${HUB_BUILD_IMAGE} --chown=2:2 \
+  /usr/local/bin/hub /usr/local/bin/
+
+COPY --chmod=755 --chown=root \
+  contrib/bin/* contrib/*/bin/*       /usr/local/bin/
+
+USER ${UID}:${GID}
+WORKDIR /src
+ENTRYPOINT /bin/zsh
