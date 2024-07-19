@@ -78,7 +78,7 @@ jobs:
 
       - name: Build and load base images
         if: ${{ matrix.name == 'nvim' || matrix.name == 'node' }}
-        run:
+        run: |
           set -x
           podman compose build dev-shell
           podman images --format '{{.Repository}}:{{.Tag}}' | grep l7 | xargs -n1 podman push
