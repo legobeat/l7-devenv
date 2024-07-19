@@ -6,7 +6,7 @@
 version: 2
 updates:
   - package-ecosystem: "npm"
-    directory: "/sidecars/node-runner"
+    directory: "/imags/node-runner"
     schedule:
       interval: "daily"
   - package-ecosystem: "github-actions"

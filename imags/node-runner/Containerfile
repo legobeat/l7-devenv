@@ -26,8 +26,8 @@ RUN  bash -c "[ ${GID} != \"1000\" ] && groupadd -g ${GID} -U node userz || true
   && bash -c "[ ${UID} != \"1000\" ] && useradd -u ${UID} -g ${GID} -s ${SHELL} -d /home/node user && chown -R ${UID}:${GID} /home/node || true"
 
 WORKDIR /tmp/
-COPY sidecars/node-runner/package.json \
-     sidecars/node-runner/package-lock.json \
+COPY imags/node-runner/package.json \
+     imags/node-runner/package-lock.json \
      .
 
 COPY --from=fwdproxy \
@@ -61,7 +61,7 @@ ENV NPM_CONFIG_PREFIX=/home/node/.npm-global
 
 WORKDIR /tmp
 
-COPY sidecars/node-runner/install-package-managers.sh .
+COPY imags/node-runner/install-package-managers.sh .
 # TODO: integrity checksums / sigchecks for bundled PMs
 ARG COREPACK_PMS='npm@10.8.2 npm@6.14.18 npm@7.24.2 npm@9.9.3 pnpm@8.15.8 pnpm@9.4 pnpm@9.5.0 yarn@1.22.22 yarn@3.2.1 yarn@3.2.2 yarn@3.5.1 yarn@3.6.0 yarn@3.6.2 yarn@4.1.1 yarn@4.2.2 yarn@4.3.1'
 RUN ./install-package-managers.sh \
