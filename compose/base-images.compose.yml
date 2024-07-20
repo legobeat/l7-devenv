@@ -4,10 +4,17 @@
 # either by copying assets from them, or using them as base images.
 # Some of these may be usable independently
 services:
+  build-caddy:
+    build:
+      context: imags/caddy
+      dockerfile: Containerfile
+    image: 'localhost/l7/caddy:latest'
   build-base-alpine:
     profiles:
       - build
       - alpine
+    depends_on:
+      - build-caddy
     build:
       context: .
       dockerfile: imags/alpine/Containerfile

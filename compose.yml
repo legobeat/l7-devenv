@@ -15,9 +15,10 @@ services:
       - container-socket-proxy
       - dns
       - http-proxy
-      - build-dev-shell
     image: 'localhost/l7/dev-shell:nvim'
     build:
+      x-build-images:
+        - 'localhost/l7/nvim:podman-remote'
       context: .
       dockerfile: imags/dev-shell/Containerfile
       args:

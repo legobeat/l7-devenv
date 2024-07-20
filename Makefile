@@ -227,7 +227,7 @@ image_lsp_node: image_runner_node_20
 		.
 #### Tests
 
-test_compose_run:
+test_compose_run: images_deps
 	podman compose run --build --rm \
 		--entrypoint /bin/sh -e DEBUG=1 dev-shell -c 'id' | grep -F --quiet 'uid=1000(user) gid=1000(userz) groups=1000(userz)' && echo pass
 
@@ -417,7 +417,11 @@ export_runner_node: # image_runner_node
 submodules:
 	@git submodule update --checkout --init --recursive --rebase
 
-images: image_caddy image_podman_remote image_dnsmasq image_nvim image_runner_node image_gpg_pk image_acng image_auth_proxy image_container_proxy image_lsp_node
+images_deps: submodules
+	BUILDCOMPOSEFILE=./compose/base-images.compose.yml ./contrib/l7-scripts/bin/compose-build-dependencies dev-shell
+
+images: images_deps image_runner_node image_dnsmasq image_gpg_pk image_nvim image_acng image_auth_proxy image_container_proxy image_lsp_node
+
 
 images_test: images image_nvim_test
 
