@@ -35,12 +35,19 @@ RUN apk add --no-cache \
     fd \
     curl-zsh-completion bat-zsh-completion git-zsh-completion github-cli-zsh-completion ripgrep-zsh-completion util-linux-bash-completion gojq-zsh-completion tmux-zsh-completion \
     sshpass \
+    git-machete git-machete-zsh-completion \
     git-lfs git-lfs-zsh-completion git-lfs-doc \
+    lab lab-zsh-completion \
     iproute2-minimal openssl procps-ng psmisc psutils util-linux-misc \
     losetup dosfstools \
     netcat-openbsd netcat-openbsd-doc \
     mandoc busybox-doc coreutils-doc git-doc less-doc grep-doc sed-doc file-doc findutils-doc fzf-doc util-linux-doc zsh-doc \
     gettext-envsubst mkpasswd pwgen \
+    # zsh-history-search-multiword \
+    # zsh-history-substring-search \
+    zsh-autosuggestions \
+    #zsh-fzf-tab \
+    zsh-pcre \
     zsh zsh-vcs zsh-completions zsh-syntax-highlighting zsh-syntax-highlighting-doc \
     make \
     ${EXTRA_PKGS} \

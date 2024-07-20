@@ -5,13 +5,15 @@ SAVEHIST=100000
 REPORTTIME=15
 WORDCHARS='*?.[]~=&;!#$%^(){}<>'
 
-plugins=(git man)
+plugins=(
+  git
+  man
+)
 
 set -o emacs
 
 fpath+=($HOME/.zsh/pure)
 autoload -Uz compinit promptinit
-compinit
 promptinit
 prompt pure
 # prevent git auto fetch from prompt
@@ -38,6 +40,13 @@ alias ll='ls -laF'
 if [ -f ~/.env ]; then
   . ~/.env
 fi
+
+source /usr/share/zsh/plugins/zsh-completions/zsh-completions.plugin.zsh
+source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
+source /usr/share/zsh/plugins/fzf/fzf.plugin.zsh
+
+compinit
 
 # Source user mutable config
 if [ -f ~/.config/zshrc ]; then
