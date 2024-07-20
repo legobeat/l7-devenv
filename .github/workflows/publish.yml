@@ -33,6 +33,12 @@ jobs:
               ghcr.io/legobeat/l7-devenv/caddy:alpine
               ghcr.io/legobeat/l7-devenv/caddy:alpine-${{ github.ref_name }}
               ghcr.io/legobeat/l7-devenv/caddy:${{ github.ref_name }}
+          - name: hub
+            file: imags/hub/Containerfile
+            context: imags/hub
+            tags:  |
+              localhost/l7/hub:latest
+              ghcr.io/legobeat/l7-devenv/hub:latest
     # exact duplicate of publish steps for other images. yaml anchors not supported in gha
     steps:
       - name: Set up QEMU
@@ -222,7 +228,7 @@ jobs:
           cache-to: type=gha,mode=max
 
 
-  publish-image:
+  publish-images:
     needs: publish-image-podman-remote
     runs-on: ubuntu-24.04
     services:
@@ -334,7 +340,7 @@ jobs:
 
   # node-runner is used as base for lsp
   publish-image-post:
-    needs: publish-image
+    needs: publish-images
     runs-on: ubuntu-24.04
     services:
       registry:
@@ -350,6 +356,17 @@ jobs:
       fail-fast: true
       matrix:
         include:
+          - name: dev-shell
+            file: imags/dev-shell/Containerfile
+            context: .
+            tags: |
+              ghcr.io/legobeat/l7-devenv/dev-shell:latest
+              ghcr.io/legobeat/l7-devenv/dev-shell:alpine
+              ghcr.io/legobeat/l7-devenv/dev-shell:nvim
+              ghcr.io/legobeat/l7-devenv/dev-shell:${{ github.ref_name }}
+            build-args: |
+              BASE_IMAGE=ghcr.io/legobeat/l7-devenv/nvim:${{ github.ref_name }}
+              CADDY_IMAGE=ghcr.io/legobeat/l7-devenv/caddy:${{ github.ref_name }}
           - name: lsp-typescript
             file: imags/node-runner/Containerfile.lsp
             context: .

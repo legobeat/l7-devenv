@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.4-labs
 #ARG BASE_IMAGE=localhost/l7/alpine:3.20
-ARG BASE_IMAGE=localhost/l7/nvim:podman
+ARG BASE_IMAGE=localhost/l7/nvim:podman-remote
 
 FROM ${BASE_IMAGE}
 
@@ -59,8 +59,10 @@ RUN apk add --no-cache \
   && chown -R ${UID}:${GID} \
     /home/user
 
-ARG HUB_BUILD_IMAGE=localhost/l7/hub:latest
-COPY --from=${HUB_BUILD_IMAGE} --chown=2:2 \
+# docker-buildx may struggle w/ this
+#ARG HUB_BUILD_IMAGE=localhost/l7/hub:latest
+#COPY --from=${HUB_BUILD_IMAGE} --chown=2:2 \
+COPY --from=localhost/l7/hub:latest --chown=2:2 \
   /usr/local/bin/hub /usr/local/bin/
 
 COPY --chmod=755 --chown=root \
