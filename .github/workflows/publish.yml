@@ -33,12 +33,6 @@ jobs:
               ghcr.io/legobeat/l7-devenv/caddy:alpine
               ghcr.io/legobeat/l7-devenv/caddy:alpine-${{ github.ref_name }}
               ghcr.io/legobeat/l7-devenv/caddy:${{ github.ref_name }}
-          - name: hub
-            file: imags/hub/Containerfile
-            context: imags/hub
-            tags:  |
-              localhost/l7/hub:latest
-              ghcr.io/legobeat/l7-devenv/hub:latest
     # exact duplicate of publish steps for other images. yaml anchors not supported in gha
     steps:
       - name: Set up QEMU
@@ -403,6 +397,18 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: true
+      - name: Build and publish hub image
+        uses: docker/build-push-action@v6
+        with:
+          context: imags/hub
+          file: imags/hub/Containerfile
+          tags:  |
+            localhost/l7/hub:latest
+            ghcr.io/legobeat/l7-devenv/hub:latest
+          load: true
+          push: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
       - name: Build and publish ${{ matrix.name }} image
         uses: docker/build-push-action@v6
         with:
