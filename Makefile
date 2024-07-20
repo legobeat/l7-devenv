@@ -88,17 +88,25 @@ image_acng:
 		-f './imags/apt-cacher-ng/Containerfile' \
 		./imags/apt-cacher-ng
 
-# aka dev-shell
+image_dev_shell : image_nvim
+	${CMD} buildx build \
+		${BUILD_OPTIONS} \
+		--build-arg "EXTRA_PKGS=${EXTRA_PKGS}" \
+		--build-arg "SHELL=${USER_SHELL}" \
+		-t "${IMAGE_REPO}/dev-shell:latest" \
+		-t "${IMAGE_REPO}/dev-shell:alpine" \
+		-t "${IMAGE_REPO}/dev-shell:nvim" \
+		-f './imags/dev-shell/Containerfile' \
+		.
+
 image_nvim : IMAGE_NAME = ${NVIM_IMAGE_NAME}
 image_nvim : IMAGE_TAG = ${NVIM_IMAGE_TAG}
-image_nvim : submodules image_podman_remote
+image_nvim : submodules images_deps
 	${CMD} buildx build \
 		${BUILD_OPTIONS} \
 		--build-arg "EXTRA_PKGS=${EXTRA_PKGS}" \
 		--build-arg "SHELL=${USER_SHELL}" \
 		-t "${IMAGE_NAME}:${IMAGE_TAG}" \
-		-t "${IMAGE_REPO}/dev-shell:${IMAGE_TAG}" \
-		-t "${IMAGE_REPO}/dev-shell:latest" \
 		-f './imags/nvim/Containerfile' \
 		.
 
@@ -420,7 +428,7 @@ submodules:
 images_deps: submodules
 	BUILDCOMPOSEFILE=./compose/base-images.compose.yml ./contrib/l7-scripts/bin/compose-build-dependencies dev-shell
 
-images: images_deps image_runner_node image_dnsmasq image_gpg_pk image_nvim image_acng image_auth_proxy image_container_proxy image_lsp_node
+images: images_deps image_runner_node image_dnsmasq image_gpg_pk image_dev_shell image_acng image_auth_proxy image_container_proxy image_lsp_node
 
 
 images_test: images image_nvim_test
