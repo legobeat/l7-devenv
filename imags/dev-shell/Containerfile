@@ -1,6 +1,11 @@
 # syntax=docker/dockerfile:1.4-labs
 #ARG BASE_IMAGE=localhost/l7/alpine:3.20
 ARG BASE_IMAGE=localhost/l7/nvim:podman-remote
+ARG CADDY_IMAGE=localhost/l7/caddy:latest
+# this assumes we already have a locally built caddy image
+# the image contains a pregenerated ca root cert for mitm, which we copy here
+# TODO: provide a nicer way to manage the rootcert
+FROM ${CADDY_IMAGE} AS fwdproxy
 
 FROM ${BASE_IMAGE}
 
@@ -67,6 +72,14 @@ COPY --from=localhost/l7/hub:latest --chown=2:2 \
 
 COPY --chmod=755 --chown=root \
   contrib/bin/* contrib/*/bin/*       /usr/local/bin/
+
+### trust internal proxy ca cert
+COPY --from=fwdproxy \
+  --chmod=444 \
+  /data/caddy/pki/authorities/local/root.crt \
+  /usr/local/share/ca-certificates/l7-fwd-proxy.crt
+RUN cat /usr/local/share/ca-certificates/l7-fwd-proxy.crt >> /etc/ssl/certs/ca-certificates.crt \
+  && update-ca-certificates
 
 USER ${UID}:${GID}
 WORKDIR /src
