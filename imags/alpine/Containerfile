@@ -1,10 +1,4 @@
 # syntax=docker/dockerfile:1.4-labs
-ARG CADDY_IMAGE=localhost/l7/caddy:latest
-# this assumes we already have a locally built caddy image
-# the image contains a pregenerated ca root cert for mitm, which we copy here
-# TODO: provide a nicer way to manage the rootcert
-FROM ${CADDY_IMAGE} AS fwdproxy
-
 #######################
 ##### FINAL IMAGE #####
 FROM alpine:3.20
@@ -42,11 +36,6 @@ COPY contrib/nvim-plugins/tokyonight.nvim/extras/ /etc/themes/tokyonight
 ### default trust github.com known ssh key
 COPY contrib/data/ssh_known_hosts /etc/ssh/ssh_known_hosts
 
-COPY --from=fwdproxy \
-  --chmod=444 \
-  /data/caddy/pki/authorities/local/root.crt \
-  /usr/local/share/ca-certificates/l7-fwd-proxy.crt
-
 COPY --chown=${UID}:${GID} skel/ /home/user/
 
 ### shim global node bins
@@ -58,9 +47,6 @@ RUN for bin in ${NODE_BINS}; do ln -s l7-run-node "/usr/local/bin/${bin}"; done 
 
   # theming
   && mv /etc/themes/tokyonight/fzf/tokyonight_moon.sh /etc/profile.d/90-fzf-theme.sh \
-
-  ### trust internal proxy ca cert
-  && cat /usr/local/share/ca-certificates/l7-fwd-proxy.crt >> /etc/ssl/certs/ca-certificates.crt \
 
   ### user env vars
   && cat /home/user/.env >> /etc/profile \
