@@ -10,7 +10,7 @@
     "@lavamoat/preinstall-always-fail": ">=2.1.0",
     "semver": "^7.6.3",
     "ts-node": "^10.9.2",
-    "typescript": "^5.5.3",
+    "typescript": "^5.5.4",
     "yarn-deduplicate": "^6.0.2"
   },
   "private": false,
