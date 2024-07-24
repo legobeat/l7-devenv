@@ -1,3 +1,8 @@
+# if this is a terminal in a graphical environment and not already in tmux, start it
+if [ -t ] && [[ -z "$TMUX" ]] && ([[ ! -z "$DISPLAY" ]] || [[ ! -z "$L7_DISPLAY" ]] || [[ ! -z "$WAYLAND_DISPLAY" ]]) && command -pv tmux >/dev/null; then
+  exec tmux -2
+fi
+
 # move history file to mount
 HISTFILE=${HOME}/.local/histfile
 HISTSIZE=100000
