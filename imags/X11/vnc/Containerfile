@@ -1,0 +1,56 @@
+ARG BASE_IMAGE=alpine:3.20
+#ARG EXTENSION_BUILDER_IMAGE=localhost/l7/node:20-bookworm
+#FROM ${EXTENSION_BUILDER_IMAGE} AS extension-builder
+#
+#USER root
+#COPY --chown=1002:1002 contrib/browser-extensions/multi-account-containers /build/multi-account-containers
+#RUN mkdir -p /out /build/multi-account-containers  /tmp/1002-home \
+#  && chmod 777 /out /build/multi-account-containers  /tmp/1002-home \
+#  && chown 1002:1002 /out /build/multi-account-containers /tmp/1002-home
+#
+#ENV HOME=/tmp/1002-home
+#USER 1002:1002
+#
+## build, pack, and install web extenstions
+#RUN set -x &&  cd /build/multi-account-containers \
+#  && npm install --frozen-lockfile \
+#  && npm run build \
+#  && npm pack
+#
+#################
+FROM ${BASE_IMAGE}
+USER root
+COPY imags/X11/vnc/bin/* /usr/local/bin/
+
+ARG EXTRA_PKGS='ratpoison ratpoison-doc'
+
+RUN apk add --no-cache \
+#    ${FIREFOX_RELEASE} \
+    tigervnc \
+    xbindkeys xkeyboard-config xsetroot xsel \
+    rofi \
+    timg \
+    tmux \
+    xterm xterm-doc \
+    lxterminal \
+    scrot feh \
+    libsixel \
+    ${EXTRA_PKGS}
+
+COPY imags/X11/vnc/vncserver-config-defaults /etc/tigervnc/vncserver-config-defaults
+
+RUN mkdir -p /tmp/.X11-unix && chmod 177 /tmp/.X11-unix
+
+COPY imags/X11/vnc/skel/.config/ /home/user/.config/
+COPY imags/X11/vnc/skel/ /home/user/
+RUN ln -sf /usr/local/bin/xinitrc /home/user/.xinitrc \
+  && chown -R user /home/user
+
+ARG TMUX_THEME_PATH="/home/user/.config/tmux/tokyonight/tokyonight_night.tmux"
+ENV TMUX_THEME_PATH="${TMUX_THEME_PATH}"
+ARG VNC_DESKTOP
+ENV VNC_DESKTOP=${VNC_DESKTOP}
+
+USER user
+
+ENTRYPOINT ["/usr/local/bin/vncserver-start"]

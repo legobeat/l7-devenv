@@ -105,3 +105,103 @@ services:
         EXTRA_PKGS: ''
         BASE_IMAGE: 'localhost/l7/podman-remote:latest'
     image: 'localhost/l7/nvim:podman-remote'
+
+
+#### X11
+
+  build-base-alpine-x11:
+    ####
+    profiles:
+      - build
+      - alpine
+    depends_on:
+      - build-base-alpine
+    build:
+      context: .
+      dockerfile: imags/X11/alpine/Containerfile
+      args:
+        BASE_IMAGE: 'localhost/l7/alpine:3.20'
+        EXTRA_PKGS: ''
+      tags:
+        - 'localhost/l7/alpine:x11-latest'
+        - 'localhost/l7/alpine:x11-3.20'
+    image: 'localhost/l7/alpine:x11'
+
+
+  firefox:
+    profiles:
+      - build
+      - alpine
+    depends_on:
+      - build-base-alpine-x11
+    build:
+      context: .
+      dockerfile: imags/X11/firefox/Containerfile
+      args:
+        EXTRA_PKGS: ''
+        BASE_IMAGE: 'localhost/l7/alpine:x11'
+        FIREFOX_RELEASE: firefox
+    image: 'localhost/l7/firefox:latest'
+
+  build-podman-remote-on-firefox:
+    profiles:
+      - build
+      - podman
+      - alpine
+    depends_on:
+      - firefox
+    build:
+      context: imags/podman-remote
+      dockerfile: ./Containerfile
+      args:
+        BASE_IMAGE: 'localhost/l7/firefox:latest'
+    image: 'localhost/l7/podman-remote:firefox'
+
+  build-nvim-on-podman-remote-on-firefox:
+    profiles:
+      - build
+      - podman
+      - alpine
+    depends_on:
+      - build-podman-remote-on-firefox
+    build:
+      context: .
+      dockerfile: imags/nvim/Containerfile
+      args:
+        BASE_IMAGE: 'localhost/l7/podman-remote:firefox'
+    image: 'localhost/l7/nvim:firefox'
+
+  build-vnc-on-nvim-on-podman-remote-on-firefox:
+    profiles:
+      - build
+      - vnc
+      - alpine
+    depends_on:
+      - build-nvim-on-podman-remote-on-firefox
+    build:
+      context: .
+      dockerfile: imags/X11/vnc/Containerfile
+      args:
+        EXTRA_PKGS: 'ratpoison ratpoison-doc'
+        BASE_IMAGE: 'localhost/l7/nvim:firefox'
+        VNC_DESKTOP: 'ratpoison'
+    image: 'localhost/l7/vnc:firefox'
+
+  build-desktop:
+    profiles:
+      - build
+      - vnc
+      - nvim
+      - alpine
+    depends_on:
+      #- build-dev-shell
+      - build-vnc-on-nvim-on-podman-remote-on-firefox
+      - build-hub
+    build:
+      context: .
+      dockerfile: imags/nvim/Containerfile
+      args:
+        EXTRA_PKGS: ''
+        #BASE_IMAGE: 'localhost/l7/podman-remote:latest'
+        BASE_IMAGE: 'localhost/l7/vnc:firefox'
+    image: 'localhost/l7/nvim:podman-remote-vnc'

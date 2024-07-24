@@ -137,6 +137,15 @@ image_alpine : submodules image_caddy
 		-f './imags/alpine/Containerfile' \
 		.
 
+image_vnc : # submodules # image_nvim
+	${CMD} buildx build \
+		${BUILD_OPTIONS} \
+		--build-arg "EXTRA_PKGS=" \
+		--build-arg "SHELL=/bin/zsh" \
+		-t "${IMAGE_REPO}/vnc:latest" \
+		-f './shipyard/vnc/Containerfile' \
+		.
+
 image_bin_ht :
 	${CMD} buildx build \
 		-t ${IMAGE_REPO}-test/ht:0.2.0 \

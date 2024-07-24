@@ -6,10 +6,15 @@ skel/README.md
 node_modules
 **/node_modules/
 **/.yarn/
+wip/
 
 contrib/nvim-plugins/*/doc
 contrib/nvim-plugins/*/test
 contrib/nvim-plugins/*/tests
 contrib/nvim-plugins/telescope.nvim/data/memes
 
-wip/
+contrib/browser-extensions/*/*.xpi
+contrib/browser-extensions/*/*.zip
+contrib/browser-extensions/*/*.tgz
+contrib/browser-extensions/*/*.gz
+contrib/browser-extensions/*/*.tar
