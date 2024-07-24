@@ -113,6 +113,22 @@ services:
     volumes:
       - ${HOME}/.local/share/l7ide/local/vnc/view_vncpasswd:/var/log/apt-cacher-ng:Z,ro
 
+  ssh-proxy:
+    depends_on:
+      - novnc
+    profiles:
+      - vnc
+      - remote
+    build:
+      context: ./imags/ssh-proxy
+      dockerfile: Containerfile
+    image: 'localhost/l7/ssh-proxy:latest'
+    command: '-p443 -R0:10.7.9.11:6080 -o ServerAliveInterval=30 tls@a.pinggy.io'
+    hostname: localhost
+    networks:
+      public:
+      vnc:
+
 ########
 
 networks:
