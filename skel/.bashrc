@@ -49,3 +49,8 @@ fi
 if [ -f ~/.local/bashrc ]; then
   . ~/.local/bashrc
 fi
+
+# if this is a terminal in a graphical environment and not already in tmux, start it
+if [ -t ] && [[ -z "$TMUX" ]] && ([[ ! -z "$DISPLAY" ]] || [[ ! -z "$WAYLAND_DISPLAY" ]]); then
+  exec tmux -2
+fi
