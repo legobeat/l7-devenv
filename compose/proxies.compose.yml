@@ -118,6 +118,8 @@ services:
     build:
       context: imags/verdaccio
       dockerfile: Dockerfile
+    environment:
+      VERDACCIO_PUBLIC_URL: 'https://npmkg.internal'
     configs:
       - source: verdaccio_cfg
         target: /verdaccio/conf/config.yaml
