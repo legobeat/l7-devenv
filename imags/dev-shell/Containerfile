@@ -45,6 +45,7 @@ RUN apk add --no-cache \
     lab lab-zsh-completion \
     iproute2-minimal openssl procps-ng psmisc psutils util-linux-misc \
     losetup dosfstools \
+    yq-go yq-go-zsh-completion \
     netcat-openbsd netcat-openbsd-doc \
     mandoc busybox-doc coreutils-doc git-doc less-doc grep-doc sed-doc file-doc findutils-doc fzf-doc util-linux-doc zsh-doc \
     gettext-envsubst mkpasswd pwgen \
