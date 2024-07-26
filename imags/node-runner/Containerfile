@@ -38,13 +38,19 @@ COPY --from=fwdproxy \
 ENV NODE_EXTRA_CA_CERTS=/usr/local/share/ca-certificates/l7-fwd-proxy.crt
 
 RUN DEBIAN_FRONTEND=noninteractive dpkg-reconfigure ca-certificates \
-  # remove bundled yarn1 to get corepack integration
-  && rm -rf /usr/local/bin/yarn* /opt/yarn* \
+  && rm -rf /usr/local/lib/node_modules/corepack \
   && npm ci --omit=dev --ignore-scripts \
+  # remove bundled shims to get corepack integration
+  && rm -rf /usr/local/bin/yarn* /usr/local/bin/npm /usr/local/bin/npx /usr/local/bin/corepack /opt/yarn* \
+  && rm -rf /usr/local/lib/node_modules/* \
   && mv node_modules/* node_modules/.bin /usr/local/lib/node_modules/ \
   # seems strange that this is needed
   && ln -s /usr/local/lib/node_modules/ /usr/local/bin/node_modules \
-  && mkdir -p /home/user/.config \
+  && mkdir -p /home/node/.config \
+  # /home/user and /home/node made same
+  && mv -T /home/node /home/user \
+  && ln -sT user /home/node \
+  && chmod +x /usr/local/lib/node_modules/corepack/shims/* \
   && chown -R node /home/user /home/node
 
 # default trust github.com known ssh key
@@ -64,14 +70,13 @@ WORKDIR /tmp
 COPY imags/node-runner/install-package-managers.sh .
 # TODO: integrity checksums / sigchecks for bundled PMs
 ARG COREPACK_PMS='npm@10.8.2 npm@6.14.18 npm@7.24.2 npm@9.9.3 pnpm@8.15.8 pnpm@9.4 pnpm@9.5.0 yarn@1.22.22 yarn@3.2.1 yarn@3.2.2 yarn@3.5.1 yarn@3.6.0 yarn@3.6.2 yarn@4.1.1 yarn@4.2.2 yarn@4.3.1'
-RUN ./install-package-managers.sh \
-  && mkdir -p /home/node/.corepack/bin \
-  # `corepack enable` determines shim installation path based on `which corepack` directory
-  && ln -s /usr/local/bin/corepack /home/node/.corepack/bin/ \
-  && PATH=/home/node/.corepack/bin/:${PATH} corepack enable \
-  # ensure ownership
-  && mkdir -p /home/node/.cache /home/node/.yarn/berry /home/node/.npm
 
+ENV PATH=/usr/local/lib/node_modules/.bin:/usr/local/lib/node_modules/corepack/shims:${HOME}/.cache/node/corepack/v1/npm:${HOME}/.corepack/bin:$PATH
+
+RUN ./install-package-managers.sh
+RUN corepack enable
+
+RUN mkdir -p /home/node/.cache /home/node/.yarn/berry /home/node/.npm
 ENV SHELL=${SHELL}
 
 COPY contrib/l*-scripts/bin/*    /usr/local/bin/
@@ -81,12 +86,10 @@ RUN sed -Ei \
     -e 's#insteadOf = "https://github.com/"#insteadOf = "git@github.com:"#' \
     /home/node/.gitconfig
 
-ENV PATH=/home/node/.corepack/bin:/usr/local/lib/node_modules/.bin:${PATH}
 ENV COREPACK_DEFAULT_TO_LATEST=0
 ENV COREPACK_ENABLE_AUTO_PIN=0
 ENV COREPACK_ENABLE_NETWORK=0
 ENV COREPACK_ENABLE_STRICT=0
-ENV COREPACK_HOME=/home/node/.cache/node/corepack/
 
 WORKDIR /src
 ENTRYPOINT ["/bin/bash"]
