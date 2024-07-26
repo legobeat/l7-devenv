@@ -5,6 +5,8 @@
 # Some of these may be usable independently
 services:
   build-caddy:
+    profiles:
+      - build
     build:
       context: imags/caddy
       dockerfile: Containerfile
