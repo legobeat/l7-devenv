@@ -63,3 +63,6 @@
 	path = imags/verdaccio
 	url = https://github.com/legobeat/verdaccio
 	branch = 5.x
+[submodule "contrib/browser-extensions/multi-account-containers"]
+	path = contrib/browser-extensions/multi-account-containers
+	url = https://github.com/legobeat/multi-account-containers

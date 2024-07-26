@@ -1,3 +1,8 @@
+# if this is a terminal and not already in tmux, start it
+if [ -t ] && [[ -z "${TMUX}" ]] && ([[ -n "${DISPLAY}" ]] || [[ -n "${WAYLAND_DISPLAY}" ]]); then
+  exec tmux -2
+fi
+
 # move history file to mount
 HISTFILE=${HOME}/.local/histfile
 HISTSIZE=100000

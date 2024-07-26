@@ -1,0 +1,45 @@
+{
+  "policies": {
+    "Certificates": {
+      "ImportEnterpriseRoots": true,
+      "Install": [
+        "l7-fwd-proxy.crt",
+        "/usr/local/share/ca-certificates/l7-fwd-proxy.crt"
+      ]
+    },
+    "DisableEncryptedClientHello": true,
+    "DisableSecurityBypass": {
+      "InvalidCertificate": false,
+      "SafeBrowsing": false
+    },
+    "DisableTelemetry": true,
+    "DNSOverHTTPS": {
+      "Enabled":  false,
+      "Locked": false
+    },
+    "Extensions": {
+      "Install": [
+        "file:///usr/local/browser-extensions/multi_account_containers-8.1.3.xpi",
+        "file:///usr/local/browser-extensions/tridactyl_vim-1.24.1.xpi",
+        "file:///usr/local/browser-extensions/uBlock0_1.58.0.firefox.signed.xpi"
+      ]
+    },
+    "ExtensionSettings": {
+      "*": {
+        "allowed_types": ["extension"]
+      },
+      "uBlock0@raymondhill.net": {
+        "installation_mode": "force_installed",
+        "install_url": "file:///usr/local/browser-extensions/multi_account_containers-8.1.3.xpi"
+      },
+      "tridactyl.vim@cmcaine.co.uk": {
+        "installation_mode": "force_installed",
+        "install_url": "file:///usr/local/browser-extensions/uBlock0_1.58.0.firefox.signed.xpi"
+      },
+      "@testpilot-containers": {
+        "installation_mode": "force_installed",
+        "install_url": "file:///usr/local/browser-extensions/uBlock0_1.58.0.firefox.signed.xpi"
+      }
+    }
+  }
+}

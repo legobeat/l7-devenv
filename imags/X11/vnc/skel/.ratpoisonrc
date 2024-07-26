@@ -1,0 +1,66 @@
+# prefix: Ctrl+`
+escape C-Escape
+
+# keybindings
+bind c meta
+
+#escape Super_R
+
+#bind c exec xfce4-terminal
+#bind e exec xfce4-terminal -x nvim
+bind c exec xterm
+bind C exec xterm
+bind e exec xterm -e tmux -c nvim
+bind w exec firefox
+# nicer launcher
+bind d exec rofi -display-run 'run command' -show run -modi run -show-icons -mode -drun -theme /home/user/.config/rofi/tokyonight.rasi
+bind exclam exec rofi -display-run 'run command' -show run -modi run -show-icons -mode -drun -theme /home/user/.config/rofi/tokyonight.rasi
+bind w exec firefox
+
+# make a screenshot and save as file
+#alias sshot exec import -window root ~/screenshot-`date +%F`.jpg
+alias scrot exec scrot -F "/home/user/.local/scrots/$(date +%F-%H%M).png"
+definekey top Print scrot
+
+# make a shot of active window and save as file
+alias scrotw exec scrot -F "/home/user/.local/scrots/$(date +%F)-\$W-$(date %H%M).png" -u
+definekey top M-Print scrotw
+
+# make a shot of selection and save as file
+alias scrots exec scrot -F "/home/user/.local/scrots/$(date +%F-%H%M).png" --select --line=width=2,opacity=70,color=green
+definekey top C-Print scrots
+# reload config
+
+bind L source /home/user/.ratpoisonrc
+
+# vim/tmux style
+bind v hsplit
+bind z only
+
+definekey top M-l exec ratpoison -c "select -" -c "gprev" -c "next"
+definekey top M-h exec ratpoison -c "select -" -c "gnext" -c "next"
+
+#switch between windows
+definekey top M-j next
+definekey top M-k prev
+
+## default
+##set font -*-fixed-bold-r-normal-*-18-*-*-*-c-*-*-*
+set font -sony-fixed-*-*-*-*-22-*-*-*-c-*-*-*
+## would be nice
+#set font Terminus:size=22
+set fgcolor #589ED7
+set bgcolor #1E2030
+set fwcolor #27a1B9
+set bwcolor #15161E
+
+exec xsetroot -cursor_name left_ptr
+
+# extra workspaces; switch with M-F1 - M-F6
+exec /usr/bin/rpws init 6 -k
+
+unmanage feh
+unmanage polybar
+
+# startup session
+exec ~/.xinitrc

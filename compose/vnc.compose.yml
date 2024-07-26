@@ -1,35 +1,28 @@
 ---
-include:
-  - path: compose/base-images.compose.yml
-    project_directory: .
-  - path: compose/proxies.compose.yml
-    project_directory: .
-  - path: compose/vnc.compose.yml
-    project_directory: .
-    #env_file: ../another/.env
-
 services:
-  dev-shell:
+  desktop:
+    depends_on:
+      - build-desktop
+      - dns
+      - http-proxy
     profiles:
+      - desktop
       - nvim
       - podman
       - alpine
-    depends_on:
-      - container-socket-proxy
-      - dns
-      - http-proxy
-    image: 'localhost/l7/dev-shell:nvim'
+      - vnc
+    image: 'localhost/l7/dev-shell:vnc'
     build:
       x-build-images:
-        - 'localhost/l7/nvim:podman-remote'
+        - 'localhost/l7/nvim:podman-remote-vnc'
       context: .
       dockerfile: imags/dev-shell/Containerfile
       args:
-        BASE_IMAGE: 'localhost/l7/nvim:podman-remote'
+        BASE_IMAGE: 'localhost/l7/nvim:podman-remote-vnc'
       tags:
-        - 'localhost/l7/nvim:latest'
-        - 'localhost/l7/dev-shell:latest'
-        - 'localhost/l7/dev-shell:nvim'
+        - 'localhost/l7/dev-shell:vnc'
+        - 'localhost/l7/dev-shell:vnc-nvim'
+        - 'localhost/l7/vnc:latest'
     hostname: dev
     restart: always
     user: '1000:1000'
@@ -37,15 +30,21 @@ services:
     networks:
       internal:
       container-control:
+      vnc:
+        ipv4_address: 10.7.9.10
+    entrypoint:
+      - '/usr/local/bin/vncserver-start'
     working_dir: "${SRC_DIR:-${L7_SRC_DIR:-/src}}"
     # TODO: mounts for config could be done as configs
     # https://github.com/compose-spec/compose-spec/blob/master/08-configs.md
     volumes:
+      # todo: move shared vncpasswd file out of here
+      #- 'user_local:/home/user/.local'
+      - '${LOCAL_DIR:-${HOME}/.local/share/l7ide/local}:/home/user/.local'
       - '${CONF_DIR:-${HOME}/.config/l7ide/config}/ssh.d:/home/user/.ssh/config.d:ro'
       - '${CONF_DIR:-${HOME}/.config/l7ide/config}/git:/home/user/.config/git:ro'
       - '${SRC_DIR:-${L7_SRC_DIR:-${PWD}}}:${SRC_DIR:-${L7_SRC_DIR:-${PWD}}}:rshared,nosuid'
       - '${SRC_DIR:-${L7_SRC_DIR:-${PWD}}}:/src:rshared,nosuid'
-      - '${LOCAL_DIR:-l7_dev_user_local}:/home/user/.local'
       - 'nvim_state:/home/user/.local/state/nvim:z'
       - 'cache_node_yarn_berry:/home/node/.yarn/cache/berry:z,ro'
       - 'cache_node_yarn_classic:/home/node/.cache/yarn:z,ro'
@@ -59,7 +58,7 @@ services:
       - '${SSH_SOCKET:-${SSH_AUTH_SOCK:-/dev/null}}:/home/user/.ssh/SSH_AUTH_SOCK'
       # ugly hack around compose insisting on overriding DNS:
       # https://github.com/docker/compose/issues/2847
-      # obviates need for custom entrypoint at cost of hardcoding DNS IP and an extra mount
+      # obviates need for custom entrypoint at cost of hardcoding DNS IP
       - './compose/mounts/resolv-internal.conf:/etc/resolv.conf:ro'
     #configs:
     #  - source: resolv_conf_internal
@@ -89,50 +88,58 @@ services:
       L7_COMPOSE_NETWORK_NAME_INTERNAL: 'l7_dev_internal'
       SSH_AUTH_SOCK: '/home/user/.ssh/SSH_AUTH_SOCK'
     dns: '${CONTAINER_DNS:-10.7.8.133}'
-    entrypoint: /bin/sh
-    command: -c 'sleep 36000000000'
+    ports:
+      # vnc
+      - '5902:5902'
 
-#########################################################
+  novnc:
+    depends_on:
+      - desktop
+    profiles:
+      - vnc
+      - remote
+    build:
+      context: imags/novnc
+      dockerfile: Containerfile
+    image: localhost/l7/novnc:latest
+    restart: always
+    command: '--listen 6080 --vnc 10.7.9.10:5902'
+    hostname: localhost
+    networks:
+      vnc:
+        ipv4_address: 10.7.9.11
+    ports:
+      - '6080:6080'
+    volumes:
+      - ${HOME}/.local/share/l7ide/local/vnc/view_vncpasswd:/var/log/apt-cacher-ng:Z,ro
 
+  ssh-proxy:
+    depends_on:
+      - novnc
+    profiles:
+      - vnc
+      - remote
+    build:
+      context: ./imags/ssh-proxy
+      dockerfile: Containerfile
+    image: 'localhost/l7/ssh-proxy:latest'
+    command: '-p443 -R0:10.7.9.11:6080 -o ServerAliveInterval=30 tls@a.pinggy.io'
+    hostname: localhost
+    networks:
+      public:
+      vnc:
 
-volumes:
-  user_local:
-    name: l7_dev_user_local
-  caddy_conf:
-    name: l7_caddy_fwd_config
-  cache_node_npm:
-    name: l7_cache_node_npm
-  cache_node_pnpm:
-    name: l7_cache_node_pnpm
-  cache_node_yarn_berry:
-    name: l7_cache_node_yarn_berry
-  cache_node_yarn_classic:
-    name: l7_cache_node_yarn_classic
-  nvim_state:
-    name: l7_nvim_state
-  gpgvault_pk:
-    name: l7_gpgvault_pk
+########
 
 networks:
-  internal:
-    name: l7_dev_internal
+  vnc:
+    name: l7_dev_vnc
     attachable: true
-    internal: true
     ipam:
       config:
-        - subnet: 10.7.8.0/24
-          ip_range: 10.7.8.0/27
+        - subnet: 10.7.9.8/29
+          ip_range: 10.7.9.12/30
     driver: bridge
     driver_opts:
-      inhibit_ipv4: '1'
-  container-control:
-    name: l7_dev_container_control
-    attachable: true
-    internal: true
-    ipam:
-      config:
-        - subnet: 10.7.9.0/29
-          ip_range: 10.7.9.4/30
-    driver: bridge
-    driver_opts:
-      inhibit_ipv4: '1'
+      inhibit_ipv4: 1
+      disable_dns: 1
