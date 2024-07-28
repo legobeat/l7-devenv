@@ -76,7 +76,7 @@ services:
       NODE_RUNNER_IMAGE: 'localhost/l7/node'
       L7_NODE_VERSION:   '20'
       HOME:    /home/user
-      SRC_DIR: '${SRC_DIR:-${L7_SRC_DIR:-/src}}'
+      SRC_DIR: '${SRC_DIR:-${L7_SRC_DIR:-${PWD}}}'
       L7_NVIM_STATE_PATH:  'l7_nvim_state'
       L7_NPM_CACHE_VOLUME:  'l7_cache_node_npm'
       L7_PNPM_CACHE_VOLUME: 'l7_cache_node_pnpm'
