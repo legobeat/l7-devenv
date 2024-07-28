@@ -291,8 +291,8 @@ jobs:
       - name: Build images
         run: |
           make images_deps
-          make -j6 images_test
-          make -j6 test_lsp_node
+          make -j3 images_test
+          make -j3 test_lsp_node
         if: ${{ matrix.test == 'lsp_typescript' }}
       - run: |
           make images_deps
