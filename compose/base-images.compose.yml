@@ -15,8 +15,6 @@ services:
     profiles:
       - build
       - alpine
-    depends_on:
-      - build-caddy
     build:
       context: .
       dockerfile: imags/alpine/Containerfile
@@ -81,7 +79,6 @@ services:
       - alpine
     depends_on:
       - podman-remote
-      #- build-nvim
     build:
       context: .
       dockerfile: imags/nvim/Containerfile
@@ -96,6 +93,7 @@ services:
       - nvim
       - alpine
     depends_on:
+      - build-caddy
       - build-nvim-on-podman-remote
       - build-hub
     build:

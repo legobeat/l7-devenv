@@ -25,10 +25,6 @@ RUN apk add --no-cache \
   && bash -c "useradd -u ${UID} -g ${GID} -d /home/user -m user -s "${SHELL}" && chown -R ${UID}:${GID} /home/user || true" \
   && apk del shadow
 
-COPY --chmod=755 --chown=root \
-  contrib/bin/* contrib/*/bin/* \
-  /usr/local/bin/
-
 COPY contrib/nvim-plugins/tokyonight.nvim/extras/ /etc/themes/tokyonight
 
 ## user config and keys

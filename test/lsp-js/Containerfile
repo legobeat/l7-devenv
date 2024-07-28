@@ -1,4 +1,5 @@
-ARG BASE_IMAGE=localhost/l7/nvim:latest
+ARG BASE_IMAGE=localhost/l7/dev-shell:nvim
+# ARG BASE_IMAGE=localhost/l7/nvim:podman-remote
 ARG HT_IMAGE=localhost/l7-test/ht:0.2.0
 FROM ${HT_IMAGE} as ht
 FROM ${BASE_IMAGE}

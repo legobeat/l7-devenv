@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1.4-labs
 # base image for images with capabilities to spawn new containers
 ARG BASE_IMAGE=localhost/l7/alpine:3.20
-FROM ${BASE_IMAGE} as base
+FROM ${BASE_IMAGE}
 ARG EXTRA_PKGS=''
 
 ARG HOME=/home/user
