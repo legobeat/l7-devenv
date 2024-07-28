@@ -12,7 +12,7 @@ result="$(
     echo '{ "type": "sendKeys", "keys": [" "] }'
     sleep 0.5
     echo '{ "type": "sendKeys", "keys": ["\""] }'
-    sleep 5
+    sleep 8
     echo '{ "type": "getView" }'
     echo '{ "type": "sendKeys", "keys": ["Escape"] }'
     sleep 0.5
