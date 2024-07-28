@@ -1,6 +1,18 @@
 #!/bin/bash
 
-export RUNNER_IMAGE="${RUNNER_IMAGE:-${NODE_RUNNER_IMAGE:-localhost/l7/node}}"
+is_react_native_project() {
+  # TODO: look at git root as well as pwd
+  if [[ -f ios/Podfile ]] ||  [[ -f Podfile ]]; then
+    return 0
+  fi
+  return -1
+}
+
+if is_react_native_project;  then
+  export RUNNER_IMAGE=${RUNNER_IMAGE:-${BUNDLER_RUNNER_IMAGE:-localhost/l7/node:ios-bookworm}}
+else
+  export RUNNER_IMAGE="${RUNNER_IMAGE:-${NODE_RUNNER_IMAGE:-localhost/l7/node}}"
+fi
 
 if [[ "${RUNNER_IMAGE}" != *:* ]]; then
   export RUNNER_IMAGE=${RUNNER_IMAGE}:${L7_NODE_VERSION:-20}-bookworm
