@@ -8,6 +8,7 @@ RUN apt-get update \
   && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
     git curl ca-certificates gnupg ssh-client less psmisc jq time man manpages \
     locales fakeroot libpcre3 \
+    tar unzip \
     build-essential ccache cmake cmake-format distcc zlib1g-dev libzlcore-dev libffi-dev libssl-dev libyaml-dev \
   && sed -i '/en_US.UTF-8/s/^# //' /etc/locale.gen \
   && locale-gen \
