@@ -19,6 +19,7 @@ services:
     build:
       x-build-images:
         - 'localhost/l7/nvim:podman-remote'
+        - 'localhost/l7/hub:latest'
       context: .
       dockerfile: imags/dev-shell/Containerfile
       args:
