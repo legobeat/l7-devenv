@@ -205,8 +205,9 @@ image_runner_node_ios: submodules image_runner_node
 		--build-arg "SHELL=${USER_SHELL}" \
 		--build-arg "NODE_VERSION=20" \
 		-t "${IMAGE_NAME}:ios-${IMAGE_TAG}" \
-		-f './imags/node-runner/Containerfile.ios' \
-		.
+		-f './imags/cocoapods-runner/Containerfile' \
+		-f './imags/cocoapods-runner/Containerfile' \
+		./imags/cocoapods-runner
 
 image_runner_node_all: IMAGE_NAME = ${RUNNER_IMAGE_NAME}
 image_runner_node_all: IMAGE_TAG = ${RUNNER_IMAGE_TAG}
@@ -455,6 +456,10 @@ test_e2e_node_majors: IMAGE_TAG = ${RUNNER_IMAGE_TAG}
 test_e2e_node_majors: # image_nvim
 	set -e; \
 	./test/runner-node/test-node-majors.sh
+
+test_e2e_cocoapods_pod:
+	set -e; \
+	./test/runner-cocoapods/test-ruby-bundler.sh
 
 test_e2e_lsp_typescript : IMAGE_NAME = ${NVIM_IMAGE_NAME}
 test_e2e_lsp_typescript : IMAGE_TAG = ${NVIM_IMAGE_TAG}

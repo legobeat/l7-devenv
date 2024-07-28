@@ -1,0 +1,15 @@
+source 'https://rubygems.org'
+
+# Recommended to use http://rbenv.org/ to install and use this version
+ruby '>= 3.1.5'
+
+gem 'activesupport', '7.0.8.1'
+gem 'addressable', '2.8.6'
+gem 'bigdecimal'
+gem 'bundler', '~> 2.5.8'
+gem 'cocoapods', '~> 1.12'
+gem 'concurrent-ruby', '1.2.3'
+gem 'ffi', '1.16.3'
+gem 'i18n', '1.14.4'
+gem 'minitest', '5.22.3'
+gem 'rexml', '3.2.8'

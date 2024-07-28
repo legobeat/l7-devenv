@@ -8,11 +8,13 @@ fi
 
 export RUNNER_ENV="${RUNNER_ENV}
 NODE_OPTIONS=${NODE_OPTIONS}
+BUNDLE_ALLOW_OFFLINE_INSTALL=1
+BUNDLE_DISABLE_SHARED_GEMS=0
 HOME=/home/node
 PATH=/home/node/.corepack/bin:/home/node/.npm-global/bin:/usr/local/lib/node_modules/.bin:/usr/local/lib/node_modules/corepack/shims:/home/node/.rbenv/shims:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 "
 
-if [[ "$(basename $0)" = "l7-run-node" ]]; then
+if [[ "$(basename $0)" = "l7-run-ruby" ]]; then
   COMMAND="$1"
   ARGS="${@:2}"
 else
@@ -21,3 +23,4 @@ else
 fi
 
 exec l7-cnt-run "${COMMAND}" ${ARGS}
+

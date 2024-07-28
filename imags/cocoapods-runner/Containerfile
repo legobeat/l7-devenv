@@ -1,0 +1,44 @@
+ARG NODE_VERSION=20
+ARG RUBY_VERSION=3.3.4
+ARG RUBY_LIB_VERSION=3.3.0
+FROM docker.io/ruby:${RUBY_VERSION}-slim-bookworm AS ruby
+
+FROM localhost/l7/node:${NODE_VERSION}-bookworm
+
+USER root
+### "Merge in" ruby from official ruby docker image
+RUN apt-get update \
+  && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+		bzip2 \
+		ca-certificates \
+		libffi-dev \
+		libgmp-dev \
+		libssl-dev \
+		libyaml-dev \
+		procps \
+		zlib1g-dev \
+  && rm -rf /var/lib/apt/lists/*
+
+COPY --from=ruby /usr/local/etc/gemrc /usr/local/etc/gemrc
+COPY --from=ruby /usr/local/bundle /usr/local/bundle
+COPY --from=ruby /usr/local/lib/ /usr/local/lib/
+COPY --from=ruby /usr/local/bin /usr/local/bin
+COPY --from=ruby /usr/local/include/ /usr/local/include/
+COPY --from=ruby /usr/local/share/man/ /usr/local/share/man/
+###
+
+RUN sed -i '/en_US.UTF-8/s/^# //' /etc/locale.gen \
+  && locale-gen
+ENV PATH=/home/user/.local/share/gem/ruby/${RUBY_LIB_VERSION}/bin:${PATH}
+ENV BUNDLE_PATH=/home/user/.bundle
+ENV LANG=en_US.UTF-8
+ARG UID=1000
+ARG GID=1000
+WORKDIR /tmp/rubygems-deps
+COPY --chown=$UID ./Gemfile ./Gemfile.lock .
+RUN gem install bundler -v 2.5.8 \
+  && chown -R "${UID}:${GID}" /home/user/
+
+USER ${UID}:${GID}
+RUN bundle install
+WORKDIR /src
