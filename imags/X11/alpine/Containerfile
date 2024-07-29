@@ -21,10 +21,9 @@ RUN apk add --no-cache \
 
 RUN mkdir -p /tmp/.X11-unix && chmod 177 /tmp/.X11-unix
 
+COPY ./skel/ /home/user/
 #COPY ./bin/* /usr/local/bin/
-#COPY ./skel/ /home/user/
-COPY imags/X11/alpine/bin/* /usr/local/bin/
-COPY imags/X11/alpine/skel/.config/ /home/user/.config/
+
 RUN touch /home/user/.Xauthority \
     && chmod 600 /home/user/.Xauthority \
     && chown -R ${UID}:${GID} /home/user

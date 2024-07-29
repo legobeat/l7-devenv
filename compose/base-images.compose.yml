@@ -98,8 +98,8 @@ services:
     depends_on:
       - build-base-alpine
     build:
-      context: ..
-      dockerfile: ./imags/X11/alpine/Containerfile
+      context: ../imags/X11/alpine
+      dockerfile: ./Containerfile
       args:
         BASE_IMAGE: 'localhost/l7/alpine:3.20'
         EXTRA_PKGS: ''
