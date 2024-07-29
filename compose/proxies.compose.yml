@@ -2,7 +2,7 @@
 services:
   container-socket-proxy:
     build:
-      context: imags/container-socket-proxy
+      context: ../imags/container-socket-proxy
       dockerfile: Dockerfile
     image: 'localhost/l7/container-socket-proxy:latest'
     networks:
@@ -20,7 +20,7 @@ services:
 
   auth-proxy:
     build:
-      context: imags/git-auth-proxy
+      context: ../imags/git-auth-proxy
       dockerfile: Dockerfile
     image: 'localhost/l7/auth-proxy:latest'
     networks:
@@ -39,7 +39,7 @@ services:
 
   dns:
     build:
-      context: imags/dnsmasq
+      context: ../imags/dnsmasq
       dockerfile: Containerfile
     image: 'localhost/l7/dnsmasq:latest'
     ports:
@@ -61,7 +61,7 @@ services:
   # package cache
   apt-cacher-ng:
     build:
-      context: imags/apt-cacher-ng
+      context: ../imags/apt-cacher-ng
       dockerfile: Containerfile
     image: 'localhost/l7/apt-cacher-ng:latest'
     restart: always
@@ -85,7 +85,7 @@ services:
       - auth-proxy
       - dns
     build:
-      context: imags/caddy
+      context: ../imags/caddy
       dockerfile: Containerfile
     image: 'localhost/l7/caddy:latest'
     environment:
@@ -103,7 +103,7 @@ services:
       public:
     volumes:
       - 'caddy_conf:/config:Z'
-      #- ./imags/caddy/default.yml:/etc/caddy/default.yml:ro
+      #- ../imags/caddy/default.yml:/etc/caddy/default.yml:ro
     tmpfs:
       - /data/caddy/certificates
       - /data/caddy/pki
@@ -116,7 +116,7 @@ services:
       - beta
     image: 'localhost/l7/verdaccio:latest'
     build:
-      context: imags/verdaccio
+      context: ../imags/verdaccio
       dockerfile: Dockerfile
     environment:
       VERDACCIO_PUBLIC_URL: 'https://npmkg.internal'
