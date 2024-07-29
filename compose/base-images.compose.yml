@@ -86,20 +86,3 @@ services:
         EXTRA_PKGS: ''
         BASE_IMAGE: 'localhost/l7/podman-remote:latest'
     image: 'localhost/l7/nvim:podman-remote'
-
-  build-dev-shell:
-    profiles:
-      - build
-      - nvim
-      - alpine
-    depends_on:
-      - build-caddy
-      - build-nvim-on-podman-remote
-      - build-hub
-    build:
-      context: .
-      dockerfile: imags/nvim/Containerfile
-      args:
-        EXTRA_PKGS: ''
-        BASE_IMAGE: 'localhost/l7/podman-remote:latest'
-    image: 'localhost/l7/nvim:podman-remote'
