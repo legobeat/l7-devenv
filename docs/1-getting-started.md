@@ -14,8 +14,10 @@ You should also be able to use this with Docker by replacing `podman` with `dock
 $ sudo apt-get update && sudo apt-get upgrade -y
 
 ## Install system dependencies
-$ sudo apt-get install --no-install-recommends coreutils make podman buildah slirp4netns fuse-overlayfs uidmap gnu-which overlayroot containers-storage
+$ sudo apt-get install --no-install-recommends coreutils make podman buildah catatonit slirp4netns netavark passt fuse-overlayfs uidmap gnu-which overlayroot containers-storage yq whois
 ```
+
+We will also need [docker-compose](https://github.com/docker/compose) v2. As of writing, it is not available in Debian/Ubuntu distro repositories. You can either [build from source](https://github.com/docker/compose/blob/main/BUILDING.md), [download the binary release from GitHub](https://github.com/docker/compose?tab=readme-ov-file#linux), or install `docker-compose-plugin` from [Docker apt repositories](https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository).
 
 ### Rootless podman setup
 
@@ -51,6 +53,8 @@ The image will be portable and contain no private information like usernames or 
 While you can run `podman build` directly, there is also a [`Makefile`](./Makefile) for convenience that we are going to use.
 
 ```
+$ export DOCKER_HOST=unix:://$XDG_RUNTIME_DIR/podman/podman.sock
+$ export DOCKER_BUILDKIT=0
 $ make images
 ```
 
