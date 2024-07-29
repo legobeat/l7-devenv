@@ -119,6 +119,9 @@ volumes:
     name: l7_nvim_state
   gpgvault_pk:
     name: l7_gpgvault_pk
+  ## x11
+  desktop_user_firefox:
+    name: l7_dev_desktop_user_firefox
 
 networks:
   internal:
