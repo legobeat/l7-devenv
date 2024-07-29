@@ -8,7 +8,7 @@ services:
     profiles:
       - build
     build:
-      context: imags/caddy
+      context: ../imags/caddy
       dockerfile: Containerfile
     image: 'localhost/l7/caddy:latest'
   build-base-alpine:
@@ -16,7 +16,7 @@ services:
       - build
       - alpine
     build:
-      context: .
+      context: ../.
       dockerfile: imags/alpine/Containerfile
       args:
         ALPINE_VERSION: '3.20'
@@ -24,14 +24,14 @@ services:
       tags:
         - 'localhost/l7/alpine:latest'
         - 'localhost/l7/alpine:3.20'
-    image: 'localhost/l7/alpine:latest'
+    image: 'localhost/l7/alpine:3.20'
 
   build-hub:
     profiles:
       - build
       - alpine
     build:
-      context: imags/hub
+      context: ../imags/hub
       dockerfile: ./Containerfile
       args:
         EXTRA_PKGS: ''
@@ -48,7 +48,7 @@ services:
     depends_on:
       - build-base-alpine
     build:
-      context: .
+      context: ../.
       dockerfile: imags/nvim/Containerfile
       args:
         EXTRA_PKGS: ''
@@ -62,7 +62,7 @@ services:
     depends_on:
       - build-base-alpine
     build:
-      context: imags/podman-remote
+      context: ../imags/podman-remote
       dockerfile: ./Containerfile
       args:
         EXTRA_PKGS: ''
@@ -80,26 +80,9 @@ services:
     depends_on:
       - podman-remote
     build:
-      context: .
+      context: ../.
       dockerfile: imags/nvim/Containerfile
       args:
         EXTRA_PKGS: ''
-        BASE_IMAGE: 'localhost/l7/podman-remote:latest'
-    image: 'localhost/l7/nvim:podman-remote'
-
-  build-dev-shell:
-    profiles:
-      - build
-      - nvim
-      - alpine
-    depends_on:
-      - build-caddy
-      - build-nvim-on-podman-remote
-      - build-hub
-    build:
-      context: .
-      dockerfile: imags/nvim/Containerfile
-      args:
-        EXTRA_PKGS: ''
-        BASE_IMAGE: 'localhost/l7/podman-remote:latest'
+        BASE_IMAGE: 'localhost/l7/podman-remote:alpine'
     image: 'localhost/l7/nvim:podman-remote'
