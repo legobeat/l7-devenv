@@ -8,7 +8,7 @@ services:
     networks:
       container-control:
         ipv4_address: 10.7.9.2
-    env_file: compose/container-socket-proxy.env
+    env_file: container-socket-proxy.env
     # TODO: Fix SElinux privileges of podman socket such that privileged-workaround for proxy not needed
     privileged: true
     volumes:
@@ -134,7 +134,7 @@ services:
 
 configs:
   verdaccio_cfg:
-    file: ./compose/configs/verdaccio.yml
+    file: configs/verdaccio.yml
 
 volumes:
   caddy_conf:
