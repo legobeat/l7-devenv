@@ -49,7 +49,8 @@ RUN apk add --no-cache \
 COPY --chown=2:2 \
   contrib/nvim-plugins /etc/xdg/nvim/pack/build-l7ide/start
 
-RUN cat /etc/xdg/nvim/pack/build-l7ide/start/tokyonight.nvim/extras/fzf/tokyonight_moon.sh >> /home/user/.env
+RUN cat /etc/xdg/nvim/pack/build-l7ide/start/tokyonight.nvim/extras/fzf/tokyonight_moon.sh >> ${HOME}/.env \
+  && mkdir -p ${HOME}/.local/state/nvim ${HOME}/.local/share/nvim
 
 ARG TMUX_THEME_PATH="/home/user/.config/tmux/tokyonight/tokyonight_night.tmux"
 ENV TMUX_THEME_PATH="${TMUX_THEME_PATH}"

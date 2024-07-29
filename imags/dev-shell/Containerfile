@@ -61,9 +61,7 @@ RUN apk add --no-cache \
     shadow \
   && chsh user -s "${SHELL}" \
   && ln -s /bin/zsh /usr/bin/zsh \
-  && apk del shadow \
-  && chown -R ${UID}:${GID} \
-    /home/user
+  && apk del shadow
 
 # docker-buildx may struggle w/ this
 #ARG HUB_BUILD_IMAGE=localhost/l7/hub:latest
@@ -80,7 +78,10 @@ COPY --from=fwdproxy \
   /data/caddy/pki/authorities/local/root.crt \
   /usr/local/share/ca-certificates/l7-fwd-proxy.crt
 RUN cat /usr/local/share/ca-certificates/l7-fwd-proxy.crt >> /etc/ssl/certs/ca-certificates.crt \
-  && update-ca-certificates
+  && update-ca-certificates \
+  && mkdir -p ${HOME}/.local/state/nvim ${HOME}/.local/share/nvim \
+  && chown -R ${UID}:${GID} \
+    /home/user
 
 USER ${UID}:${GID}
 WORKDIR /src
