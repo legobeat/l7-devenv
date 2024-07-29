@@ -17,6 +17,7 @@ RUN git clone \
   && git checkout ${HUB_COMMIT} \
   && HOME=/go ./script/build -o /go/app/out/hub
 USER root
-RUN mv /go/app/out/hub /usr/local/bin/hub
+RUN mv /go/app/out/hub /usr/local/bin/hub \
+  && rm -rf /go
 
 
