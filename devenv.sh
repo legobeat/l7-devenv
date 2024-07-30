@@ -60,6 +60,7 @@ runtime_config () {
   NODE_VERSION="${NODE_VERSION:-20}"
   GPG_IMAGE="${GPG_IMAGE:-localhost/l7/gpg-vault:pk}"
 
+  export CONTAINERS_CONF_OVERRIDE="${ROOT_DIR}/compose/.containers-override.conf"
   export CONTAINER_DNS="${CONTAINER_DNS:-10.7.8.133}"
 
   # compose, used for imags and leaked into de
@@ -136,7 +137,7 @@ detect_compose_command() {
     echo "Could not detect compose command. Install a newer version of ${cmd}-compose or set it by COMPOSE_CMD" >&2
     exit 1
   fi
-  echo "${composecmd} --project-directory=${ROOT_DIR} --log-level=${COMPOSE_LOG_LEVEL:-error}"
+  echo "${composecmd} --progress=quiet --project-directory=${ROOT_DIR} --log-level=${COMPOSE_LOG_LEVEL:-error}"
 }
 
 # set value in shell env file
