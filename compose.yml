@@ -65,6 +65,8 @@ services:
     #    target:   /etc/myresolv.conf
     #    uid: '0'
     #    gid: '0'
+    #sysctls:
+    #  - net.ipv4.ping_group_range: '1000 1000'
     env_file:
       - path: env
         required: false

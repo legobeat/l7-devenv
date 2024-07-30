@@ -37,6 +37,7 @@ user_config () {
 
 runtime_config () {
   set -a # export variables
+  export UID
   if [[ "$(id -u)" -eq "0"  || "${cmd}" == sudo\ * ]]; then
     if [[ -z "${L7_FORCE_UNSAFE_ROOT}" ]]; then
       echo "ERROR: Running as superuser is unsupported. Do not run as root."
@@ -50,18 +51,7 @@ runtime_config () {
     exit 1
   fi
   composecmd="${COMPOSE_CMD:-$(detect_compose_command)}"
-  NAME="${NAME:-l7-nvim}"
-  IMAGE_TAG=${IMAGE_TAG:-latest}
-  IMAGE_NAME=${IMAGE_NAME:-localhost/l7/dev-shell}
-  IMAGE=${IMAGE:-$IMAGE_NAME:$IMAGE_TAG}
-
-  GO_RUNNER_IMAGE="${GO_RUNNER_IMAGE:-localhost/l7/go:1.20-bookworm}"
-  NODE_RUNNER_IMAGE="${NODE_RUNNER_IMAGE:-localhost/l7/node}"
-  NODE_VERSION="${NODE_VERSION:-20}"
-  GPG_IMAGE="${GPG_IMAGE:-localhost/l7/gpg-vault:pk}"
-
   export CONTAINERS_CONF_OVERRIDE="${ROOT_DIR}/compose/.containers-override.conf"
-  export CONTAINER_DNS="${CONTAINER_DNS:-10.7.8.133}"
 
   # compose, used for imags and leaked into de
   # CONTAINER_SOCKET is proxied into the container and used by dev-shell container to run imags
@@ -75,48 +65,28 @@ runtime_config () {
     exit 1
   fi
 
-  # used to run de itself. should be separate from CONTAINER_HOST inside de itself
-  DOCKER_HOST="${DOCKER_HOST:-unix://${CONTAINER_SOCKET}}"
-
   NETWORK_NAME="${NETWORK_NAME:-${COMPOSE_NETWORK_NAME:-l7_dev_internal}}"
-  CONTROL_NETWORK_NAME="${CONTROL_NETWORK_NAME:-${CONTROL_COMPOSE_NETWORK_NAME:-l7_dev_container_control}}"
 
   ### run args
-  if [[ -n "${SSH_SOCKET}" ]]; then
-    RUN_ARGS="${RUN_ARGS} -v ${SSH_SOCKET}:${HOME}/.ssh/SSH_AUTH_SOCK -e SSH_AUTH_SOCK=${HOME}/.ssh/SSH_AUTH_SOCK"
-  fi
+  ### TODO: use `compose run` for dev-shell in order to be able to forward these
+  #if [[ -n "${SSH_SOCKET}" ]]; then
+  #  RUN_ARGS="${RUN_ARGS} -v ${SSH_SOCKET}:${HOME}/.ssh/SSH_AUTH_SOCK -e SSH_AUTH_SOCK=${HOME}/.ssh/SSH_AUTH_SOCK"
+  #fi
   if [[ -n "${NAME}" ]]; then
-    RUN_ARGS="${RUN_ARGS} --name ${NAME} --hostname ${NAME}"
+  #  RUN_ARGS="${RUN_ARGS} --name ${NAME} --hostname ${NAME}"
+    RUN_ARGS="${RUN_ARGS} --name=${NAME}"
   fi
 
-  GPG_PK_VOLUME=${GPG_PK_VOLUME:-"l7-gpg-vault-pk"}
-  if [[ -n "${GPG_PK_VOLUME}" ]]; then
-    RUN_ARGS="${RUN_ARGS} -e GPG_PK_VOLUME=${GPG_PK_VOLUME}"
-  fi
-
-  if [[ -f "${ROOT_DIR}/env" ]]; then
-    RUN_ARGS="${RUN_ARGS} --env-file ${ROOT_DIR}/env"
-  fi
-  if [[ -f "${CONF_DIR}/env" ]]; then
-    RUN_ARGS="${RUN_ARGS} --env-file ${CONF_DIR}/env"
-  fi
-  if [[ "${L7_DISABLE_SELINUX}" == "1" ]]; then
-    RUN_ARGS="${RUN_ARGS} --security-opt=label=disable -e L7_DISABLE_SELINUX=1"
-  fi
-
-  # podman / netavark hijack both dns and/or resolv.conf no matter what, it seems...
-  RESOLV_CONF_PATH="${L7_RESOLV_CONF_PATH:-$(mktemp -t l7-resolvconf.XXX --tmpdir)}"
-  cat <<EOT > "${RESOLV_CONF_PATH}"
-options no-aaaa
-options single-request
-nameserver ${CONTAINER_DNS}
-EOT
-  NVIM_STATE_PATH="${L7_NVIM_STATE_PATH:-$(mktemp -d -t l7-nvim-state.XXXX --tmpdir)}"
-
-  # detect tty
-  if [ -t 1 ] ; then
-    RUN_ARGS="${RUN_ARGS} -t "
-  fi
+  # TODO
+  #if [[ -f "${ROOT_DIR}/env" ]]; then
+  #  RUN_ARGS="${RUN_ARGS} --env-file ${ROOT_DIR}/env"
+  #fi
+  #if [[ -f "${CONF_DIR}/env" ]]; then
+  #  RUN_ARGS="${RUN_ARGS} --env-file ${CONF_DIR}/env"
+  #fi
+  #if [[ "${L7_DISABLE_SELINUX}" == "1" ]]; then
+  #  RUN_ARGS="${RUN_ARGS} --security-opt=label=disable -e L7_DISABLE_SELINUX=1"
+  #fi
 }
 
 detect_runtime_command() {
@@ -232,7 +202,6 @@ configure_gh_token() {
       "${composecmd}" restart --no-deps 'auth-proxy'  >/dev/null 2>/dev/null || true
       unset  SHOULD_RESTART_AUTH_PROXY
     fi
-
   fi
 }
 
@@ -240,7 +209,7 @@ start_compose () {
   (cd "${ROOT_DIR}" \
     && DOCKER_HOST="${DOCKER_HOST:-unix://${CONTAINER_SOCKET}}" \
        CONTAINER_SOCKET="${CONTAINER_SOCKET}" \
-      ${composecmd} up -d --wait >> "${LOG_DIR}/compose.log" 2>> "${LOG_DIR}/compose.err"
+      ${composecmd} up -d --wait dev-shell >> "${LOG_DIR}/compose.log" 2>> "${LOG_DIR}/compose.err"
   )
 }
 
@@ -263,10 +232,6 @@ fi
 # https://stackoverflow.com/questions/59895/how-do-i-get-the-directory-where-a-bash-script-is-located-from-within-the-script/1482133#1482133
 export ROOT_DIR="${ROOT_DIR:-$(dirname -- "$( readlink -f -- "$0"; )")}"
 
-if [[ -n "${1}" ]]; then
-  RUN_ARGS="${RUN_ARGS} --entrypoint ${1}"
-fi
-
 user_config
 runtime_config
 configure_gh_token
@@ -282,51 +247,26 @@ if [[ -n "${DEBUG}" ]]; then
   env | sort
 fi
 
-container_id="$(${cmd} ps -f "name=${NAME}" -q || echo '')"
+entrypoint=${1:-${SHELL}}
 
-if [[ -n "${container_id}" ]]; then
-  entrypoint=${1:-${SHELL}}
-  EXEC_ARGS=${EXEC_ARGS:--it}
-  ${cmd} exec -it \
-    -w "${CWD}" \
-    ${EXEC_ARGS} \
-    "${NAME}" \
-    ${entrypoint} \
-    "${@:2}"
-else
-  ${cmd} run --rm -i \
-    --user 1000:1000 --userns=keep-id:uid=1000,gid=1000 \
-    --mount type=bind,source="${LOCAL_DIR},target=/home/user/.local" \
-    --mount type=bind,source="${CONF_DIR}/ssh.d,target=/home/user/.ssh/config.d,ro=true" \
-    --mount type=bind,source="${CONF_DIR}/git,target=/home/user/.config/git,ro=true" \
-    -v "${SRC_DIR}:${SRC_DIR}${SRC_DIR_OPTS}" \
-    -v "${SRC_DIR}:/src${SRC_DIR_OPTS}" \
-    -v "${NVIM_STATE_PATH}:/home/user/.local/state/nvim:z" \
-    -v "${RESOLV_CONF_PATH}:/etc/resolv.conf:ro" \
-    -v "${NODE_CACHE_DIR}/yarn/cache/berry:/home/node/.yarn/cache/berry:z,ro" \
-    -v "${NODE_CACHE_DIR}/yarn/cache/classic:/home/node/.cache/yarn:z,ro" \
-    -v "${NODE_CACHE_DIR}/pnpm/cache:/home/node/.cache/pnpm:z,ro" \
-    -v "${NODE_CACHE_DIR}/npm/cache:/home/node/.npm/_cacache:z,ro" \
-    -w "${CWD}" \
-    --mount type=tmpfs,tmpfs-size=2G,destination=/tmp,tmpfs-mode=0777 \
-    -e "L7_COMPOSE_NETWORK_NAME_INTERNAL=${NETWORK_NAME}" \
-    -e "L7_NVIM_STATE_PATH=${NVIM_STATE_PATH}" \
-    -e "L7_NODE_CACHE_DIR=${NODE_CACHE_DIR}" \
-    -e "L7_RESOLV_CONF_PATH=${RESOLV_CONF_PATH}" \
-    -e "CONTAINER_HOST=tcp://10.7.9.2:2375" \
-    -e "CONTAINER_DNS=${CONTAINER_DNS}" \
-    -e "GO_RUNNER_IMAGE=${GO_RUNNER_IMAGE}" \
-    -e "NODE_RUNNER_IMAGE=${NODE_RUNNER_IMAGE}" \
-    -e "L7_NODE_VERSION=${NODE_VERSION}" \
-    -e "GPG_IMAGE=${GPG_IMAGE}" \
-    -e HOME=/home/user \
-    -e "SRC_DIR=${SRC_DIR}" \
-    --network "${NETWORK_NAME}" \
-    --network "${CONTROL_NETWORK_NAME}" \
-    --dns "${CONTAINER_DNS}" \
-    ${RUN_ARGS} \
-    "${IMAGE}" \
-    "${@:2}"
+# allow explicitly execing into named container
+if [[ -n "${NAME}" ]]; then
+  container_id="$(${cmd} ps -f "name=${NAME}" -q || echo '')"
+  if [[ -n "${container_id}" ]]; then
+    EXEC_ARGS=${EXEC_ARGS:--it}
+    ${cmd} exec \
+      -w "${CWD}" \
+      ${EXEC_ARGS} \
+      "${NAME}" \
+      ${entrypoint} \
+      "${@:2}"
+    exit
+  fi
 fi
-###
-# --sysctl "net.ipv4.ping_group_range=1000 1000" \
+${composecmd} run \
+  --rm \
+  -w "${CWD}" \
+  "--entrypoint=${entrypoint}" \
+  ${RUN_ARGS} \
+  "dev-shell" \
+  "${@:2}"
