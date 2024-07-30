@@ -10,10 +10,11 @@ services:
         ipv4_address: 10.7.9.2
     env_file: container-socket-proxy.env
     # TODO: Fix SElinux privileges of podman socket such that privileged-workaround for proxy not needed
+    # and/or host separate socket
     privileged: true
     volumes:
-      - ${CONTAINER_SOCKET:-${XDG_RUNTIME_DIR}/podman/podman.sock}:/var/run/docker.sock:Z
-      #- /run/user/${UID}/podman/podman.sock:/var/run/docker.sock:ro
+      - '${CONTAINER_SOCKET:-${XDG_RUNTIME_DIR:-/var/run/user/${UID:-1000}}/podman/podman.sock}:/var/run/docker.sock:Z'
+      #- '/run/user/${UID:-1000}/podman/podman.sock:/var/run/docker.sock:ro'
     restart: unless-stopped
     tmpfs:
       - /run

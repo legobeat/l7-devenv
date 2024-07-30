@@ -64,10 +64,15 @@ runtime_config () {
   export CONTAINER_DNS="${CONTAINER_DNS:-10.7.8.133}"
 
   # compose, used for imags and leaked into de
+  # CONTAINER_SOCKET is proxied into the container and used by dev-shell container to run imags
   export CONTAINER_SOCKET="${CONTAINER_SOCKET:-${XDG_RUNTIME_DIR}/podman/podman.sock}"
-  # CONTAINER_SOCKET is leaked into the container and used by de container to run imags
-  if [[ -z "${CONTAINER_SOCKET}" || ! -f "${CONTAINER_SOCKET}" ]]; then
+  if [[ -z "${CONTAINER_SOCKET}" || ! -S "${CONTAINER_SOCKET}" ]]; then
     CONTAINER_SOCKET="${CONTAINER_SOCKET:-/var/run/docker.sock}"
+  fi
+
+  if [[ ! -S "${CONTAINER_SOCKET}" ]]; then
+    echo "Error: Could not detect container socket. This can be worked around by setting the CONTAINER_SOCKET env var. File this as a bug."
+    exit 1
   fi
 
   # used to run de itself. should be separate from CONTAINER_HOST inside de itself
@@ -233,7 +238,7 @@ configure_gh_token() {
 
 start_compose () {
   (cd "${ROOT_DIR}" \
-    && DOCKER_HOST="${DOCKER_HOST}" \
+    && DOCKER_HOST="${DOCKER_HOST:-unix://${CONTAINER_SOCKET}}" \
        CONTAINER_SOCKET="${CONTAINER_SOCKET}" \
       ${composecmd} up -d --wait >> "${LOG_DIR}/compose.log" 2>> "${LOG_DIR}/compose.err"
   )
