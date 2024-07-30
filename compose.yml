@@ -130,8 +130,8 @@ networks:
     internal: true
     ipam:
       config:
-        - subnet: 10.7.9.0/29
-          ip_range: 10.7.9.4/30
+        - subnet: 10.7.9.0/27
+          ip_range: 10.7.9.16/28
     driver: bridge
     driver_opts:
       inhibit_ipv4: '1'
