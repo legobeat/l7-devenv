@@ -255,7 +255,7 @@ if [ -z "${CWD}" ]; then
 fi
 
 # https://stackoverflow.com/questions/59895/how-do-i-get-the-directory-where-a-bash-script-is-located-from-within-the-script/1482133#1482133
-ROOT_DIR="${ROOT_DIR:-$(dirname -- "$( readlink -f -- "$0"; )")}"
+export ROOT_DIR="${ROOT_DIR:-$(dirname -- "$( readlink -f -- "$0"; )")}"
 
 if [[ -n "${1}" ]]; then
   RUN_ARGS="${RUN_ARGS} --entrypoint ${1}"

@@ -86,7 +86,7 @@ services:
       L7_YARN_CLASSIC_CACHE_VOLUME: 'l7_cache_node_yarn_classic'
       GPG_PK_VOLUME: 'l7_gpgvault_pk'
       L7_COMPOSE_NETWORK_NAME_INTERNAL: 'l7_dev_internal'
-      L7_RESOLV_CONF_PATH: '${L7_RESOLV_CONF_PATH:-${PWD}/compose/mounts/resolv-internal.conf}'
+      L7_RESOLV_CONF_PATH: '${L7_RESOLV_CONF_PATH:-${ROOT_DIR:-${PWD}}/compose/mounts/resolv-internal.conf}'
       SSH_AUTH_SOCK: '/home/user/.ssh/SSH_AUTH_SOCK'
     dns: '${CONTAINER_DNS:-10.7.8.133}'
     entrypoint: /bin/sh
