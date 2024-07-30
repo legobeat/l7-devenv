@@ -136,7 +136,7 @@ detect_compose_command() {
     echo "Could not detect compose command. Install a newer version of ${cmd}-compose or set it by COMPOSE_CMD" >&2
     exit 1
   fi
-  echo "${composecmd}"
+  echo "${composecmd} --project-directory=${ROOT_DIR}"
 }
 
 # set value in shell env file
