@@ -8,6 +8,7 @@ RUN apt-get update \
     git curl ca-certificates gnupg ssh-client less psmisc jq time \
     fakeroot \
     build-essential ccache cmake cmake-format distcc zlib1g-dev libzlcore-dev libffi-dev libssl-dev libyaml-dev \
+    golang-github-seccomp-libseccomp-golang-dev seccomp \
   && rm -rf /var/{cache,lib}/apt
 
 ENV CGO_ENABLED=0

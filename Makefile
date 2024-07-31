@@ -153,11 +153,19 @@ image_runner_go_1.20: submodules
 		-t "${IMAGE_NAME}:1.20-${IMAGE_TAG}" \
 		-f './imags/go-runner/Containerfile' \
 
-image_runner_go_1.20 : IMAGE_NAME = ${GO_RUNNER_IMAGE_NAME}
-image_runner_go_1.20 : IMAGE_TAG = ${GO_RUNNER_IMAGE_TAG}
-image_runner_go: image_runner_go_1.20
+image_runner_go_1.21 : IMAGE_NAME = ${GO_RUNNER_IMAGE_NAME}
+image_runner_go_1.21 : IMAGE_TAG = ${GO_RUNNER_IMAGE_TAG}
+image_runner_go_1.21: submodules
+	${CMD} buildx build \
+		${BUILD_OPTIONS} \
+		--build-arg "SHELL=${USER_SHELL}" \
+		--build-arg "GO_VERSION=1.21" \
+		-t "${IMAGE_NAME}:1.21-${IMAGE_TAG}" \
+		-f './imags/go-runner/Containerfile' \
+
+image_runner_go: image_runner_go_1.21
 	${CMD tag \
-		"${IMAGE_NAME}:1.20-${IMAGE_TAG} \
+		"${IMAGE_NAME}:1.21-${IMAGE_TAG} \
 	    "${IMAGE_NAME}:${IMAGE_TAG}"
 
 
