@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1.4-labs
 FROM docker.io/ubuntu:noble-20240605
 
 ENV APT_CACHER_NG_VERSION=3.7.4

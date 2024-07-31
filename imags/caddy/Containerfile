@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1.4-labs
 FROM docker.io/library/caddy:2.8-builder-alpine AS builder
 
 RUN xcaddy build \
