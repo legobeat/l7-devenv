@@ -248,7 +248,7 @@ if [[ -n "${DEBUG}" ]]; then
   env | sort
 fi
 
-entrypoint=${1:-${SHELL}}
+entrypoint="${1:-${USER_SHELL:-${SHELL:-/bin/zsh}}}"
 
 # allow explicitly execing into named container
 EXEC_ARGS=${EXEC_ARGS:--it}
@@ -260,7 +260,7 @@ if [[ -n "${L7_CNTR}" ]]; then
     -w "${CWD}" \
     ${EXEC_ARGS} \
     "${L7_CNTR}" \
-    ${entrypoint} \
+    "${entrypoint}" \
     "${@:2}"
   exit $?
 #else
