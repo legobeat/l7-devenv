@@ -14,10 +14,12 @@ You should also be able to use this with Docker by replacing `podman` with `dock
 $ sudo apt-get update && sudo apt-get upgrade -y
 
 ## Install system dependencies
-$ sudo apt-get install --no-install-recommends coreutils make podman buildah catatonit slirp4netns netavark passt fuse-overlayfs uidmap gnu-which overlayroot containers-storage yq whois
+$ sudo apt-get install --no-install-recommends coreutils make podman buildah catatonit slirp4netns netavark passt fuse-overlayfs uidmap gnu-which overlayroot containers-storage yq whois golang-github-containernetworking-plugin-dnsname docker-compose-v2
 ```
 
-We will also need [docker-compose](https://github.com/docker/compose) v2. As of writing, it is not available in Debian/Ubuntu distro repositories. You can either [build from source](https://github.com/docker/compose/blob/main/BUILDING.md), [download the binary release from GitHub](https://github.com/docker/compose?tab=readme-ov-file#linux), or install `docker-compose-plugin` from [Docker apt repositories](https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository).
+<details><summary>Debian-specific</summary>
+We will also need [docker-compose](https://github.com/docker/compose) v2. As of writing, it is not available in Debian distro repositories. You can either [build from source](https://github.com/docker/compose/blob/main/BUILDING.md), [download the binary release from GitHub](https://github.com/docker/compose?tab=readme-ov-file#linux), or install `docker-compose-plugin` from [Docker apt repositories](https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository).
+</details>
 
 ### Rootless podman setup
 
