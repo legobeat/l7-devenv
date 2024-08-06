@@ -40,11 +40,11 @@ services:
     # TODO: mounts for config could be done as configs
     # https://github.com/compose-spec/compose-spec/blob/master/08-configs.md
     volumes:
-      - '${CONF_DIR:-${HOME}/.config/l7ide/config}/ssh.d:/home/user/.ssh/config.d:ro'
-      - '${CONF_DIR:-${HOME}/.config/l7ide/config}/git:/home/user/.config/git:ro'
+      - '${CONF_DIR:-${L7_HOME:-${HOME}}/.config/l7ide/config}/ssh.d:/home/user/.ssh/config.d:ro'
+      - '${CONF_DIR:-${L7_HOME:-${HOME}}/.config/l7ide/config}/git:/home/user/.config/git:ro'
       - '${SRC_DIR:-${L7_SRC_DIR:-${PWD}}}:${SRC_DIR:-${L7_SRC_DIR:-${PWD}}}:rshared,nosuid'
       - '${SRC_DIR:-${L7_SRC_DIR:-${PWD}}}:/src:rshared,nosuid'
-      - '${LOCAL_DIR:-l7_dev_user_local}:/home/user/.local'
+      - '${LOCAL_DIR:-user_local}:/home/user/.local'
       - 'nvim_state:/home/user/.local/state/nvim:z'
       - 'cache_node_yarn_berry:/home/node/.yarn/cache/berry:z,ro'
       - 'cache_node_yarn_classic:/home/node/.cache/yarn:z,ro'
@@ -80,6 +80,7 @@ services:
       NODE_RUNNER_IMAGE: '${NODE_RUNNER_IMAGE:-localhost/l7/node}'
       L7_NODE_VERSION:   '${L7_NODE_VERSION:-20}'
       HOME:    /home/user
+      L7_HOME: '${HOME}'
       SRC_DIR: '${SRC_DIR:-${L7_SRC_DIR:-${PWD}}}'
       L7_NVIM_STATE_PATH:  'l7_nvim_state'
       L7_NPM_CACHE_VOLUME:  'l7_cache_node_npm'
