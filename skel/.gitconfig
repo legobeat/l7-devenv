@@ -52,6 +52,9 @@
   dno  = diff --name-only
   dns  = diff --name-status
   f    = fetch
+  head = rev-parse HEAD
+  h    = rev-parse HEAD
+  hs   = rev-parse --short HEAD
   wt   = worktree
   wta  = worktree add
   worktree-add-branch = "!add_and_log() { git worktree add \"${1}\" \"${2}\" && echo \"pushd '${1}'\" ; }; add_and_log \"${SRC_DIR}/.worktrees/$(basename \"$(pwd)\")/${1}\""
@@ -77,6 +80,9 @@
   rbi  = rebase -i
   rbs  = rebase --skip
   rl   = reflog
+  rp   = rev-parse
+  rp   = rev-parse --abbrev-ref
+  rps  = rev-parse --short
   ru   = remote -v update
   rr   = remote remove
   rv   = remote -v
