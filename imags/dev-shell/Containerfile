@@ -81,7 +81,8 @@ RUN cat /usr/local/share/ca-certificates/l7-fwd-proxy.crt >> /etc/ssl/certs/ca-c
   && update-ca-certificates \
   && mkdir -p ${HOME}/.local/state/nvim ${HOME}/.local/share/nvim \
   && chown -R ${UID}:${GID} \
-    /home/user
+    /home/user \
+  && chmod 777 /tmp
 
 USER ${UID}:${GID}
 WORKDIR /src

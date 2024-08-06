@@ -50,11 +50,12 @@ services:
       - 'cache_node_yarn_classic:/home/node/.cache/yarn:z,ro'
       - 'cache_node_pnpm:/home/node/.cache/pnpm:z,ro'
       - 'cache_node_npm:/home/node/.npm/_cacache:z,ro'
-      - target: /tmp
-        type: tmpfs
-        tmpfs:
-          size: 2G
-          mode: 0777
+      # TODO: tmpfs mounts not supported under podman-compose
+      #- target: /tmp
+      #  type: tmpfs
+      #  tmpfs:
+      #    size: 2G
+      #    mode: 0777
       - '${SSH_SOCKET:-${SSH_AUTH_SOCK:-/dev/null}}:/home/user/.ssh/SSH_AUTH_SOCK'
       # ugly hack around compose insisting on overriding DNS:
       # https://github.com/docker/compose/issues/2847
