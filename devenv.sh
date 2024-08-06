@@ -37,6 +37,7 @@ user_config () {
 
 runtime_config () {
   set -a # export variables
+  export PODMAN_COMPOSE_WARNING_LOGS=false
   export UID
   if [[ "$(id -u)" -eq "0"  || "${cmd}" == sudo\ * ]]; then
     if [[ -z "${L7_FORCE_UNSAFE_ROOT}" ]]; then
