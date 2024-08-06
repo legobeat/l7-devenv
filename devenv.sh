@@ -250,23 +250,34 @@ fi
 entrypoint=${1:-${SHELL}}
 
 # allow explicitly execing into named container
-if [[ -n "${NAME}" ]]; then
-  container_id="$(${cmd} ps -f "name=${NAME}" -q || echo '')"
-  if [[ -n "${container_id}" ]]; then
-    EXEC_ARGS=${EXEC_ARGS:--it}
-    ${cmd} exec \
-      -w "${CWD}" \
-      ${EXEC_ARGS} \
-      "${NAME}" \
-      ${entrypoint} \
-      "${@:2}"
-    exit
-  fi
+EXEC_ARGS=${EXEC_ARGS:--it}
+if [[ -n "${L7_NAME:-${NAME}}" ]]; then
+  L7_CNTR="$(${cmd} ps -f "name=${L7_NAME:-${NAME}}" -q || echo '')"
 fi
+if [[ -n "${L7_CNTR}" ]]; then
+  ${cmd} exec \
+    -w "${CWD}" \
+    ${EXEC_ARGS} \
+    "${L7_CNTR}" \
+    ${entrypoint} \
+    "${@:2}"
+  exit $?
+#else
+#  # fall back to compose
+#  echo "Warning: Could not determine container id; falling back to compose. This is probably a bug." >&2
+#  ${composecmd} exec \
+#    -w "${CWD}" \
+#    ${EXEC_ARGS} \
+#    "dev-shell" \
+#    ${entrypoint} \
+#    "${@:2}"
+#  exit $?
+fi
+
 ${composecmd} run \
   --rm \
   -w "${CWD}" \
   "--entrypoint=${entrypoint}" \
   ${RUN_ARGS} \
-  "dev-shell" \
+  "${L7_COMPOSE_SVC:-"dev-shell"}" \
   "${@:2}"
