@@ -1,4 +1,4 @@
-# syntax=docker/dockerfile:1
+# syntax=docker/dockerfile:1.4-labs
 ARG CADDY_IMAGE=localhost/l7/caddy:latest
 ARG NODE_VERSION=20
 FROM ${CADDY_IMAGE} AS fwdproxy

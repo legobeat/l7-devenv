@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1.4-labs
 ARG GO_VERSION=1.22
 FROM docker.io/golang:${GO_VERSION}-alpine
 WORKDIR /go/app
