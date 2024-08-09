@@ -437,9 +437,13 @@ image_firefox: images_deps_firefox
 submodules:
 	@git submodule update --checkout --init --recursive --rebase
 
+image_docker_compose: submodules
+	pushd imags/docker-compose; \
+	DOCKER_HOST="$${CONTAINER_HOST:-unix://$${XDG_RUNTIME_DIR}/podman/podman.sock}" docker buildx bake --progress=plain --load image; \
+	popd
+
 images_deps_firefox: submodules
 	COMPOSEFILE=./compose/base-images.compose.yml BUILDCOMPOSEFILE=./compose/base-images.compose.yml ./contrib/l7-scripts/bin/compose-build-dependencies firefox
-
 
 images_deps: submodules
 	BUILDCOMPOSEFILE=./compose/base-images.compose.yml ./contrib/l7-scripts/bin/compose-build-dependencies dev-shell
