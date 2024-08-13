@@ -1,0 +1,8 @@
+#!/bin/bash
+xrdir="${HOME}/.config/xresources/"
+if [[ -d "${xrdir}" ]]; then
+  find ${HOME}/.config/xresources/ \
+    -maxdepth 3 -name '*.Xresources' \
+    -exec xrdb -m '{}'  \;
+fi
+

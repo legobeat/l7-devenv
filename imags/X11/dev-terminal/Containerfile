@@ -1,0 +1,28 @@
+# syntax=docker/dockerfile:1.4-labs
+ARG BASE_IMAGE="localhost/l7/xterm:podman-remote"
+FROM ${BASE_IMAGE}
+USER root
+RUN apk add --no-cache \
+    bash \
+    yq \
+    tmux
+
+ARG COMPOSE_BUILD_IMAGE="localhost/docker-compose:latest"
+ARG TARGETOS=linux
+
+#ARG TARGETARCH=x86_64
+#COPY --from=${COMPOSE_BUILD_IMAGE} /docker-compose-${TARGETOS}-${TARGETARCH} /usr/local/bin/docker-compose
+ARG COMPOSE_TARGETARCH=x86_64
+COPY --from=${COMPOSE_BUILD_IMAGE} /docker-compose-${TARGETOS}-${COMPOSE_TARGETARCH} /usr/local/bin/docker-compose
+
+COPY --chown=1000 ./devenv.sh ./compose.yml /app
+COPY --chown=1000 ./compose /app/compose
+COPY ./imags/X11/dev-terminal/bin/ /usr/local/bin
+COPY ./contrib/bin/l7-cnt-run /usr/local/bin
+COPY ./contrib/bin/firefox /usr/local/bin
+
+RUN chmod 777 /app /home \
+  && ln -s app /l7-de \
+  && mkdir -p /tmp/.X11-unix && chmod 755 /tmp/.X11-unix && chown -R 1000:1000 /tmp/.X11-unix
+USER user
+WORKDIR /app
