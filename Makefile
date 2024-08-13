@@ -432,6 +432,9 @@ export_runner_node: # image_runner_node
 image_firefox: images_deps_firefox
 	podman compose build firefox
 
+image_xterm: images_deps_xterm
+	podman compose build xterm
+
 ####
 
 submodules:
@@ -447,6 +450,10 @@ images_deps_firefox: submodules
 
 images_deps: submodules
 	BUILDCOMPOSEFILE=./compose/base-images.compose.yml ./contrib/l7-scripts/bin/compose-build-dependencies dev-shell
+
+
+images_deps_xterm: image_docker_compose images_deps
+	BUILDCOMPOSEFILE=./compose/base-images.compose.yml ./contrib/l7-scripts/bin/compose-build-dependencies xterm
 
 images: images_deps image_runner_node image_dnsmasq image_gpg_pk image_dev_shell image_acng image_auth_proxy image_container_proxy image_lsp_node
 

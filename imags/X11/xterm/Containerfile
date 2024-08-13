@@ -1,0 +1,61 @@
+# syntax=docker/dockerfile:1.4-labs
+ARG X11_BASE_IMAGE=localhost/l7/alpine:x11
+ARG BASE_IMAGE=localhost/l7/alpine:x11
+
+FROM ${X11_BASE_IMAGE} AS x11_base
+#ARG BASE_IMAGE=alpine:3.20
+#ARG EXTENSION_BUILDER_IMAGE=localhost/l7/node:20-bookworm
+#FROM ${EXTENSION_BUILDER_IMAGE} AS extension-builder
+#
+#USER root
+#COPY --chown=1002:1002 contrib/browser-extensions/multi-account-containers /build/multi-account-containers
+#RUN mkdir -p /out /build/multi-account-containers  /tmp/1002-home \
+#  && chmod 777 /out /build/multi-account-containers  /tmp/1002-home \
+#  && chown 1002:1002 /out /build/multi-account-containers /tmp/1002-home
+#
+#ENV HOME=/tmp/1002-home
+#USER 1002:1002
+#
+## build, pack, and install web extenstions
+#RUN set -x &&  cd /build/multi-account-containers \
+#  && npm install --frozen-lockfile \
+#  && npm run build \
+#  && npm pack
+#
+#################
+FROM ${BASE_IMAGE}
+USER root
+
+ARG EXTRA_PKGS=''
+ARG FONT_PKGS='font-jetbrains-mono-nerd'
+
+RUN apk add --no-cache \
+    #xhost \
+    xbindkeys xkeyboard-config xrdb xsetroot xsel \
+    #rofi \
+    #timg \
+    #tmux \
+    xterm xterm-doc \
+    #scrot feh \
+    libsixel \
+    ${FONT_PKGS} \
+    ${EXTRA_PKGS}
+
+ARG UID=1000
+ARG GID=1000
+RUN mkdir -p /tmp/.X11-unix && chmod 755 /tmp/.X11-unix
+
+#COPY skel/.config/ /home/user/.config/
+# xresources and other x11-generics
+COPY --from=x11_base /home/user/ /home/user/
+COPY skel/ /home/user/
+RUN ln -sf /home/user/.xinitrc /usr/local/bin/xinitrc \
+  && chown -R user /home/user
+
+ARG TMUX_THEME_PATH="/home/user/.config/tmux/tokyonight/tokyonight_night.tmux"
+ENV TMUX_THEME_PATH="${TMUX_THEME_PATH}"
+ENV TERM=xterm-256color
+
+USER user
+
+ENTRYPOINT ["/usr/bin/xterm"]
