@@ -108,6 +108,20 @@ services:
         - 'localhost/l7/alpine:x11-3.20'
     image: 'localhost/l7/alpine:x11'
 
+  build-xterm-on-podman-remote-on-x11:
+    profiles:
+      - build
+      - xterm
+      - alpine
+    depends_on:
+      - build-podman-remote-on-x11
+    build:
+      context: ../imags/X11/xterm
+      dockerfile: ./Containerfile
+      args:
+        EXTRA_PKGS: ''
+        BASE_IMAGE: 'localhost/l7/podman-remote:x11'
+    image: 'localhost/l7/xterm:x11'
 
   firefox:
     profiles:

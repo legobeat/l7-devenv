@@ -106,6 +106,64 @@ services:
     entrypoint: /bin/sh
     command: -c 'sleep 36000000000'
 
+  xterm:
+    profiles:
+      - podman
+      - xterm
+    depends_on:
+      - dev-shell
+    image: 'localhost/l7/dev-terminal:xterm'
+    build:
+      x-build-images:
+        - 'localhost/l7/xterm:x11'
+      context: .
+      dockerfile: imags/X11/dev-terminal/Containerfile
+      args:
+        BASE_IMAGE: '${XTERM_IMAGE:-localhost/l7/xterm:x11}'
+      tags:
+        - 'localhost/l7/dev-terminal:xterm'
+        - 'localhost/l7/dev-terminal:latest'
+    hostname: localhost
+    restart: never
+    user: '1000:1000'
+    networks:
+      container-control:
+    working_dir: /home/user
+    # TODO: mounts for config could be done as configs
+    # https://github.com/compose-spec/compose-spec/blob/master/08-configs.md
+    volumes:
+      - '${L7_XAUTHORITY_VOLUME:-desktop_x11_xauthority}:/etc/x11/xauthority'
+      - '${L7_X11_SOCKET_VOLUME:-desktop_x11_unix}:/tmp/.X11-unix'
+    environment:
+      CONTAINER_DNS:     '${CONTAINER_DNS:-10.7.8.133}'
+      CONTAINER_HOST:    'tcp://10.7.9.2:2375'
+      DOCKER_HOST:       'tcp://10.7.9.2:2375'
+      GO_RUNNER_IMAGE:   '${GO_RUNNER_IMAGE:-localhost/l7/go:1.20-bookworm}'
+      GPG_IMAGE:         '${GPG_IMAGE:-localhost/l7/gpg-vault:pk}'
+      NODE_RUNNER_IMAGE: '${NODE_RUNNER_IMAGE:-localhost/l7/node}'
+      L7_NODE_VERSION:   '${L7_NODE_VERSION:-20}'
+      HOME:    /home/user
+      L7_HOME: '${L7_HOME:-${HOME}}'
+      CONF_DIR: '${CONF_DIR:-${L7_HOME:-${HOME}}/.config/l7ide/config}'
+      SRC_DIR: '${SRC_DIR:-${L7_SRC_DIR:-${PWD}}}'
+      ROOT_DIR: '${L7_ROOT_DIR:-${ROOT_DIR:-${PWD}}}'
+      L7_NVIM_STATE_PATH:  'l7_nvim_state'
+      L7_NPM_CACHE_VOLUME:  'l7_cache_node_npm'
+      L7_PNPM_CACHE_VOLUME: 'l7_cache_node_pnpm'
+      L7_YARN_BERRY_CACHE_VOLUME:   'l7_cache_node_yarn_berry'
+      L7_YARN_CLASSIC_CACHE_VOLUME: 'l7_cache_node_yarn_classic'
+      GPG_PK_VOLUME: '${GPG_PK_VOLUME:-l7_gpgvault_pk}'
+      L7_COMPOSE_NETWORK_NAME_INTERNAL: 'l7_dev_internal'
+      L7_RESOLV_CONF_PATH: '${L7_RESOLV_CONF_PATH:-${ROOT_DIR:-${PWD}}/compose/mounts/resolv-internal.conf}'
+      SSH_SOCKET: '${SSH_SOCKET:-${SSH_AUTH_SOCK:-}}'
+      DISPLAY:    '${L7_DISPLAY:-:1.0}'
+      L7_DISPLAY: '${L7_DISPLAY:-:1.0}'
+      L7_X11_SOCKET_VOLUME: '${L7_X11_SOCKET_VOLUME:-l7_dev_desktop_x11_unix}'
+      #L7_XAUTHORITY: '${L7_XAUTHORITY:-${XAUTHORITY:-${HOME}/.Xauthority}}'
+      XAUTHORITY: '/etc/x11/xauthority/Xauthority'
+      L7_XAUTHORITY: '${L7_XAUTHORITY:-${XAUTHORITY:-}}'
+      L7_XAUTHORITY_VOLUME: '${L7_XAUTHORITY_VOLUME:-l7_dev_desktop_x11_xauthority}'
+    entrypoint: xterm
 #########################################################
 
 volumes:
