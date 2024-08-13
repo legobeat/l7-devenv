@@ -429,10 +429,17 @@ export_runner_node: # image_runner_node
 	@@${CMD} save \
 		"${IMAGE_NAME}:${IMAGE_TAG}"
 
+image_firefox: images_deps_firefox
+	podman compose build firefox
+
 ####
 
 submodules:
 	@git submodule update --checkout --init --recursive --rebase
+
+images_deps_firefox: submodules
+	COMPOSEFILE=./compose/base-images.compose.yml BUILDCOMPOSEFILE=./compose/base-images.compose.yml ./contrib/l7-scripts/bin/compose-build-dependencies firefox
+
 
 images_deps: submodules
 	BUILDCOMPOSEFILE=./compose/base-images.compose.yml ./contrib/l7-scripts/bin/compose-build-dependencies dev-shell

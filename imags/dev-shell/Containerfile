@@ -73,6 +73,8 @@ COPY --from=localhost/l7/hub:latest --chown=2:2 \
 COPY --chmod=755 --chown=root \
   contrib/bin/* contrib/*/bin/*       /usr/local/bin/
 
+ARG XDG_APPLICATION_IMAG=dev-shell
+COPY imags/${XDG_APPLICATION_IMAG}/applications/*.desktop /usr/share/applications/
 ### trust internal proxy ca cert
 COPY --from=fwdproxy \
   --chmod=444 \

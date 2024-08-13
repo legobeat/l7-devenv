@@ -1,0 +1,32 @@
+# syntax=docker/dockerfile:1.4-labs
+ARG ALPINE_VERSION=3.20
+ARG BASE_IMAGE=alpine:${ALPINE_VERSION}
+FROM ${BASE_IMAGE}
+
+ARG EXTRA_PKGS=''
+
+ARG UID=1000
+ARG GID=1000
+
+USER root
+
+RUN apk add --no-cache \
+    xbindkeys xkeyboard-config xsetroot xsel \
+    font-source-code-pro-nerd font-terminus-nerd font-noto-symbols font-noto-emoji font-nerd-fonts-symbols nerd-fonts \
+    font-awesome font-adobe-source-code-pro font-jetbrains-mono-nerd ttf-dejavu \
+    font-terminus font-noto font-noto-thai font-ipa font-sony-misc font-jis-misc font-inconsolata font-dejavu font-noto font-awesome font-noto-extra font-vollkorn font-misc-cyrillic font-mutt-misc font-screen-cyrillic \
+    # font-noto-cjk \
+    mesa-dri-gallium mesa-vulkan-swrast xf86-video-fbdev xf86-video-vesa \
+    scrot feh
+    # nerd-fonts-all \
+
+RUN mkdir -p /tmp/.X11-unix && chmod 177 /tmp/.X11-unix
+
+COPY ./skel/ /home/user/
+#COPY ./bin/* /usr/local/bin/
+
+RUN touch /home/user/.Xauthority \
+    && chmod 600 /home/user/.Xauthority \
+    && chown -R ${UID}:${GID} /home/user
+
+USER user
