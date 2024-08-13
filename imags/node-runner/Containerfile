@@ -102,5 +102,8 @@ ENV GIT_AUTHOR_NAME=${GIT_AUTHOR_NAME}
 ENV GIT_COMMITTER_EMAIL=${GIT_COMMITTER_EMAIL}
 ENV GIT_COMMITTER_NAME=${GIT_COMMITTER_NAME}
 
+# Without disabling enableStrictSettigs, it's impossible to have one unified config file for yarn v3+v4
+ENV YARN_ENABLE_STRICT_SETTINGS=false
+
 WORKDIR /src
 ENTRYPOINT ["/bin/bash"]
