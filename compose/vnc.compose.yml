@@ -1,0 +1,89 @@
+---
+services:
+
+##############################
+
+  vnc:
+    profiles:
+      - vnc
+    build:
+      context: ..
+      dockerfile: imags/X11/dev-terminal/Containerfile
+      x-build-images:
+        - 'localhost/l7/vnc:ratpoison'
+      args:
+        BASE_IMAGE: 'localhost/l7/vnc:ratpoison'
+      tags:
+        - 'localhost/l7/dev-terminal:vnc'
+    image: 'localhost/l7/dev-terminal:vnc'
+    volumes:
+      - target: /tmp/.X11-unix
+        type: volume
+        source: desktop_x11_unix
+      - target: '/home/user/xauthority'
+        type: volume
+        source: desktop_x11_xauthority
+    working_dir: /tmp
+    environment:
+      CONTAINER_DNS:     '${CONTAINER_DNS:-10.7.8.133}'
+      CONTAINER_HOST:    'tcp://10.7.9.2:2375'
+      GO_RUNNER_IMAGE:   'localhost/l7/go:1.20-bookworm'
+      GPG_IMAGE:         'localhost/l7/gpg-vault:pk'
+      NODE_RUNNER_IMAGE: 'localhost/l7/node'
+      L7_NODE_VERSION:   '20'
+      HOME:    /home/user
+      L7_HOME: '${L7_HOME:-${HOME}}'
+      CONF_DIR: '${CONF_DIR:-${L7_HOME:-${HOME}}/.config/l7ide/config}'
+      SRC_DIR: '${SRC_DIR:-${L7_SRC_DIR:-${PWD}}}'
+      ROOT_DIR: '${L7_ROOT_DIR:-${ROOT_DIR:-${PWD}}}'
+      L7_NVIM_STATE_PATH:   'l7_nvim_state'
+      L7_NPM_CACHE_VOLUME:  'l7_cache_node_npm'
+      L7_PNPM_CACHE_VOLUME: 'l7_cache_node_pnpm'
+      L7_YARN_BERRY_CACHE_VOLUME:   'l7_cache_node_yarn_berry'
+      L7_YARN_CLASSIC_CACHE_VOLUME: 'l7_cache_node_yarn_classic'
+      GPG_PK_VOLUME: 'l7_gpgvault_pk'
+      L7_COMPOSE_NETWORK_NAME_INTERNAL: 'l7_dev_internal'
+      L7_RESOLV_CONF_PATH: '${L7_RESOLV_CONF_PATH:-${PWD}/compose/mounts/resolv-internal.conf}'
+      SSH_SOCKET: '${SSH_SOCKET:-${SSH_AUTH_SOCK:-/dev/null}}'
+      XAUTHORITY: '/home/user/xauthority/Xauthority'
+      VNC_X11_SOCKET_PATH: '/tmp/.X11-unix/X1'
+      DISPLAY: ':1'
+      L7_DISPLAY: '${L7_DISPLAY:-:1}'
+      L7_X11_SOCKET_VOLUME: '${L7_X11_SOCKET_VOLUME:-l7_dev_desktop_x11_unix}'
+      L7_XAUTHORITY: '${L7_XAUTHORITY:-${XAUTHORITY:-}}'
+      L7_XAUTHORITY_VOLUME: '${L7_XAUTHORITY_VOLUME:-l7_dev_desktop_x11_xauthority}'
+    networks:
+      container-control:
+      vnc:
+        ipv4_address: 10.7.9.50
+    ports:
+      # vnc
+      - '5902:5902'
+
+########
+
+networks:
+  vnc:
+    name: l7_dev_vnc
+    attachable: true
+    ipam:
+      config:
+        - subnet: 10.7.9.48/28
+          ip_range: 10.7.9.56/30
+    driver: bridge
+    driver_opts:
+      inhibit_ipv4: 1
+      disable_dns: 1
+volumes:
+    desktop_x11_unix:
+      name: l7_dev_desktop_x11_unix
+      driver: local
+      driver_opts:
+        copy: 'false'
+        o: 'uid=1000,gid=1000'
+    desktop_x11_xauthority:
+      name: l7_dev_desktop_x11_xauthority
+      driver: local
+      driver_opts:
+        copy: 'false'
+        o: 'uid=1000,gid=1000'

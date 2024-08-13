@@ -17,6 +17,9 @@ COPY --from=${COMPOSE_BUILD_IMAGE} /docker-compose-${TARGETOS}-${COMPOSE_TARGETA
 
 COPY --chown=1000 ./devenv.sh ./compose.yml /app
 COPY --chown=1000 ./compose /app/compose
+COPY ./imags/X11/dev-terminal/bin/ /usr/local/bin
+COPY ./contrib/bin/l7-cnt-run /usr/local/bin
+COPY ./contrib/bin/firefox /usr/local/bin
 
 RUN chmod 777 /app /home \
   && ln -s app /l7-de \

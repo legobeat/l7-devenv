@@ -1,0 +1,79 @@
+#!/bin/bash
+[[ -n "${DEBUG}" ]] && set -x
+
+export DISPLAY=:1
+export LANG="${LANG:-"en_US.UTF-8"}"
+export LANGUAGE="${LANGUAGE:-"en_US.UTF-8"}"
+
+export VNC_RESOLUTION="${VNC_RESOLUTION:-1440x768x16}"
+if [ "$(echo "${VNC_RESOLUTION}" | tr -cd 'x' | wc -c)" = "1" ]; then
+  VNC_RESOLUTION="${VNC_RESOLUTION}x16"
+fi
+screen_geometry="${VNC_RESOLUTION%*x*}"
+screen_depth="${VNC_RESOLUTION##*x}"
+
+VNC_PORT=${VNC_PORT:-5902}
+if [[ -z "${VNC_DESKTOP}" ]]; then
+  echo "Error: Missing VNC_DESKTOP variable - set it to a desired X11 session name"
+  exit 1
+fi
+
+mkdir -p "${HOME}/.vnc/"
+
+pwfile="${HOME}/.vnc/passwd"
+export VNC_X11_SOCKET_PATH="${VNC_X11_SOCKET_PATH:-/home/user/X11/X1}"
+
+cat <<EOT > "${HOME}/.vnc/config"
+Log=*:stderr:9
+geometry=${screen_geometry}
+depth=${screen_depth}
+rfbport=${VNC_PORT}
+rfbauth=${pwfile}
+dpi=${VNC_DPI:-96}
+desktop=${VNC_DESKTOP}
+EOT
+
+
+if [[ ! -f "${pwfile}" ]]; then
+  # TODO: better pw management, no need to shuffle around cleartext like this
+  # prob should do x509 auth instead
+  prevumask="$(umask)"
+  LOCAL_DIR="${HOME}/.local/"
+
+  if [[ ! -f "${LOCAL_DIR}/vnc/admin_vncpasswd" ]]; then
+    umask 0277
+    mkdir -p "${LOCAL_DIR}/vnc"
+    umask 0377
+    VNC_PASSWORD="$(head -c 1000 /dev/random | base32 | head -c8)"
+    VNC_VIEW_PASSWORD="$(head -c 1000 /dev/random | base32 | head -c8)"
+    #echo "${VNC_PASSWORD}\n${VNC_VIEW_PASSWORD}" > "${LOCAL_DIR}/vnc/vncpasswd"
+    # TODO: better secrets handling
+    echo "${VNC_PASSWORD}" > "${LOCAL_DIR}/vnc/admin_vncpasswd"
+    echo "${VNC_VIEW_PASSWORD}" > "${LOCAL_DIR}/vnc/view_vncpasswd"
+    cat <<EOT
+  Generated new *insecure* VNC passwords at:
+  - Admin: "${LOCAL_DIR}/vnc/admin_vncpasswd"
+  - View: "${LOCAL_DIR}/vnc/view_vncpasswd"
+
+EOT
+  fi
+
+  umask 0377
+  cat "${LOCAL_DIR}/vnc/admin_vncpasswd" "${LOCAL_DIR}/vnc/view_vncpasswd" \
+    | vncpasswd -f \
+    > "${pwfile}"
+  # rm -f /home/user/.local/vnc/admin_vncpasswd  /home/user/.local/vnc/admin_vncpasswd
+  umask "${prevumask}"
+fi
+
+
+if [[ -n "${@}" ]]; then
+  echo "Error: Entrypoint does not support arguments"
+  exit 1
+fi
+
+echo "Starting vncserver on localhost:${VNC_PORT}"
+
+vncserver "${DISPLAY}" 2>&1 \
+  | grep -Ev 'ratpoison: Cannot load font|mieq:|Xfree86_VT|desktop is dev:1'
+

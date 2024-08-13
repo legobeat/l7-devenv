@@ -1,0 +1,20 @@
+#!/bin/bash
+# TODO: secure xauth better
+xhost +
+find ${HOME}/.config/xresources/ \
+  -maxdepth 3 -name '*.Xresources' \
+  -exec xrdb -m '{}'  \;
+
+sleep 0.5
+# startup session
+##ratpoison \
+##  -c "exec xterm -e nvim ${SRC_DIR}" \
+##  -c 'hsplit -850' \
+##  -c focus
+##  -c 'exec xterm'
+## add sleeps to get border color right
+##ratpoison -c "exec xterm -e zsh -c nvim -c ToggleTerm ${SRC_DIR}"
+#ratpoison -c "exec xterm -e ${SHELL:-/bin/bash} -c 'nvim -c ToggleTerm ${SRC_DIR}'"
+set-desktop-background.sh
+ratpoison -c "exec /usr/local/bin/xterm"
+sleep 0.01
