@@ -60,7 +60,7 @@ services:
       # ugly hack around compose insisting on overriding DNS:
       # https://github.com/docker/compose/issues/2847
       # obviates need for custom entrypoint at cost of hardcoding DNS IP and an extra mount
-      - './compose/mounts/resolv-internal.conf:/etc/resolv.conf:ro'
+      - '${L7_RESOLV_CONF_PATH:-./compose/mounts/resolv-internal.conf}:/etc/resolv.conf:ro'
     #configs:
     #  - source: resolv_conf_internal
     #    target:   /etc/myresolv.conf
