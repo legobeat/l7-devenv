@@ -1,0 +1,66 @@
+# syntax=docker/dockerfile:1.4-labs
+ARG ALPINE_VERSION=3.20
+ARG BASE_IMAGE=alpine:${ALPINE_VERSION}
+ARG CADDY_IMAGE=localhost/l7/caddy:latest
+FROM ${CADDY_IMAGE} AS fwdproxy
+
+# podman run --rm -it --security-opt label=type:container_runtime_t -u1000:1000 --userns=keep-id:uid=1000,gid=1000 -e DISPLAY -v "${XAUTHORITY:-${HOME}/.Xauthority}:/etc/x11/xauthority/Xauthority:ro" -e XAUTHORITY=/etc/x11/xauthority/Xauthority -v /tmp/.X11-unix/:/tmp/.X11-unix localhost/l7/firefox:latest
+#ARG EXTENSION_BUILDER_IMAGE=localhost/l7/node:20-bookworm
+#FROM ${EXTENSION_BUILDER_IMAGE} AS extension-builder
+#
+#USER root
+#COPY --chown=1002:1002 contrib/browser-extensions/multi-account-containers /build/multi-account-containers
+#RUN mkdir -p /out /build/multi-account-containers  /tmp/1002-home \
+#  && chmod 777 /out /build/multi-account-containers  /tmp/1002-home \
+#  && chown 1002:1002 /out /build/multi-account-containers /tmp/1002-home
+#
+#ENV HOME=/tmp/1002-home
+#USER 1002:1002
+#
+## build, pack, and install web extenstions
+#RUN set -x &&  cd /build/multi-account-containers \
+#  && npm install --frozen-lockfile \
+#  && npm run build \
+#  && npm pack
+#
+#################
+FROM ${BASE_IMAGE}
+USER root
+ARG FIREFOX_RELEASE="firefox-esr"
+ARG EXTRA_PKGS=''
+RUN apk add --no-cache \
+    ${FIREFOX_RELEASE} \
+    font-source-code-pro-nerd font-terminus-nerd font-noto-symbols font-noto-emoji font-nerd-fonts-symbols nerd-fonts \
+    font-awesome font-adobe-source-code-pro font-jetbrains-mono-nerd ttf-dejavu \
+    # font-noto-cjk \
+    # ffmpeg-libavcodec \
+    mesa-vulkan-swrast mesa-egl vulkan-loader \
+    pciutils-libs \
+    font-terminus font-noto font-noto-thai font-ipa font-sony-misc font-jis-misc font-inconsolata font-dejavu font-noto font-awesome font-noto-extra font-vollkorn font-misc-cyrillic font-mutt-misc font-screen-cyrillic
+
+COPY configs/*.js /usr/lib/${FIREFOX_RELEASE}/browser/defaults/preferences/
+RUN sed -i 's/^user_pref/pref/' /usr/lib/${FIREFOX_RELEASE}/browser/defaults/preferences/*-*.js \
+  && cat /usr/lib/${FIREFOX_RELEASE}/browser/defaults/preferences/*-*.js  >> /usr/lib/${FIREFOX_RELEASE}/browser/defaults/preferences/vendor.js \
+  && mkdir -p /usr/lib/${FIREFOX_RELEASE}/distribution \
+  && [[ -f /usr/bin/firefox ]] || ln -s ${FIREFOX_RELEASE} /usr/bin/firefox \
+  && mkdir -p /tmp/.X11-unix && chmod 177 /tmp/.X11-unix
+
+# trust custom CA in firefox
+COPY policies.json /usr/lib/${FIREFOX_RELEASE}/distribution/policies.json
+
+COPY --from=fwdproxy \
+  --chmod=444 \
+  /data/caddy/pki/authorities/local/root.crt \
+  /usr/local/share/ca-certificates/l7-fwd-proxy.crt
+
+COPY browser-extensions/*.xpi \
+     /usr/local/browser-extensions/
+
+RUN cat /usr/local/share/ca-certificates/l7-fwd-proxy.crt >> /etc/ssl/certs/ca-certificates.crt \
+  && update-ca-certificates
+RUN chown -R user /home/user
+
+USER user
+
+ENTRYPOINT ["firefox"]
+

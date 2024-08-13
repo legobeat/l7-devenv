@@ -45,6 +45,10 @@ for url in ${urls[@]}; do
   #  || echo "fail $url $(echo "$result" | head -n3)";
   sleep 0.1;
 done
+
 if [[ -n "${TESTFAIL}" ]]; then
   exit 4
 fi
+
+# TODO: Test POST for https://registry.npmjs.org/-/npm/v1/security/audits/quick
+
