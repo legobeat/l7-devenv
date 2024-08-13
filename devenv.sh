@@ -223,7 +223,7 @@ fi
 
 # default workdir to pwd if within SRC_DIR or /src; otherwise SRC_DIR
 if [ -z "${CWD}" ]; then
-  case $PWD/ in
+  case "${PWD}/" in
     ${SRC_DIR}/*) export CWD="${PWD}";;
     /src/*)       export CWD="${PWD}";;
     *)            export CWD="${SRC_DIR}";;

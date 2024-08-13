@@ -36,7 +36,7 @@ services:
     networks:
       internal:
       container-control:
-    working_dir: "${SRC_DIR:-${L7_SRC_DIR:-/src}}"
+    working_dir: "${CWD:-${SRC_DIR:-${L7_SRC_DIR:-/src}}}"
     # TODO: mounts for config could be done as configs
     # https://github.com/compose-spec/compose-spec/blob/master/08-configs.md
     volumes:
