@@ -432,6 +432,9 @@ export_runner_node: # image_runner_node
 image_firefox: images_deps_firefox
 	podman compose build firefox
 
+image_vnc: images_deps_vnc
+	podman compose build vnc
+
 image_xterm: images_deps_xterm
 	podman compose build xterm
 
@@ -445,12 +448,14 @@ image_docker_compose: submodules
 	DOCKER_HOST="$${CONTAINER_HOST:-unix://$${XDG_RUNTIME_DIR}/podman/podman.sock}" docker buildx bake --progress=plain --load image; \
 	popd
 
-images_deps_firefox: submodules
-	COMPOSEFILE=./compose/base-images.compose.yml BUILDCOMPOSEFILE=./compose/base-images.compose.yml ./contrib/l7-scripts/bin/compose-build-dependencies firefox
-
 images_deps: submodules
 	BUILDCOMPOSEFILE=./compose/base-images.compose.yml ./contrib/l7-scripts/bin/compose-build-dependencies dev-shell
 
+images_deps_firefox: submodules
+	COMPOSEFILE=./compose/base-images.compose.yml BUILDCOMPOSEFILE=./compose/base-images.compose.yml ./contrib/l7-scripts/bin/compose-build-dependencies firefox
+
+images_deps_vnc: images_deps image_xterm
+	COMPOSEFILE=./compose/vnc.compose.yml BUILDCOMPOSEFILE=./compose/base-images.compose.yml ./contrib/l7-scripts/bin/compose-build-dependencies vnc
 
 images_deps_xterm: image_docker_compose images_deps
 	BUILDCOMPOSEFILE=./compose/base-images.compose.yml ./contrib/l7-scripts/bin/compose-build-dependencies xterm

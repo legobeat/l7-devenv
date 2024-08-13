@@ -1,0 +1,40 @@
+ARG BASE_IMAGE=alpine:3.20
+FROM ${BASE_IMAGE}
+
+USER root
+COPY bin/* /usr/local/bin/
+
+ARG EXTRA_PKGS='ratpoison ratpoison-doc'
+
+RUN apk add --no-cache \
+    coreutils \
+    tigervnc xhost \
+    xbindkeys xkeyboard-config xsetroot xsel \
+    rofi \
+    imagemagick \
+    tmux \
+    scrot feh \
+    ${EXTRA_PKGS}
+
+COPY vncserver-config-defaults /etc/tigervnc/vncserver-config-defaults
+
+ARG UID=1000
+ARG GID=1000
+
+RUN mkdir -p /tmp/.X11-unix && chmod 711 /tmp/.X11-unix && chown ${UID}:${GID} /tmp/.X11-unix
+
+COPY skel/.config/ /home/user/.config/
+COPY skel/ /home/user/
+RUN ln -sf /usr/local/bin/xinitrc /home/user/.xinitrc \
+  && mkdir -p /home/user/.local/vnc \
+  && mkdir -p /home/user/X11 \
+  && chown -R $UID:$GID /home/user
+
+ARG TMUX_THEME_PATH="/home/user/.config/tmux/tokyonight/tokyonight_night.tmux"
+ENV TMUX_THEME_PATH="${TMUX_THEME_PATH}"
+ARG VNC_DESKTOP
+ENV VNC_DESKTOP=${VNC_DESKTOP}
+
+USER ${UID}:${GID}
+
+ENTRYPOINT ["/usr/local/bin/vncserver-start"]

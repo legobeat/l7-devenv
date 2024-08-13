@@ -35,6 +35,30 @@ user_config () {
   mkdir -p ~/.local/share/l7ide/apt-cacher-ng/cache
 }
 
+vnc_config () {
+  set -a # export variables
+  mkdir -p "${LOCAL_DIR}/vnc"
+  if [[ -n "${L7_ENABLE_VNC}" ]]; then
+    VNC_NETWORK_NAME=${VNC_NETWORK_NAME:-l7_dev_vnc}
+    RUN_ARGS="${RUN_ARGS} --network ${VNC_NETWORK_NAME}:ip=10.7.9.50"
+    if [[ ! -f "${LOCAL_DIR}/vnc/admin_vncpasswd" ]]; then
+      VNC_PASSWORD="$(head -c 1000 /dev/random | base32 | head -c8)"
+      VNC_VIEW_PASSWORD="$(head -c 1000 /dev/random | base32 | head -c8)"
+      #echo "${VNC_PASSWORD}\n${VNC_VIEW_PASSWORD}" > "${LOCAL_DIR}/vnc/vncpasswd"
+      # TODO: better secrets handling
+      echo "${VNC_PASSWORD}" > "${LOCAL_DIR}/vnc/admin_vncpasswd"
+      echo "${VNC_VIEW_PASSWORD}" > "${LOCAL_DIR}/vnc/view_vncpasswd"
+      #echo "Generated new VNC passwords:\n  - Admin: ${VNC_PASSWORD}\n  - View: ${VNC_VIEW_PASSWORD}\n\n" >&2
+      cat <<EOT >&2
+Generated new VNC passwords:
+  - Admin: ${VNC_PASSWORD}
+  - View: ${VNC_VIEW_PASSWORD}
+
+EOT
+    fi
+  fi
+}
+
 runtime_config () {
   set -a # export variables
   export PODMAN_COMPOSE_WARNING_LOGS=false
@@ -236,6 +260,7 @@ export ROOT_DIR="${ROOT_DIR:-$(dirname -- "$( readlink -f -- "$0"; )")}"
 user_config
 runtime_config
 configure_gh_token
+vnc_config
 start_compose
 
 ${cmd} network ls --filter="name=${NETWORK_NAME}" | grep --quiet "${NETWORK_NAME}" >/dev/null 2>/dev/null

@@ -137,3 +137,38 @@ services:
         BASE_IMAGE: 'localhost/l7/alpine:x11'
         FIREFOX_RELEASE: firefox
     image: 'localhost/l7/firefox:latest'
+
+  build-podman-remote-on-x11:
+    profiles:
+      - build
+      - podman
+      - alpine
+    depends_on:
+      - build-base-alpine-x11
+    build:
+      context: ../imags/podman-remote
+      dockerfile: ./Containerfile
+      args:
+        BASE_IMAGE: 'localhost/l7/alpine:x11'
+    image: 'localhost/l7/podman-remote:x11'
+
+  build-vnc-on-podman-remote-on-x11:
+    profiles:
+      - build
+      - vnc
+      - alpine
+    depends_on:
+      - build-podman-remote-on-x11
+    build:
+      context: ../imags/X11/vnc
+      dockerfile: ./Containerfile
+      args:
+        EXTRA_PKGS: 'ratpoison ratpoison-doc'
+        BASE_IMAGE: 'localhost/l7/podman-remote:x11'
+        VNC_DESKTOP: 'ratpoison'
+      tags:
+        - 'localhost/l7/vnc:x11'
+        - 'localhost/l7/vnc:latest'
+        - 'localhost/l7/vnc:ratpoison'
+    #image: 'localhost/l7/vnc:x11'
+    image: 'localhost/l7/vnc:ratpoison'
