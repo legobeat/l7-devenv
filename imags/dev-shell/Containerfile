@@ -47,6 +47,7 @@ RUN apk add --no-cache \
     losetup dosfstools \
     yq-go yq-go-zsh-completion \
     netcat-openbsd netcat-openbsd-doc \
+    coreutils less grep sed findutils file which \
     mandoc busybox-doc coreutils-doc git-doc less-doc grep-doc sed-doc file-doc findutils-doc fzf-doc util-linux-doc zsh-doc \
     gettext-envsubst mkpasswd pwgen \
     # zsh-history-search-multiword \
