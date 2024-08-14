@@ -10,6 +10,8 @@ RUNNER_IMAGE_NAME := ${IMAGE_REPO}/node
 RUNNER_IMAGE_TAG  := bookworm
 PUPPETEER_IMAGE_NAME := ${IMAGE_REPO}/node-puppeteer
 PUPPETEER_IMAGE_TAG  := bookworm
+MERMAID_IMAGE_NAME := ${IMAGE_REPO}/mermaid
+MERMAID_IMAGE_TAG  := bookworm
 AUTH_PROXY_IMAGE_NAME := ${IMAGE_REPO}/auth-proxy
 AUTH_PROXY_IMAGE_TAG  := latest
 CONTAINER_PROXY_IMAGE_NAME := ${IMAGE_REPO}/container-socket-proxy
@@ -230,7 +232,7 @@ image_runner_node_ios: submodules image_runner_node
 		-f './imags/cocoapods-runner/Containerfile' \
 		./imags/cocoapods-runner
 
-# for mermaid etc
+# base for mermaid etc
 image_runner_node_puppeteer: IMAGE_NAME = ${PUPPETEER_IMAGE_NAME}
 image_runner_node_puppeteer: IMAGE_TAG = ${PUPPETEER_IMAGE_TAG}
 image_runner_node_puppeteer: submodules # image_runner_node
@@ -240,6 +242,17 @@ image_runner_node_puppeteer: submodules # image_runner_node
 		--build-arg "NODE_VERSION=20" \
 		-t "${IMAGE_NAME}:${IMAGE_TAG}" \
 		-f './imags/node-puppeteer/Containerfile' \
+		./imags/node-puppeteer
+
+image_runner_mermaid: IMAGE_NAME = ${MERMAID_IMAGE_NAME}
+image_runner_mermaid: IMAGE_TAG = ${MERMAID_IMAGE_TAG}
+image_runner_mermaid: submodules # image_runner_node
+	${CMD} buildx build \
+		${BUILD_OPTIONS} \
+		--build-arg "SHELL=${USER_SHELL}" \
+		--build-arg "NODE_VERSION=20" \
+		-t "${IMAGE_NAME}:${IMAGE_TAG}" \
+		-f './imags/node-puppeteer/Containerfile.mermaid' \
 		./imags/node-puppeteer
 
 image_runner_node_all: IMAGE_NAME = ${RUNNER_IMAGE_NAME}
@@ -488,6 +501,9 @@ images_deps_xterm: images_deps
 images: images_deps image_runner_node image_dnsmasq image_gpg_pk image_dev_shell image_acng image_auth_proxy image_container_proxy image_lsp_node
 
 images_gui: images image_xterm image_firefox image_vnc
+
+# these are optional and not enabled by default due to extra build time and disk usage
+images_opt: images_runner_mermaid image_runner_node_all
 
 images_test: images image_nvim_test
 
