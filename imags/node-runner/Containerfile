@@ -52,6 +52,7 @@ RUN DEBIAN_FRONTEND=noninteractive dpkg-reconfigure ca-certificates \
   && mv -T /home/node /home/user \
   && ln -sT user /home/node \
   && chmod +x /usr/local/lib/node_modules/corepack/shims/* \
+  && chmod 777 /var/tmp /tmp \
   && chown -R node /home/user /home/node
 
 # default trust github.com known ssh key
