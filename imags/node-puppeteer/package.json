@@ -1,0 +1,25 @@
+{
+  "name": "l7-node-puppeteer",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "legobeat",
+  "license": "AGPL-3.0",
+  "private": true,
+  "packageManager": "npm@10.8.2",
+  "dependencies": {
+    "@lavamoat/allow-scripts": ">=3.1.0",
+    "@lavamoat/preinstall-always-fail": ">=2.1.0",
+    "@puppeteer/browsers": "^2.2.3",
+    "corepack": "^0.29.3",
+    "puppeteer": "^22.12.1",
+    "puppeteer-core": "^22.12.1",
+    "semver": "^7.6.3",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.5.4",
+    "yarn-deduplicate": "^6.0.2"
+  }
+}
