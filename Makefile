@@ -8,6 +8,8 @@ GPG_IMAGE_NAME := ${IMAGE_REPO}/gpg-vault
 GPG_IMAGE_TAG  := pk
 RUNNER_IMAGE_NAME := ${IMAGE_REPO}/node
 RUNNER_IMAGE_TAG  := bookworm
+PUPPETEER_IMAGE_NAME := ${IMAGE_REPO}/node-puppeteer
+PUPPETEER_IMAGE_TAG  := bookworm
 AUTH_PROXY_IMAGE_NAME := ${IMAGE_REPO}/auth-proxy
 AUTH_PROXY_IMAGE_TAG  := latest
 CONTAINER_PROXY_IMAGE_NAME := ${IMAGE_REPO}/container-socket-proxy
@@ -227,6 +229,18 @@ image_runner_node_ios: submodules image_runner_node
 		-f './imags/cocoapods-runner/Containerfile' \
 		-f './imags/cocoapods-runner/Containerfile' \
 		./imags/cocoapods-runner
+
+# for mermaid etc
+image_runner_node_puppeteer: IMAGE_NAME = ${PUPPETEER_IMAGE_NAME}
+image_runner_node_puppeteer: IMAGE_TAG = ${PUPPETEER_IMAGE_TAG}
+image_runner_node_puppeteer: submodules # image_runner_node
+	${CMD} buildx build \
+		${BUILD_OPTIONS} \
+		--build-arg "SHELL=${USER_SHELL}" \
+		--build-arg "NODE_VERSION=20" \
+		-t "${IMAGE_NAME}:${IMAGE_TAG}" \
+		-f './imags/node-puppeteer/Containerfile' \
+		./imags/node-puppeteer
 
 image_runner_node_all: IMAGE_NAME = ${RUNNER_IMAGE_NAME}
 image_runner_node_all: IMAGE_TAG = ${RUNNER_IMAGE_TAG}
