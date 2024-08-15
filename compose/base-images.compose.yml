@@ -167,8 +167,5 @@ services:
         BASE_IMAGE: 'localhost/l7/podman-remote:x11'
         VNC_DESKTOP: 'ratpoison'
       tags:
-        - 'localhost/l7/vnc:x11'
-        - 'localhost/l7/vnc:latest'
         - 'localhost/l7/vnc:ratpoison'
-    #image: 'localhost/l7/vnc:x11'
     image: 'localhost/l7/vnc:ratpoison'
