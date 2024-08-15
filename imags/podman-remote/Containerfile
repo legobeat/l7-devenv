@@ -12,6 +12,8 @@ ARG GID=1000
 USER root
 RUN apk add --no-cache \
     podman-remote fuse-overlayfs containers-common openssh-client \
+    # utils \
+    bash yq \
     gettext-envsubst mkpasswd \
     coreutils less grep sed findutils file \
     which \
