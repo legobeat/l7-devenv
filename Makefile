@@ -463,6 +463,7 @@ images_deps_xterm: image_docker_compose images_deps
 
 images: images_deps image_runner_node image_dnsmasq image_gpg_pk image_dev_shell image_acng image_auth_proxy image_container_proxy image_lsp_node
 
+images_gui: images image_xterm image_firefox image_vnc
 
 images_test: images image_nvim_test
 
