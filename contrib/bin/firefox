@@ -5,7 +5,7 @@ export RUNNER_IMAGE="${RUNNER_IMAGE:-${FIREFOX_RUNNER_IMAGE:-localhost/l7/firefo
 export RUNNER_ENV="${RUNNER_ENV} DISPLAY=${L7_DISPLAY:-${DISPLAY}}"
 export RUNNER_ENV="${RUNNER_ENV} XAUTHORITY=/etc/x11/xauthority/Xauthority"
 
-if [ -n "${L7_XAUTHORITY}" ]; then
+if [[ -n "${L7_XAUTHORITY}" ]] && [[ -z "${L7_XAUTHORITY_VOLUME}" ]]; then
   export RUNNER_VOLS="${L7_XAUTHORITY}:/etc/x11/xauthority/Xauthority:Z ${RUNNER_VOLS}"
 else
   export RUNNER_VOLS="${L7_XAUTHORITY_VOLUME:-l7_dev_desktop_x11_xauthority}:/etc/x11/xauthority:Z ${RUNNER_VOLS}"
