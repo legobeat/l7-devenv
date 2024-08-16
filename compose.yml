@@ -28,7 +28,6 @@ services:
       args:
         BASE_IMAGE: 'localhost/l7/nvim:podman-remote'
       tags:
-        - 'localhost/l7/nvim:latest'
         - 'localhost/l7/dev-shell:latest'
         - 'localhost/l7/dev-shell:nvim'
     hostname: dev

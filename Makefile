@@ -91,6 +91,7 @@ image_acng:
 image_dev_shell : image_nvim
 	${CMD} buildx build \
 		${BUILD_OPTIONS} \
+		--build-arg "BASE_IMAGE=localhost/l7/nvim:podman-remote" \
 		--build-arg "EXTRA_PKGS=${EXTRA_PKGS}" \
 		--build-arg "SHELL=${USER_SHELL}" \
 		-t "${IMAGE_REPO}/dev-shell:latest" \
