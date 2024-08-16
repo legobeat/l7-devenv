@@ -12,13 +12,15 @@ ARG COMPOSE_TARGETARCH=x86_64
 ARG COMPOSE_BUILD_PATH=/docker-compose-${TARGETOS}-${COMPOSE_TARGETARCH}
 COPY --from=compose_base ${COMPOSE_BUILD_PATH} /usr/local/bin/docker-compose
 
-COPY --chown=1000 ./devenv.sh ./compose.yml /app
+USER root
+# buildx borks in ci without explicit mkdir
+RUN mkdir -p /app/compose
+COPY --chown=1000 ./devenv.sh ./compose.yml /app/
 COPY --chown=1000 ./compose /app/compose
 COPY ./imags/X11/dev-terminal/bin/ /usr/local/bin
 COPY ./contrib/bin/l7-cnt-run /usr/local/bin
 COPY ./contrib/bin/firefox /usr/local/bin
 
-USER root
 RUN chmod 777 /app /home \
   && ln -s app /l7-de \
   && mkdir -p /tmp/.X11-unix && chmod 755 /tmp/.X11-unix && chown -R 1000:1000 /tmp/.X11-unix
