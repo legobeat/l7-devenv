@@ -1,0 +1,19 @@
+ARG ALPINE_VERSION=3.20
+FROM docker.io/alpine:${ALPINE_VERSION}
+
+ARG CERT_VALIDITY_DAYS="365"
+ARG CERT_SUBJECT="/C=GB/ST=London/L=London/O=Global Security/OU=IT Department/CN=example.com"
+
+RUN apk add --no-cache \
+      novnc \
+      openssl \
+    # Prebaked key and cert for convenience; mounting at runtime can be better
+    && mkdir /keys \
+    && openssl req -new -x509 -nodes \
+      -days "${CERT_VALIDITY_DAYS}" \
+      -subj "${CERT_SUBJECT}" \
+      -out /keys/novnc.pem \
+      -keyout /keys/novnc-private.pem \
+    && openssl x509 -in /keys/novnc.pem
+
+ENTRYPOINT ["novnc_server", "--key", "/keys/novnc-private.pem", "--cert", "/keys/novnc.pem", "--ssl-only"]
