@@ -60,6 +60,25 @@ services:
       # vnc
       - '5902:5902'
 
+  novnc:
+    depends_on:
+      - vnc
+    profiles:
+      - vnc
+      - remote
+    build:
+      context: ../imags/X11/novnc
+      dockerfile: Containerfile
+    image: 'localhost/l7/novnc:latest'
+    restart: always
+    command: '--listen 6080 --vnc 10.7.9.50:5902'
+    hostname: localhost
+    networks:
+      vnc:
+        ipv4_address: 10.7.9.51
+    ports:
+      - '6080:6080'
+
 ########
 
 networks:
