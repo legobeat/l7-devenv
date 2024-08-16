@@ -2,7 +2,7 @@
 # podman run --pull=never --rm -it --security-opt label=type:container_runtime_t -u1000 --userns=keep-id:uid=1000,gid=1000 -e DISPLAY=:1.0 -e XAUTHORITY=/etc/x11/xauthority/Xauthority -v l7_dev_desktop_x11_xauthority:/etc/x11/xauthority:Z -v l7_dev_desktop_x11_unix:/tmp/.X11-unix localhost/l7/firefox:latest
 export RUNNER_IMAGE="${RUNNER_IMAGE:-${FIREFOX_RUNNER_IMAGE:-localhost/l7/firefox:latest}}"
 
-export RUNNER_ENV="${RUNNER_ENV} DISPLAY=${L7_DISPLAY:-${DISPLAY}}"
+export RUNNER_ENV="${RUNNER_ENV} DISPLAY=${L7_DISPLAY:-${DISPLAY:-:1}}"
 export RUNNER_ENV="${RUNNER_ENV} XAUTHORITY=/etc/x11/xauthority/Xauthority"
 
 if [[ -n "${L7_XAUTHORITY}" ]] && [[ -z "${L7_XAUTHORITY_VOLUME}" ]]; then
