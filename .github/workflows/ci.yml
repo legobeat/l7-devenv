@@ -141,10 +141,15 @@ jobs:
             location = 'localhost:80'
           insecure = true" | tee ~/.config/containers/registries.conf.d/insecure-localhost.conf
           systemctl --user restart podman
-      - name: Make all images
+      - name: Make images
         run: |
           make images_deps
+      - name: Make test images
+        run: |
           make -j6 images_test
+      - name: Make GUI images
+        run: |
+          make images_gui
     env:
       CMD: ${{ matrix.cmd }}
       CONTAINER_CMD: ${{ matrix.cmd }}
@@ -213,6 +218,7 @@ jobs:
       matrix:
         test:
           - test_compose_run
+          - images_gui
         os:
           - ubuntu-24.04
     steps:

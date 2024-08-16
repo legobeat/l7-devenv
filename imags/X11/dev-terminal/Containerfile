@@ -1,14 +1,16 @@
 # syntax=docker/dockerfile:1.4-labs
 ARG BASE_IMAGE="localhost/l7/xterm:podman-remote"
+ARG COMPOSE_BUILD_IMAGE="localhost/docker-compose:latest"
+FROM ${COMPOSE_BUILD_IMAGE} AS compose_base
 FROM ${BASE_IMAGE}
 
-ARG COMPOSE_BUILD_IMAGE="localhost/docker-compose:latest"
 ARG TARGETOS=linux
 
 #ARG TARGETARCH=x86_64
 #COPY --from=${COMPOSE_BUILD_IMAGE} /docker-compose-${TARGETOS}-${TARGETARCH} /usr/local/bin/docker-compose
 ARG COMPOSE_TARGETARCH=x86_64
-COPY --from=${COMPOSE_BUILD_IMAGE} /docker-compose-${TARGETOS}-${COMPOSE_TARGETARCH} /usr/local/bin/docker-compose
+ARG COMPOSE_BUILD_PATH=/docker-compose-${TARGETOS}-${COMPOSE_TARGETARCH}
+COPY --from=compose_base ${COMPOSE_BUILD_PATH} /usr/local/bin/docker-compose
 
 COPY --chown=1000 ./devenv.sh ./compose.yml /app
 COPY --chown=1000 ./compose /app/compose

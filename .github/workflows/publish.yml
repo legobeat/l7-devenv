@@ -177,6 +177,16 @@ jobs:
             build-args: |
               CADDY_IMAGE=ghcr.io/legobeat/l7-devenv/caddy:${{ github.ref_name }}
               BASE_IMAGE=ghcr.io/legobeat/l7-devenv/alpine:${{ github.ref_name }}
+          - name: x11
+            file: imags/X11/alpine/Containerfile
+            context: imags/X11/alpine
+            tags:  |
+              localhost/l7/alpine:x11
+              ghcr.io/legobeat/l7-devenv/alpine:x11
+              ghcr.io/legobeat/l7-devenv/alpine:x11-${{ github.ref_name }}
+            build-args: |
+              BASE_IMAGE=ghcr.io/legobeat/l7-devenv/alpine:${{ github.ref_name }}
+              EXTRA_PKGS=
     # exact duplicate of publish steps for other images. yaml anchors not supported in gha
     steps:
       - name: Set up QEMU
@@ -275,6 +285,28 @@ jobs:
               ghcr.io/legobeat/l7-devenv/gpg-vault:alpine
               ghcr.io/legobeat/l7-devenv/gpg-vault:${{ github.ref_name }}
               ghcr.io/legobeat/l7-devenv/gpg-vault:alpine-${{ github.ref_name }}
+          - name: firefox
+            file: imags/X11/firefox/Containerfile
+            context: imags/X11/firefox
+            tags:  |
+              localhost/l7/firefox:latest
+              ghcr.io/legobeat/l7-devenv/firefox:latest
+              ghcr.io/legobeat/l7-devenv/firefox:${{ github.ref_name }}
+            build-args: |
+              EXTRA_PKGS=
+              CADDY_IMAGE=ghcr.io/legobeat/l7-devenv/caddy:${{ github.ref_name }}
+              BASE_IMAGE=ghcr.io/legobeat/l7-devenv/alpine:x11-${{ github.ref_name }}
+              FIREFOX_RELEASE: firefox
+          - name: podman-remote-x11
+            file: imags/podman-remote/Containerfile
+            context: imags/podman-remote
+            tags:  |
+              localhost/l7/podman-remote:x11
+              ghcr.io/legobeat/l7-devenv/podman-remote:x11
+              ghcr.io/legobeat/l7-devenv/podman-remote:x11-${{ github.ref_name }}
+            build-args: |
+              CADDY_IMAGE=ghcr.io/legobeat/l7-devenv/caddy:${{ github.ref_name }}
+              BASE_IMAGE=ghcr.io/legobeat/l7-devenv/alpine:x11-${{ github.ref_name }}
           - name: node
             file: imags/node-runner/Containerfile
             context: .
@@ -373,6 +405,116 @@ jobs:
             build-args: |
               CADDY_IMAGE=ghcr.io/legobeat/l7-devenv/caddy:${{ github.ref_name }}
               BASE_IMAGE=ghcr.io/legobeat/l7-devenv/node:20-${{ github.ref_name }}
+          - name: vnc
+            file: imags/X11/vnc/Containerfile
+            context: ./imags/X11/vnc
+            tags: |
+              localhost/l7/vnc:ratpoison
+              ghcr.io/legobeat/l7-devenv/vnc:ratpoison
+              ghcr.io/legobeat/l7-devenv/vnc:ratpoison-${{ github.ref_name }}
+            build-args: |
+              BASE_IMAGE=ghcr.io/legobeat/l7-devenv/podman-remote:x11-${{ github.ref_name }}
+              EXTRA_PKGS=ratpoison ratpoison-doc
+              VNC_DESKTOP=ratpoison
+          - name: xterm
+            file: imags/X11/xterm/Containerfile
+            context: ./imags/X11/xterm
+            tags: |
+              localhost/l7/xterm:x11
+              ghcr.io/legobeat/l7-devenv/xterm:x11
+              ghcr.io/legobeat/l7-devenv/xterm:x11-${{ github.ref_name }}
+            build-args: |
+              BASE_IMAGE=ghcr.io/legobeat/l7-devenv/podman-remote:x11-${{ github.ref_name }}
+              X11_BASE_IMAGE=ghcr.io/legobeat/l7-devenv/alpine:x11-${{ github.ref_name }}
+              EXTRA_PKGS=
+    steps:
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      - name: Log in to the Container registry
+        uses: docker/login-action@9780b0c442fbb1117ed29e0efdff1e18412f7567 #v3.3.0
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@8e5442c4ef9f78752691e2d8f8d19755c6f78e81 #v5.5.1
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/${{ matrix.name }}
+      - name: allow cleartext http to localhost container registry
+        run: |
+          echo '{"insecure-registries" : [ "localhost" ]}' | sudo tee /etc/docker/daemon.json
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        with:
+          driver-opts: network=host
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+      - name: Build and publish hub image
+        uses: docker/build-push-action@v6
+        with:
+          context: imags/hub
+          file: imags/hub/Containerfile
+          tags:  |
+            localhost/l7/hub:latest
+            ghcr.io/legobeat/l7-devenv/hub:latest
+          load: true
+          push: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      - name: Build and publish ${{ matrix.name }} image
+        uses: docker/build-push-action@v6
+        with:
+          context: ${{ matrix.context }}
+          file: ${{ matrix.file }}
+          build-args: ${{ matrix.build-args }}
+          tags:  ${{ matrix.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          load: true
+          push: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  publish-image-dev-terminal:
+    needs: publish-image-post
+    runs-on: ubuntu-24.04
+    services:
+      registry:
+        image: registry:2
+        ports:
+          - 80:5000
+    permissions:
+      contents: read
+      packages: write
+      attestations: write
+      id-token: write
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - name: dev-terminal-vnc
+            file: imags/X11/dev-terminal/Containerfile
+            context: .
+            tags: |
+              ghcr.io/legobeat/l7-devenv/dev-terminal:vnc
+              ghcr.io/legobeat/l7-devenv/dev-terminal:vnc-${{ github.ref_name }}
+            build-args: |
+              BASE_IMAGE=ghcr.io/legobeat/l7-devenv/vnc:ratpoison-${{ github.ref_name }}
+              CADDY_IMAGE=ghcr.io/legobeat/l7-devenv/caddy:${{ github.ref_name }}
+              COMPOSE_BUILD_IMAGE=docker.io/docker/compose-bin:v2.29.2
+              COMPOSE_BUILD_PATH=/docker-compose
+          - name: dev-terminal-xterm
+            file: imags/X11/dev-terminal/Containerfile
+            context: .
+            tags: |
+              ghcr.io/legobeat/l7-devenv/dev-terminal:xterm
+              ghcr.io/legobeat/l7-devenv/dev-terminal:xterm-${{ github.ref_name }}
+            build-args: |
+              BASE_IMAGE=ghcr.io/legobeat/l7-devenv/xterm:x11-${{ github.ref_name }}
+              CADDY_IMAGE=ghcr.io/legobeat/l7-devenv/caddy:${{ github.ref_name }}
+              COMPOSE_BUILD_IMAGE=docker.io/docker/compose-bin:v2.29.2
+              COMPOSE_BUILD_PATH=/docker-compose
     steps:
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
