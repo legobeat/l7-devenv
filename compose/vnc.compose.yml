@@ -80,6 +80,22 @@ services:
     ports:
       - '6080:6080'
 
+  ssh-proxy:
+    depends_on:
+      - novnc
+    profiles:
+      - vnc
+      - remote
+    build:
+      context: ../imags/ssh-proxy
+      dockerfile: Containerfile
+    image: 'localhost/l7/ssh-proxy:latest'
+    command: '-p443 -R0:10.7.9.51:6080 -o ServerAliveInterval=30 tls@a.pinggy.io'
+    hostname: localhost
+    networks:
+      public:
+      vnc:
+
 ########
 
 networks:
