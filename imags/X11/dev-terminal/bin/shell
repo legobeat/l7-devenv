@@ -1,0 +1,14 @@
+#!/bin/bash
+if [ -z "${COMPOSE_PROJECT_NAME}" ]; then
+  COMPOSE_PROJECT_NAME="$(basename "${ROOT_DIR:-${L7_ROOT_DIR}}")"
+fi
+export COMPOSE_PROJECT_NAME
+
+DOCKER_HOST=${DOCKER_HOST:-${CONTAINER_HOST}} \
+  docker-compose --progress=quiet --log-level=error \
+  --project-name="${COMPOSE_PROJECT_NAME}" --project-directory=/app \
+  run --rm -w /src \
+  --entrypoint=${USER_SHELL:-/bin/zsh} --no-deps --no-build --pull=never \
+  -e '*' \
+  -e TMUX=disable \
+  dev-shell ${@}
