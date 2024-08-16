@@ -96,6 +96,7 @@ services:
       L7_COMPOSE_NETWORK_NAME_INTERNAL: 'l7_dev_internal'
       L7_RESOLV_CONF_PATH: '${L7_RESOLV_CONF_PATH:-${ROOT_DIR:-${PWD}}/compose/mounts/resolv-internal.conf}'
       SSH_AUTH_SOCK: '/home/user/.ssh/SSH_AUTH_SOCK'
+      SSH_SOCKET: '${SSH_SOCKET:-}'
       L7_DISPLAY: '${L7_DISPLAY:-}'
       #L7_X11_SOCKET_VOLUME: '${L7_X11_SOCKET_VOLUME:-/tmp/.X11-unix}'
       L7_X11_SOCKET_VOLUME: '${L7_X11_SOCKET_VOLUME:-l7_dev_desktop_x11_unix}'
