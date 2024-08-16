@@ -112,8 +112,6 @@ services:
     profiles:
       - podman
       - xterm
-    depends_on:
-      - dev-shell
     image: 'localhost/l7/dev-terminal:xterm'
     build:
       x-build-images:
