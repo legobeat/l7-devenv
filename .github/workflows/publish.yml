@@ -326,6 +326,21 @@ jobs:
             build-args: |
               BASE_IMAGE=ghcr.io/legobeat/l7-devenv/podman-remote:${{ github.ref_name }}
               CADDY_IMAGE=ghcr.io/legobeat/l7-devenv/caddy:${{ github.ref_name }}
+          - name: vscode-build-agent
+            file: imags/X11/vscode-linux-build-agent/focal-x64/Dockerfile
+            context: imags/X11/vscode-linux-build-agent/focal-x64
+            tags: |
+              ghcr.io/legobeat/l7-devenv/vscode-build-agent:focal-x64
+              ghcr.io/legobeat/l7-devenv/vscode-build-agent:focal-x64-${{ github.ref_name }}
+          - name: ubuntu-x11
+            file: imags/X11/ubuntu/Containerfile
+            context: imags/X11/ubuntu
+            tags: |
+              ghcr.io/legobeat/l7-devenv/ubuntu:x11
+              ghcr.io/legobeat/l7-devenv/ubuntu:x11-${{ github.ref_name }}
+            build-args: |
+              UBUNTU_VERSION: '24.04'
+              EXTRA_PKGS: ''
     steps:
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -416,6 +431,18 @@ jobs:
               BASE_IMAGE=ghcr.io/legobeat/l7-devenv/podman-remote:x11-${{ github.ref_name }}
               EXTRA_PKGS=ratpoison ratpoison-doc
               VNC_DESKTOP=ratpoison
+          - name: vscodium
+            file: imags/X11/vscodium/Containerfile
+            context: ./imags/X11/vscodium
+            tags: |
+              localhost/l7/vscodium:noble
+              ghcr.io/legobeat/l7-devenv/vscodium:noble
+              ghcr.io/legobeat/l7-devenv/vscodium:noble-${{ github.ref_name }}
+            build-args: |
+              BASE_IMAGE=ghcr.io/legobeat/l7-devenv/ubuntu:x11-${{ github.ref_name }}
+              BUILDER_BASE_IMAGE=ghcr.io/legobeat/l7-devenv/vscode-build-agent:focal-x64-${{ github.ref_name }}
+              CADDY_IMAGE=ghcr.io/legobeat/l7-devenv/caddy:${{ github.ref_name }}
+              EXTENSION_BUILDER_BASE_IMAGE=ghcr.io/legobeat/l7-devenv/node:20-${{ github.ref_name }}
           - name: xterm
             file: imags/X11/xterm/Containerfile
             context: ./imags/X11/xterm
@@ -501,6 +528,17 @@ jobs:
               ghcr.io/legobeat/l7-devenv/dev-terminal:vnc-${{ github.ref_name }}
             build-args: |
               BASE_IMAGE=ghcr.io/legobeat/l7-devenv/vnc:ratpoison-${{ github.ref_name }}
+              CADDY_IMAGE=ghcr.io/legobeat/l7-devenv/caddy:${{ github.ref_name }}
+              COMPOSE_BUILD_IMAGE=docker.io/docker/compose-bin:v2.29.2
+              COMPOSE_BUILD_PATH=/docker-compose
+          - name: dev-terminal-vscodium
+            file: imags/X11/dev-terminal/Containerfile
+            context: .
+            tags: |
+              ghcr.io/legobeat/l7-devenv/dev-terminal:vscodium
+              ghcr.io/legobeat/l7-devenv/dev-terminal:vscodium-${{ github.ref_name }}
+            build-args: |
+              BASE_IMAGE=ghcr.io/legobeat/l7-devenv/vscodium:noble-${{ github.ref_name }}
               CADDY_IMAGE=ghcr.io/legobeat/l7-devenv/caddy:${{ github.ref_name }}
               COMPOSE_BUILD_IMAGE=docker.io/docker/compose-bin:v2.29.2
               COMPOSE_BUILD_PATH=/docker-compose
