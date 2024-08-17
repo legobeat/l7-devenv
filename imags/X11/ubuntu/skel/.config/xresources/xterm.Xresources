@@ -1,0 +1,26 @@
+XTerm*faceName: xft:JetBrainsMono Nerd Font Mono
+! XTerm*faceName: SauceCodePro Nerd Font Mono
+! XTerm*faceName: Terminess Nerd Font
+
+XTerm*faceSize: 12
+XTerm.termName: xterm-256color
+XTerm.vt100.locale: false
+XTerm.vt100.utf8: true
+XTerm.vt100.metaSendsEscape: true
+
+XTerm*renderFont: true
+XTerm*cursorBlink: 1
+XTerm*cursorColor: purple
+
+XTerm.VT100.translations: #override \
+Meta <Key> minus: smaller-vt-font() \n\
+Meta <Key> plus: larger-vt-font() \n\
+Meta <Key> KP_Subtract: smaller-vt-font() \n\
+Meta <Key> KP_Add: larger-vt-font() \n\
+Super <Key> minus: smaller-vt-font() \n\
+Super <Key> plus: larger-vt-font() \n\
+Super <Key> KP_Subtract: smaller-vt-font() \n\
+Super <Key> KP_Add: larger-vt-font() \n\
+Ctrl <Btn4Down>: larger-vt-font() \n\
+Ctrl <Btn5Down>: smaller-vt-font() \n
+

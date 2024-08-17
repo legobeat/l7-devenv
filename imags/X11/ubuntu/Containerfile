@@ -1,0 +1,36 @@
+
+#####
+
+ARG UBUNTU_VERSION=24.04
+ARG BASE_IMAGE=docker.io/ubuntu:${UBUNTU_VERSION}
+
+FROM ${BASE_IMAGE}
+
+RUN apt-get update && \
+  DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y \
+    libfontconfig1 libglib2.0-0 libglib2.0-data libx11-xcb1 libxcb1 libxcomposite1 libxcursor1 libxrandr2 libxrender1 \
+    libgl1 \
+    libxkbfile1 \
+    xfonts-base \
+    xsel \
+    xvfb \
+  && mv /home/ubuntu /home/user \
+  && ln -sfT /home/user /home/ubuntu
+
+ARG UID=1000
+ARG GID=1000
+
+COPY ./skel/ /home/user/
+
+RUN mkdir -p \
+    /tmp/.X11-unix \
+    /var/tmp /run \
+    /home/user \
+  && chmod 777 /tmp /var/tmp /run \
+  && chmod 177 /tmp/.X11-unix \
+  && touch /home/user/.Xauthority \
+  && chmod 600 /home/user/.Xauthority \
+  && sed -i 's#ubuntu#user#g' /etc/passwd* /etc/subuid \
+  && chown -R ${UID}:${GID} /home/user
+
+USER ${UID}:${GID}
