@@ -1,0 +1,9 @@
+*URxvt*letterSpace: 0
+*URxvt*.depth: 32
+!*URxvt*.depth: 24
+*URxvt*.allow_bold: true
+*URxvt*.termName: rxvt-unicode
+*URxvt*.selection-autotransform.0: s| +$||gm
+*URxvt*.iso14755: false
+*URxvt*.iso14755_52: false
+*URxvt*.scrollBar: false

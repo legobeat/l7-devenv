@@ -137,6 +137,13 @@ image_alpine : submodules image_caddy
 		-t "${IMAGE_REPO}/alpine:3.20" \
 		-f './imags/alpine/Containerfile' \
 		.
+image_ubuntu_x11: submodules
+	${CMD} buildx build \
+		${BUILD_OPTIONS} \
+		--build-arg='UBUNTU_VERSION=24.04' \
+		--build-arg='EXTRA_PKGS=' \
+		-t "${IMAGE_REPO}/ubuntu:x11" \
+		./imags/X11/ubuntu
 
 image_bin_ht :
 	${CMD} buildx build \
