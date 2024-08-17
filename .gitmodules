@@ -73,3 +73,6 @@
 [submodule "l7-de/imags/X11/vscode-linux-build-agent"]
 	path = imags/X11/vscode-linux-build-agent
 	url = https://github.com/VSCodium/vscode-linux-build-agent
+[submodule "imags/X11/vscodium/extensions/gitlens"]
+	path = imags/X11/vscodium/extensions/gitlens
+	url = https://github.com/gitkraken/vscode-gitlens
