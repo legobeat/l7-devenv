@@ -67,3 +67,9 @@
 [submodule "imags/docker-compose"]
 	path = imags/docker-compose
 	url = https://github.com/legobeat/compose
+[submodule "imags/X11/vscodium/vscodium"]
+	path = imags/X11/vscodium/vscodium
+	url = https://github.com/VSCodium/vscodium
+[submodule "l7-de/imags/X11/vscode-linux-build-agent"]
+	path = imags/X11/vscode-linux-build-agent
+	url = https://github.com/VSCodium/vscode-linux-build-agent

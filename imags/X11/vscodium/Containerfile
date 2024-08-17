@@ -1,0 +1,82 @@
+# syntax=docker/dockerfile:1.4-labs
+ARG BUILDER_BASE_IMAGE=localhost/l7-build/vscode-build-agent:focal-x64
+ARG BASE_IMAGE=docker.io/ubuntu:24.04
+
+#### Build vscodium
+FROM ${BUILDER_BASE_IMAGE} AS builder
+USER root
+RUN mkdir -p /app/vscode /home/builder && chown 1234:1234 /app/vscode /home/builder
+USER 1234:1234
+COPY --chown=1234 ./vscodium /app/vscodium
+WORKDIR /app/vscodium
+
+# OS_NAME=linux CI_BUILD=no APP_NAME=VSCodium SKIP_ASSETS=yes SHOULD_BUILD=no VSCODE_QUALITY=stable get_repo.sh
+
+RUN sed \
+    -i 's/max.old.space.size=8192/\000/g' \
+    'build/build.sh' 'build.sh' \
+  && HOME=/home/builder \
+    NODE_OPTIONS="--max-old-space-size=300000000 --no-network-family-autoselection --trace-warnings" \
+    # https://github.com/nodejs/node/issues/51555 \
+    DISABLE_V8_COMPILE_CACHE=1 \
+    build/build_docker.sh \
+  && rm -rf \
+    ./node_modules \
+    ./vscode \
+    ./vscode-reh-linux-* \
+    /home/builder/* \
+    /home/builder/.cache
+
+##### Final image
+FROM ${BASE_IMAGE}
+
+USER root
+
+RUN apt-get update && \
+  DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y \
+    file \
+    imagemagick \
+    iproute2 \
+    jq \
+    krb5-user \
+    libfuse2 \
+    libasound2t64 \
+    libdrm2 \
+    libgdk-pixbuf2.0-0 \
+    libgdk-pixbuf2.0-bin \
+    libibus-1.0-5 \
+    librsvg2-common \
+    libglib2.0-data \
+    libgtk-3-bin \
+    libsecret-common \
+    libsecret-1-0 \
+    libssh-4 \
+    locales \
+    lsof \
+    packagekit-gtk3-module \
+    tzdata \
+    xdg-user-dirs \
+    desktop-file-utils libnotify4 libxcb-util1 \
+    gnome-themes-extra-data gnome-themes-extra \
+    #xfonts-base \
+    ca-certificates libatk-bridge2.0-0 libatk1.0-0 libc6 libcairo2 libexpat1 libfontconfig1 libgbm1 libgcc1 libglib2.0-0 libgtk-3-0 libnspr4 libnss3 libpango-1.0-0 libpangocairo-1.0-0 libstdc++6 libx11-6 libx11-xcb1 libxcb1 libxcomposite1 libxcursor1 libxdamage1 libxext6 libxfixes3 libxi6 libxrandr2 libxrender1 libxss1 libxtst6 lsb-release xdg-utils \
+    ## extraneous - split out?
+    git git-lfs gettext-base patch less ssh-client krb5-locales
+
+ARG UID=1000
+ARG GID=1000
+
+COPY --from=builder --chown=${UID}:${GID} /app/vscodium/VSCode-linux-x64 /opt/codium
+
+COPY product.json /home/user/.config/VSCodium/product.json
+COPY settings.json /home/user/.config/VSCodium/User/settings.json
+
+RUN ln -sf /opt/codium/codium /usr/local/bin \
+  && mkdir "/tmp/storage-run-${UID}" \
+  && chown -R "${UID}:${GID}" /home/user "/tmp/storage-run-${UID}"
+
+USER ${UID}:${GID}
+ENV XDG_DATA_DIRS=/usr/local/share:/usr/share
+ENV XDG_RUNTIME_DIR=/tmp/storage-run-${UID}
+
+ENTRYPOINT ["dbus-run-session", "codium", "--disable-gpu"]
