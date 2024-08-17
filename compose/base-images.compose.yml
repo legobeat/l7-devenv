@@ -161,7 +161,7 @@ services:
       dockerfile: ./Dockerfile
     image: 'localhost/l7-build/vscode-build-agent:focal-${ARCH:-x64}'
 
-  vscodium:
+  build-vscodium:
     profiles:
       - build
     depends_on:
@@ -173,7 +173,29 @@ services:
       args:
         BASE_IMAGE: 'localhost/l7/ubuntu:x11'
         BUILDER_BASE_IMAGE: 'localhost/l7-build/vscode-build-agent:focal-${ARCH:-x64}'
+    ulimits:
+      nofile:
+        soft: 65535
+        hard: 65535
     image: 'localhost/l7/vscodium:noble'
+
+  vscodium:
+    profiles:
+      - build
+    depends_on:
+      - build-vscodium
+    build:
+      x-build-images:
+        - 'localhost/l7/vscodium:noble'
+      context: ..
+      dockerfile: imags/X11/dev-terminal/Containerfile
+      args:
+        BASE_IMAGE: 'localhost/l7/vscodium:noble'
+    ulimits:
+      nofile:
+        soft: 65535
+        hard: 65535
+    image: 'localhost/l7/dev-terminal:vscodium'
 
   build-podman-remote-on-x11:
     profiles:
