@@ -1,10 +1,22 @@
 # syntax=docker/dockerfile:1.4-labs
-ARG CADDY_IMAGE=localhost/l7/caddy:latest
 ARG TARGETARCH=x64
 ARG BUILDER_BASE_IMAGE=localhost/l7-build/vscode-build-agent:focal-${TARGETARCH}
+ARG EXTENSION_BUILDER_BASE_IMAGE=localhost/l7/node:20-bookworm
 ARG BASE_IMAGE=docker.io/ubuntu:24.04
+ARG CADDY_IMAGE=localhost/l7/caddy:latest
 
 FROM ${CADDY_IMAGE} AS fwdproxy
+
+#### Build gitlens
+FROM ${EXTENSION_BUILDER_BASE_IMAGE} AS gitlens-builder
+USER root
+RUN mkdir -p /app/gitlens && chown 1000 /app/gitlens
+USER 1000:1000
+COPY --chown=1000 ./extensions/gitlens /app/gitlens
+WORKDIR /app/gitlens
+
+RUN corepack yarn@1 install --frozen-lockfile \
+  && corepack yarn@1 run package
 
 #### Build vscodium
 FROM ${BUILDER_BASE_IMAGE} AS builder
@@ -52,7 +64,6 @@ RUN apt-get update && \
     librsvg2-common \
     libglib2.0-data \
     libgtk-3-bin \
-    libnss3-tools \
     libsecret-common \
     libsecret-1-0 \
     libssh-4 \
@@ -65,12 +76,24 @@ RUN apt-get update && \
     gnome-themes-extra-data gnome-themes-extra \
     #xfonts-base \
     ca-certificates libatk-bridge2.0-0 libatk1.0-0 libc6 libcairo2 libexpat1 libfontconfig1 libgbm1 libgcc1 libglib2.0-0 libgtk-3-0 libnspr4 libnss3 libpango-1.0-0 libpangocairo-1.0-0 libstdc++6 libx11-6 libx11-xcb1 libxcb1 libxcomposite1 libxcursor1 libxdamage1 libxext6 libxfixes3 libxi6 libxrandr2 libxrender1 libxss1 libxtst6 lsb-release xdg-utils \
+    ## build only
+    libnss3-tools \
+    unzip \
     ## extraneous - split out?
     git git-lfs gettext-base patch less ssh-client krb5-locales
 
+ARG GITLENS_VERSION=15.2.3
+COPY --from=gitlens-builder /app/gitlens/gitlens-${GITLENS_VERSION}.vsix /opt/gitlens/
+WORKDIR /opt/gitlens
+RUN unzip "gitlens-${GITLENS_VERSION}.vsix" \
+  && mkdir -p "/opt/codium/resources/app/extensions/" \
+  && mv extension "/opt/codium/resources/app/extensions/eamodio.gitlens-${GITLENS_VERSION}" \
+  && mv extension.vsixmanifest "/opt/codium/resources/app/extensions/eamodio.gitlens-${GITLENS_VERSION}/.vsixmanifest"
+
+COPY extensions.json /home/user/.vscode-oss/extensions/extensions.json
+
 ARG UID=1000
 ARG GID=1000
-
 
 COPY --from=builder --chown=${UID}:${GID} /app/vscodium/VSCode-linux-${TARGETARCH} /opt/codium
 COPY --from=fwdproxy \
@@ -93,7 +116,9 @@ RUN ln -sf /opt/codium/codium /usr/local/bin \
   && cp /usr/local/share/ca-certificates/l7-fwd-proxy.crt /etc/ssl/ca-bundle.pem \
   && mkdir "/tmp/storage-run-${UID}" \
   && chown -R "${UID}:${GID}" /home/user "/tmp/storage-run-${UID}" \
-  && apt-get purge --autoremove -y libnss3-tools
+  && apt-get purge --autoremove -y \
+    libnss3-tools \
+    unzip
 
 USER ${UID}:${GID}
 ENV XDG_DATA_DIRS=/usr/local/share:/usr/share
