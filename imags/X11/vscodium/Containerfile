@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.4-labs
-ARG TARGETARCH=x64
-ARG BUILDER_BASE_IMAGE=localhost/l7-build/vscode-build-agent:focal-${TARGETARCH}
+ARG ARCH=x64
+ARG BUILDER_BASE_IMAGE=localhost/l7-build/vscode-build-agent:focal-${ARCH}
 ARG EXTENSION_BUILDER_BASE_IMAGE=localhost/l7/node:20-bookworm
 ARG BASE_IMAGE=docker.io/ubuntu:24.04
 ARG CADDY_IMAGE=localhost/l7/caddy:latest
@@ -92,10 +92,26 @@ RUN unzip "gitlens-${GITLENS_VERSION}.vsix" \
 
 COPY extensions.json /home/user/.vscode-oss/extensions/extensions.json
 
+
+########
+# container-control stuff
+# inlined here b/c ubuntu-specific
+########
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    bash yq whois \
+    # xz-utils \
+    # binutils \
+    coreutils podman-remote less grep sed findutils uidmap gnu-which \
+  && ln -s podman-remote /usr/bin/podman \
+  && rm -rf /var/apt/lists
+
+########
+
 ARG UID=1000
 ARG GID=1000
 
-COPY --from=builder --chown=${UID}:${GID} /app/vscodium/VSCode-linux-${TARGETARCH} /opt/codium
+ARG ARCH=x64
+COPY --from=builder --chown=${UID}:${GID} /app/vscodium/VSCode-linux-${ARCH} /opt/codium
 COPY --from=fwdproxy \
   --chmod=444 \
   /data/caddy/pki/authorities/local/root.crt \
@@ -123,5 +139,8 @@ RUN ln -sf /opt/codium/codium /usr/local/bin \
 USER ${UID}:${GID}
 ENV XDG_DATA_DIRS=/usr/local/share:/usr/share
 ENV XDG_RUNTIME_DIR=/tmp/storage-run-${UID}
+ENV SHELL=/usr/local/bin/shell
+#ENV ELECTRON_RUN_AS_NODE=1
+ENV ELECTRON_NO_ATTACH_CONSOLE=1
 
-ENTRYPOINT ["dbus-run-session", "codium", "--disable-gpu", "--useHostProxy=true"]
+ENTRYPOINT ["dbus-run-session", "codium", "--disable-gpu", "--useHostProxy=true", "--force-disable-user-env"]
