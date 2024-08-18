@@ -24,6 +24,10 @@ services:
       context: ../imags/git-auth-proxy
       dockerfile: Dockerfile
     image: 'localhost/l7/auth-proxy:latest'
+    environment:
+      http_proxy:  ${http_proxy:-${HTTP_PROXY:-}}
+      https_proxy: ${https_proxy:-${HTTPS_PROXY:-}}
+      no_proxy:    ${no_proxy:-${NO_PROXY:-}}
     networks:
       public:
       svcs:
