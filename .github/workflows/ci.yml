@@ -154,7 +154,7 @@ jobs:
           make images_deps
       - name: Make test images
         run: |
-          make -j6 images_test
+          make -j2 images_test
       - name: Increase resources
         run: |
           ulimit -a
