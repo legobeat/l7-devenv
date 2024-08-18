@@ -54,10 +54,14 @@ jobs:
           echo '{"insecure-registries" : [ "localhost" ]}' | sudo tee /etc/docker/daemon.json
       - name: Allow cleartext http to localhost container registry (podman)
         run: |
-          mkdir -p ~/.config/containers/registries.conf.d
+          mkdir -p ~/.config/containers/registries.conf.d ~/.config/containers/containers.conf.d
           echo "[[registry]]
             location = 'localhost:80'
           insecure = true" | tee ~/.config/containers/registries.conf.d/insecure-localhost.conf
+          echo "[containers]
+            default_ulimits = [
+              'nofile=65535:65535',
+            ]" | tee ~/.config/containers/containers.conf.d/ulimits.conf
           systemctl --user restart podman
 
       - name: Set up Docker Buildx
@@ -136,10 +140,14 @@ jobs:
           submodules: true
       - name: Allow cleartext http to localhost container registry (podman)
         run: |
-          mkdir -p ~/.config/containers/registries.conf.d
+          mkdir -p ~/.config/containers/registries.conf.d ~/.config/containers/containers.conf.d
           echo "[[registry]]
             location = 'localhost:80'
           insecure = true" | tee ~/.config/containers/registries.conf.d/insecure-localhost.conf
+          echo "[containers]
+            default_ulimits = [
+              'nofile=65535:65535',
+            ]" | tee ~/.config/containers/containers.conf.d/ulimits.conf
           systemctl --user restart podman
       - name: Make images
         run: |
@@ -147,6 +155,11 @@ jobs:
       - name: Make test images
         run: |
           make -j6 images_test
+      - name: Increase resources
+        run: |
+          ulimit -a
+          sudo sysctl -w fs.file-max=65536
+          ulimit -a
       - name: Make GUI images
         run: |
           make images_gui
@@ -181,10 +194,14 @@ jobs:
           submodules: true
       - name: Setup podman
         run: |
-          mkdir -p ~/.config/containers/registries.conf.d
+          mkdir -p ~/.config/containers/registries.conf.d ~/.config/containers/containers.conf.d
           echo "[[registry]]
             location = 'localhost:80'
           insecure = true" | tee ~/.config/containers/registries.conf.d/insecure-localhost.conf
+          echo "[containers]
+            default_ulimits = [
+              'nofile=65535:65535',
+            ]" | tee ~/.config/containers/containers.conf.d/ulimits.conf
           systemctl --user restart podman.socket
           podman info
       - name: Prep
@@ -224,10 +241,14 @@ jobs:
     steps:
       - name: Setup podman
         run: |
-          mkdir -p ~/.config/containers/registries.conf.d
+          mkdir -p ~/.config/containers/registries.conf.d ~/.config/containers/containers.conf.d
           echo "[[registry]]
             location = 'localhost:80'
           insecure = true" | tee ~/.config/containers/registries.conf.d/insecure-localhost.conf
+          echo "[containers]
+            default_ulimits = [
+              'nofile=65535:65535',
+            ]" | tee ~/.config/containers/containers.conf.d/ulimits.conf
           systemctl --user restart podman.socket
           podman info
       - uses: actions/checkout@v4
@@ -265,10 +286,14 @@ jobs:
     steps:
       - name: Setup podman
         run: |
-          mkdir -p ~/.config/containers/registries.conf.d
+          mkdir -p ~/.config/containers/registries.conf.d ~/.config/containers/containers.conf.d
           echo "[[registry]]
             location = 'localhost:80'
           insecure = true" | tee ~/.config/containers/registries.conf.d/insecure-localhost.conf
+          echo "[containers]
+            default_ulimits = [
+              'nofile=65535:65535',
+            ]" | tee ~/.config/containers/containers.conf.d/ulimits.conf
           systemctl --user restart podman.socket
           podman info
       - uses: actions/checkout@v4
