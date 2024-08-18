@@ -77,7 +77,7 @@ services:
     environment:
       CONTAINER_DNS:     '${CONTAINER_DNS:-10.7.8.133}'
       CONTAINER_HOST:    'tcp://10.7.9.2:2375'
-      GO_RUNNER_IMAGE:   '${GO_RUNNER_IMAGE:-localhost/l7/go:1.20-bookworm}'
+      GO_RUNNER_IMAGE:   '${GO_RUNNER_IMAGE:-localhost/l7/go:1.22-bookworm}'
       GPG_IMAGE:         '${GPG_IMAGE:-localhost/l7/gpg-vault:pk}'
       NODE_RUNNER_IMAGE: '${NODE_RUNNER_IMAGE:-localhost/l7/node}'
       L7_NODE_VERSION:   '${L7_NODE_VERSION:-20}'
@@ -138,7 +138,7 @@ services:
       CONTAINER_DNS:     '${CONTAINER_DNS:-10.7.8.133}'
       CONTAINER_HOST:    'tcp://10.7.9.2:2375'
       DOCKER_HOST:       'tcp://10.7.9.2:2375'
-      GO_RUNNER_IMAGE:   '${GO_RUNNER_IMAGE:-localhost/l7/go:1.20-bookworm}'
+      GO_RUNNER_IMAGE:   '${GO_RUNNER_IMAGE:-localhost/l7/go:1.22-bookworm}'
       GPG_IMAGE:         '${GPG_IMAGE:-localhost/l7/gpg-vault:pk}'
       NODE_RUNNER_IMAGE: '${NODE_RUNNER_IMAGE:-localhost/l7/node}'
       L7_NODE_VERSION:   '${L7_NODE_VERSION:-20}'
