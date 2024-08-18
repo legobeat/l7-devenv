@@ -485,6 +485,9 @@ images: images_deps image_runner_node image_dnsmasq image_gpg_pk image_dev_shell
 
 images_gui: images image_xterm image_firefox image_vnc
 
+# these are optional and not enabled by default due to extra build time and disk usage
+images_opt: images_gui images_runner_mermaid image_runner_node_all
+
 images_test: images image_nvim_test
 
 test: test_nvim test_runner_node test_gpg_pk
