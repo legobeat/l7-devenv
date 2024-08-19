@@ -1,0 +1,18 @@
+#!/bin/bash
+# podman run --rm -it --security-opt label=type:container_runtime_t -u1000:1000 --userns=keep-id:uid=1000,gid=1000 -e DISPLAY -v "${XAUTHORITY:-${HOME}/.Xauthority}:/etc/x11/xauthority/Xauthority:ro" -e XAUTHORITY=/etc/x11/xauthority/Xauthority -v /tmp/.X11-unix/:/tmp/.X11-unix --entrypoint bash localhost/l7/vscodium:noble
+export RUNNER_IMAGE="${RUNNER_IMAGE:-${VSCODIUM_RUNNER_IMAGE:-localhost/l7/vscodium:noble}}"
+
+export RUNNER_ENV="${RUNNER_ENV} DISPLAY=${L7_DISPLAY:-${DISPLAY:-:1}}"
+export RUNNER_ENV="${RUNNER_ENV} XAUTHORITY=/etc/x11/xauthority/Xauthority"
+export RUNNER_OPTS="${RUNNER_OPTS} --network=${L7_COMPOSE_NETWORK_NAME_CONTROL} "
+
+if [[ -n "${L7_XAUTHORITY}" ]] && [[ -z "${L7_XAUTHORITY_VOLUME}" ]]; then
+  export RUNNER_VOLS="${L7_XAUTHORITY}:/etc/x11/xauthority/Xauthority:Z ${RUNNER_VOLS}"
+else
+  export RUNNER_VOLS="${L7_XAUTHORITY_VOLUME:-l7_dev_desktop_x11_xauthority}:/etc/x11/xauthority:Z ${RUNNER_VOLS}"
+fi
+
+export RUNNER_VOLS="${L7_X11_SOCKET_VOLUME:-l7_dev_desktop_x11_unix}:/tmp/.X11-unix ${RUNNER_VOLS}"
+#export RUNNER_VOLS="l7_dev_desktop_user_vscodium:/home/user/.mozilla ${RUNNER_VOLS}"
+export RUNNER_VOLS="${L7_VSCODIUM_VOLUME:-l7_dev_desktop_user_vscodium}:/home/user/.VSCodium ${RUNNER_VOLS}"
+exec l7-cnt-run dbus-run-session codium --disable-gpu --useHostProxy=true --force-disable-user-env ${@}

@@ -42,6 +42,7 @@ services:
       L7_YARN_BERRY_CACHE_VOLUME:   'l7_cache_node_yarn_berry'
       L7_YARN_CLASSIC_CACHE_VOLUME: 'l7_cache_node_yarn_classic'
       GPG_PK_VOLUME: 'l7_gpgvault_pk'
+      L7_COMPOSE_NETWORK_NAME_CONTROL:  'l7_dev_container_control'
       L7_COMPOSE_NETWORK_NAME_INTERNAL: 'l7_dev_internal'
       L7_RESOLV_CONF_PATH: '${L7_RESOLV_CONF_PATH:-${PWD}/compose/mounts/resolv-internal.conf}'
       SSH_SOCKET: '${SSH_SOCKET:-${SSH_AUTH_SOCK:-/dev/null}}'
