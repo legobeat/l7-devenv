@@ -281,6 +281,7 @@ jobs:
           - node_corepack
           - lsp_typescript
           - node_majors
+          - xterm
         ubuntu-version:
           - 24.04
     steps:
@@ -334,6 +335,11 @@ jobs:
           make images_deps
           make -j6 images
         if: ${{ matrix.test == 'curl' }}
+      - run: |
+          make images_deps
+          make -j6 images
+          make images_gui
+        if: ${{ matrix.test == 'xterm' }}
       - name: Run test ${{ matrix.test }}
         run: |
           podman network ls

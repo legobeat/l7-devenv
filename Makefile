@@ -482,6 +482,9 @@ images_test: images image_nvim_test
 
 test: test_nvim test_runner_node test_gpg_pk
 
+test_e2e_xterm:
+	set -e; \
+	./test/x11/test-xterm-vnc.sh
 test_e2e_curl:
 	set -e; \
 	./test/proxy/test-proxy-curl.sh
