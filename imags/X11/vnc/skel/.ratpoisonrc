@@ -10,12 +10,11 @@ bind c meta
 #bind e exec xfce4-terminal -x nvim
 bind c exec xterm
 bind C exec xterm
-bind e exec xterm -e tmux -c nvim
+bind e exec xterm '-c "tmux new-session nvim"'
 bind w exec firefox
 # nicer launcher
 bind d exec rofi -display-run 'run command' -show run -modi run -show-icons -mode -drun -theme /home/user/.config/rofi/tokyonight.rasi
 bind exclam exec rofi -display-run 'run command' -show run -modi run -show-icons -mode -drun -theme /home/user/.config/rofi/tokyonight.rasi
-bind w exec firefox
 
 # make a screenshot and save as file
 #alias sshot exec import -window root ~/screenshot-`date +%F`.jpg

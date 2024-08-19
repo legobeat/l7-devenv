@@ -56,6 +56,7 @@ Refer to `imags/X11/vnc/skel/.ratpoisonrc` for customization and complete refere
 - `Ctrl+Esc c`: New terminal window
 - `Ctrl+Esc d`: Application launcher
 - `Ctrl+Esc w`: New firefox window
+- `Ctrl+Esc e`: New neovim window
 - `Ctrl+Esc n`: Next window
 - `Ctrl+Esc Tab`: Focus next
 - `Ctrl+Esc s`: Split horizontally
