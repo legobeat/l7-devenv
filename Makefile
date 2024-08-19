@@ -456,6 +456,9 @@ image_firefox: images_deps_firefox
 image_vnc: images_deps_vnc
 	podman compose build vnc
 
+image_vscodium: images_deps_vscodium
+	podman compose build vscodium
+
 image_xterm: images_deps_xterm
 	podman compose build xterm
 
@@ -478,15 +481,18 @@ images_deps_firefox: submodules
 images_deps_vnc: images_deps image_xterm
 	COMPOSEFILE=./compose/vnc.compose.yml BUILDCOMPOSEFILE=./compose/base-images.compose.yml ./contrib/l7-scripts/bin/compose-build-dependencies vnc
 
+images_deps_vscodium: submodules
+	COMPOSEFILE=./compose/base-images.compose.yml BUILDCOMPOSEFILE=./compose/base-images.compose.yml ./contrib/l7-scripts/bin/compose-build-dependencies vscodium
+
 images_deps_xterm: images_deps
 	BUILDCOMPOSEFILE=./compose/base-images.compose.yml ./contrib/l7-scripts/bin/compose-build-dependencies xterm
 
 images: images_deps image_runner_node image_dnsmasq image_gpg_pk image_dev_shell image_acng image_auth_proxy image_container_proxy image_lsp_node
 
-images_gui: images image_xterm image_firefox image_vnc
+images_gui: images image_xterm image_firefox image_vnc image_vscodium
 
 # these are optional and not enabled by default due to extra build time and disk usage
-images_opt: images_gui images_runner_mermaid image_runner_node_all
+images_opt: images_gui image_runner_node_all image_runner_go
 
 images_test: images image_nvim_test
 
