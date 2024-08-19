@@ -1,6 +1,10 @@
 # syntax=docker/dockerfile:1.4-labs
-ARG BUILDER_BASE_IMAGE=localhost/l7-build/vscode-build-agent:focal-x64
+ARG CADDY_IMAGE=localhost/l7/caddy:latest
+ARG TARGETARCH=x64
+ARG BUILDER_BASE_IMAGE=localhost/l7-build/vscode-build-agent:focal-${TARGETARCH}
 ARG BASE_IMAGE=docker.io/ubuntu:24.04
+
+FROM ${CADDY_IMAGE} AS fwdproxy
 
 #### Build vscodium
 FROM ${BUILDER_BASE_IMAGE} AS builder
@@ -48,6 +52,7 @@ RUN apt-get update && \
     librsvg2-common \
     libglib2.0-data \
     libgtk-3-bin \
+    libnss3-tools \
     libsecret-common \
     libsecret-1-0 \
     libssh-4 \
@@ -66,17 +71,32 @@ RUN apt-get update && \
 ARG UID=1000
 ARG GID=1000
 
-COPY --from=builder --chown=${UID}:${GID} /app/vscodium/VSCode-linux-x64 /opt/codium
+
+COPY --from=builder --chown=${UID}:${GID} /app/vscodium/VSCode-linux-${TARGETARCH} /opt/codium
+COPY --from=fwdproxy \
+  --chmod=444 \
+  /data/caddy/pki/authorities/local/root.crt \
+  # note: the .crt ending is important
+  /usr/local/share/ca-certificates/l7-fwd-proxy.crt
+ENV NODE_EXTRA_CA_CERTS=/usr/local/share/ca-certificates/l7-fwd-proxy.crt
 
 COPY product.json /home/user/.config/VSCodium/product.json
 COPY settings.json /home/user/.config/VSCodium/User/settings.json
 
 RUN ln -sf /opt/codium/codium /usr/local/bin \
+  && update-ca-certificates \
+  && mkdir -p -m755 "/home/user/.pki/nssdb" \
+  # https://github.com/SeleniumHQ/docker-selenium/blob/0a4a7782eeaff6b264a689d5e478bfeaffad7253/README.md#alternative-method-add-certificates-to-existing-selenium-based-images-for-browsers \
+  # https://superuser.com/questions/1772957/how-to-trust-a-self-signed-ssl-root-ca-in-chrome-on-debian-via-terminal \
+  && certutil -d "sql:/home/user/.pki/nssdb" -N --empty-password \
+  && certutil -d "sql:/home/user/.pki/nssdb" -A -t 'C,,' -n trustedca -i /usr/local/share/ca-certificates/l7-fwd-proxy.crt \
+  && cp /usr/local/share/ca-certificates/l7-fwd-proxy.crt /etc/ssl/ca-bundle.pem \
   && mkdir "/tmp/storage-run-${UID}" \
-  && chown -R "${UID}:${GID}" /home/user "/tmp/storage-run-${UID}"
+  && chown -R "${UID}:${GID}" /home/user "/tmp/storage-run-${UID}" \
+  && apt-get purge --autoremove -y libnss3-tools
 
 USER ${UID}:${GID}
 ENV XDG_DATA_DIRS=/usr/local/share:/usr/share
 ENV XDG_RUNTIME_DIR=/tmp/storage-run-${UID}
 
-ENTRYPOINT ["dbus-run-session", "codium", "--disable-gpu"]
+ENTRYPOINT ["dbus-run-session", "codium", "--disable-gpu", "--useHostProxy=true"]
