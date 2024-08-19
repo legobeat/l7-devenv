@@ -1,0 +1,14 @@
+# syntax=docker/dockerfile:1.4-labs
+ARG ALPINE_VERSION=3.20
+ARG BASE_IMAGE=docker.io/alpine:3.20
+FROM ${BASE_IMAGE}
+
+RUN apk --update --no-cache add tor \
+  && rm -rf /var/cache/apk
+
+COPY torrc /etc/torrc
+
+USER tor
+WORKDIR /var/lib/tor
+
+ENTRYPOINT ["/usr/bin/tor", "-f", "/etc/torrc"]

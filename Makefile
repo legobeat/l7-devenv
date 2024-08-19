@@ -440,6 +440,9 @@ export_runner_node: # image_runner_node
 	@@${CMD} save \
 		"${IMAGE_NAME}:${IMAGE_TAG}"
 
+image_tor:
+	podman compose build tor
+
 image_firefox: images_deps_firefox
 	podman compose build firefox
 

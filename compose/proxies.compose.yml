@@ -135,6 +135,18 @@ services:
     volumes:
       - 'verdaccio_storage:/verdaccio/storage'
 
+  tor:
+    profiles:
+      - tor
+    image: 'localhost/l7/tor:latest'
+    build:
+      context: ../imags/tor
+      dockerfile: Containerfile
+    networks:
+      public:
+      internal:
+        ipv4_address: 10.7.8.139
+
 ##########
 
 configs:
