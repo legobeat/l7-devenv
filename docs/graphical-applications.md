@@ -37,11 +37,11 @@ $ vncviewer 127.0.0.1:5902
 ### Launching applications
 #### From the dev-shell
 
-Provided applications will be launched directly in the VNC server if started from the shell. For example:
+Provided applications will be launched directly in the VNC server if started from the shell. For example, to start the graphical IDE VSCodium:
 
 ```
 $ de
-> firefox
+> codium
 ```
 
 ### Inside the desktop environment
