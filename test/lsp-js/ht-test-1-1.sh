@@ -1,5 +1,5 @@
-#/!bin/bash
-# senss keystrokes to neovim (navigate to element and inspect) and screenscrapes for expected output
+#!/bin/bash
+# sends keystrokes to neovim (navigate to element and inspect) and screenscrapes for expected output
 result="$(
   (
     sleep 30
