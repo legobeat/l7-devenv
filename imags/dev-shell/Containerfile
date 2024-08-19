@@ -87,6 +87,8 @@ RUN cat /usr/local/share/ca-certificates/l7-fwd-proxy.crt >> /etc/ssl/certs/ca-c
     /home/user \
   && chmod 777 /tmp
 
+ENV SHELL=${SHELL}
+
 USER ${UID}:${GID}
 WORKDIR /src
 ENTRYPOINT /bin/zsh
