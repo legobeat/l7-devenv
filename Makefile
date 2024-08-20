@@ -522,7 +522,7 @@ images_gui: images image_xterm image_firefox image_vnc image_vscodium
 images_opt: images_gui image_runner_node_all image_runner_go
 
 # these are optional and not enabled by default due to extra build time and disk usage
-images_opt: images_runner_mermaid image_runner_node_all
+images_opt: image_runner_node_puppeteer images_gui image_runner_mermaid image_runner_node_all
 
 images_test: images image_nvim_test
 
