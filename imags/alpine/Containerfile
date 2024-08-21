@@ -34,8 +34,14 @@ COPY contrib/data/ssh_known_hosts /etc/ssh/ssh_known_hosts
 COPY --chown=${UID}:${GID} skel/ /home/user/
 
 ### shim global node bins
-ARG NODE_BINS="npm7 npm9 npm10 pnpm9 yarn1 yarn3 yarn4     allow-scripts corepack glob lavamoat-ls mkdirp node-gyp node-which nopt npx pnpx resolve semver yarn-deduplicate"
+ARG NODE_BINS="allow-scripts corepack glob lavamoat-ls mkdirp node-gyp node-which nopt npx pnpx resolve semver yarn-deduplicate"
+ARG NPM_BINS="npm7 npm9 npm10"
+ARG PNPM_BINS="pnpm9"
+ARG YARN_BINS="yarn1 yarn3 yarn4"
 RUN for bin in ${NODE_BINS}; do ln -s l7-run-node "/usr/local/bin/${bin}"; done \
+  && for bin in ${NPM_BINS}; do ln -s npm "/usr/local/bin/${bin}"; done \
+  && for bin in ${PNPM_BINS}; do ln -s pnpm "/usr/local/bin/${bin}"; done \
+  && for bin in ${YARN_BINS}; do ln -s yarn "/usr/local/bin/${bin}"; done \
 
   # caus some scripts can be silly
   && ln -s /bin/bash /usr/bin/bash \
