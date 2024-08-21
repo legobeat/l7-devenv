@@ -20,7 +20,6 @@ else
 fi
 
 # replace newlines with spaces
-RUNNER_ENV="${RUNNER_ENV//@@ /$'\n'}"
 RUNNER_PORTS="${RUNNER_PORTS//@@ /$'\n'}"
 RUNNER_VOLS="${RUNNER_VOLS//@@ /$'\n'}"
 if [ -n "${RUNNER_ENV}"  ]; then
