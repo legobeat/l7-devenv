@@ -1,5 +1,6 @@
 #!/bin/bash
 export RUNNER_IMAGE=localhost/l7/mermaid:bookworm
 RUNNER_OPTS="${RUNNER_OPTS} -i "
-RUNNER_ENV="${RUNNER_ENV} PUPPETEER_CACHE_DIR=/opt/puppeteer"
+RUNNER_ENV="${RUNNER_ENV}
+PUPPETEER_CACHE_DIR=/opt/puppeteer"
 l7-run-node mmdc ${@}
