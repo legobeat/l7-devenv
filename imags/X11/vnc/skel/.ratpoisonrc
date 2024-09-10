@@ -11,6 +11,7 @@ bind c meta
 bind c exec xterm
 bind C exec xterm
 bind e exec xterm '-c "tmux new-session nvim"'
+bind E exec codium
 bind w exec firefox
 # nicer launcher
 bind d exec rofi -display-run 'run command' -show run -modi run -show-icons -mode -drun -theme /home/user/.config/rofi/tokyonight.rasi

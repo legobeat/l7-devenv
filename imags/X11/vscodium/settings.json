@@ -1,0 +1,5 @@
+{
+    "http.experimental.systemCertificatesV2": true,
+    "http.proxyStrictSSL": true,
+    "window.titleBarStyle": "custom"
+}

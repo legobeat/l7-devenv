@@ -108,6 +108,21 @@ services:
         - 'localhost/l7/alpine:x11-3.20'
     image: 'localhost/l7/alpine:x11'
 
+  build-base-ubuntu-x11:
+    ####
+    profiles:
+      - build
+      - ubuntu
+    build:
+      context: ../imags/X11/ubuntu
+      dockerfile: ./Containerfile
+      args:
+        UBUNTU_VERSION: '24.04'
+        EXTRA_PKGS: ''
+      tags:
+        - 'localhost/l7/ubuntu:x11-24.04'
+    image: 'localhost/l7/ubuntu:x11'
+
   build-xterm-on-podman-remote-on-x11:
     profiles:
       - build
@@ -137,6 +152,50 @@ services:
         BASE_IMAGE: 'localhost/l7/alpine:x11'
         FIREFOX_RELEASE: firefox
     image: 'localhost/l7/firefox:latest'
+
+  build-vscodium-builder:
+    profiles:
+      - build
+    build:
+      context: ../imags/X11/vscode-linux-build-agent/focal-${ARCH:-x64}
+      dockerfile: ./Dockerfile
+    image: 'localhost/l7-build/vscode-build-agent:focal-${ARCH:-x64}'
+
+  build-vscodium:
+    profiles:
+      - build
+    depends_on:
+      - build-base-ubuntu-x11
+      - build-vscodium-builder
+    build:
+      context: ../imags/X11/vscodium
+      dockerfile: ./Containerfile
+      args:
+        BASE_IMAGE: 'localhost/l7/ubuntu:x11'
+        BUILDER_BASE_IMAGE: 'localhost/l7-build/vscode-build-agent:focal-${ARCH:-x64}'
+    ulimits:
+      nofile:
+        soft: 65535
+        hard: 65535
+    image: 'localhost/l7/vscodium:noble'
+
+  vscodium:
+    profiles:
+      - build
+    depends_on:
+      - build-vscodium
+    build:
+      x-build-images:
+        - 'localhost/l7/vscodium:noble'
+      context: ..
+      dockerfile: imags/X11/dev-terminal/Containerfile
+      args:
+        BASE_IMAGE: 'localhost/l7/vscodium:noble'
+    ulimits:
+      nofile:
+        soft: 65535
+        hard: 65535
+    image: 'localhost/l7/dev-terminal:vscodium'
 
   build-podman-remote-on-x11:
     profiles:

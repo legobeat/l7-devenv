@@ -37,11 +37,11 @@ $ vncviewer 127.0.0.1:5902
 ### Launching applications
 #### From the dev-shell
 
-Provided applications will be launched directly in the VNC server if started from the shell. For example:
+Provided applications will be launched directly in the VNC server if started from the shell. For example, to start the graphical IDE VSCodium:
 
 ```
 $ de
-> firefox
+> codium
 ```
 
 ### Inside the desktop environment
@@ -55,6 +55,8 @@ Refer to `imags/X11/vnc/skel/.ratpoisonrc` for customization and complete refere
 - `Ctrl+Esc ?`: Display keybindings
 - `Ctrl+Esc c`: New terminal window
 - `Ctrl+Esc d`: Application launcher
+- `Ctrl+Esc E`: New vscodium window
+- `Ctrl+Esc e`: New neovim window
 - `Ctrl+Esc w`: New firefox window
 - `Ctrl+Esc e`: New neovim window
 - `Ctrl+Esc n`: Next window
