@@ -73,7 +73,7 @@ WORKDIR /tmp
 
 COPY imags/node-runner/install-package-managers.sh .
 # TODO: integrity checksums / sigchecks for bundled PMs
-ARG COREPACK_PMS='npm@10.8.2 npm@10 npm@6.14.18 npm@6 npm@7.24.2 npm@7 npm@9.9.3 npm@9 pnpm@8.15.8 pnpm@8 pnpm@9.4 pnpm@9.5.0 pnpm@9 yarn@1.22.22 yarn@1 yarn@3.2.1 yarn@3.2.2 yarn@3.4.1 yarn@3.5.1 yarn@3.6.0 yarn@3.6.2 yarn@3 yarn@4.1.1 yarn@4.2.2 yarn@4.3.1 yarn@4'
+ARG COREPACK_PMS='npm@10.8.3 npm@10 npm@6.14.18 npm@6 npm@7.24.2 npm@7 npm@9.9.3 npm@9 pnpm@8.15.8 pnpm@8 pnpm@9.4 pnpm@9.5.0 pnpm@9 yarn@1.22.22 yarn@1 yarn@3.2.1 yarn@3.2.2 yarn@3.4.1 yarn@3.5.1 yarn@3.6.0 yarn@3.6.2 yarn@3 yarn@4.1.1 yarn@4.2.2 yarn@4.3.1 yarn@4'
 
 ENV PATH=/usr/local/lib/node_modules/.bin:/usr/local/lib/node_modules/corepack/shims:${HOME}/.cache/node/corepack/v1/npm:${HOME}/.corepack/bin:$PATH
 
