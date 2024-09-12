@@ -83,6 +83,9 @@ COPY --from=fwdproxy \
 RUN cat /usr/local/share/ca-certificates/l7-fwd-proxy.crt >> /etc/ssl/certs/ca-certificates.crt \
   && update-ca-certificates \
   && mkdir -p ${HOME}/.local/state/nvim ${HOME}/.local/share/nvim \
+  && mkdir -p ${HOME}/.ssh/config.d \
+  && touch ${HOME}/.ssh/config \
+  && chmod -R go-rwx /home/user \
   && chown -R ${UID}:${GID} \
     /home/user \
   && chmod 777 /tmp
