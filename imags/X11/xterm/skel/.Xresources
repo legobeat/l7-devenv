@@ -1,2 +1,3 @@
-! #import statements don't seem to work as expected
-! files merged explicitly in .xinitirc
+#include "/home/user/.config/xresources/xterm.Xresources"
+#include "/home/user/.config/xresources/tokyonight_moon.Xresources"
+#include "/home/user/.config/xresources/Xresources"
