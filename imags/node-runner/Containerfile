@@ -9,6 +9,8 @@ RUN apt-get update \
     git curl ca-certificates gnupg ssh-client less psmisc jq time man manpages \
     locales fakeroot libpcre3 \
     tar unzip \
+    # node-gyp
+    brotli libbrotli1 libvips-dev \
     build-essential ccache cmake cmake-format distcc zlib1g-dev libzlcore-dev libffi-dev libssl-dev libyaml-dev \
   && sed -i '/en_US.UTF-8/s/^# //' /etc/locale.gen \
   && locale-gen \
