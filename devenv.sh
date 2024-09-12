@@ -137,7 +137,9 @@ detect_compose_command() {
     echo "Could not detect compose command. Install a newer version of ${cmd}-compose or set it by COMPOSE_CMD" >&2
     exit 1
   fi
-  echo "${composecmd} --progress=quiet --project-directory=${ROOT_DIR} --log-level=${COMPOSE_LOG_LEVEL:-error}"
+  # TODO: set log-level when supported in repo docker-compose, or containerize docker-compose
+  # echo "${composecmd} --progress=quiet --project-directory=${ROOT_DIR} --log-level=${COMPOSE_LOG_LEVEL:-error}"
+  echo "${composecmd} --progress=quiet --project-directory=${ROOT_DIR}"
 }
 
 # set value in shell env file
