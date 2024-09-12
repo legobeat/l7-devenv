@@ -24,6 +24,7 @@ prompt pure
 # prevent git auto fetch from prompt
 export PURE_GIT_PULL=0
 zstyle :prompt:pure:git:fetch only_upstream yes
+zstyle :prompt:pure:path color '#82aaff'
 
 if [ -x /usr/bin/dircolors ]; then
   test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
