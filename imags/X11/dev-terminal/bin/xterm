@@ -7,6 +7,6 @@ export COMPOSE_PROJECT_NAME
 DOCKER_HOST=${DOCKER_HOST:-${CONTAINER_HOST}} \
   docker-compose --progress=quiet --log-level=error \
     --project-name="${COMPOSE_PROJECT_NAME}" --project-directory=/app \
-    run --rm -w /src -e DISPLAY=:1 --entrypoint=/usr/bin/xterm --no-deps --no-build --pull=never -e TMUX= \
+    run --rm -w /src -e DISPLAY="${L7_DISPLAY:-${DISPLAY:-:1}}" --entrypoint=/usr/bin/xterm --no-deps --no-build --pull=never -e TMUX= \
     xterm -e "/usr/local/bin/docker-compose --progress=quiet --project-directory=/app --project-name=${COMPOSE_PROJECT_NAME} --log-level=error run --rm -w /src --entrypoint=${USER_SHELL:-/bin/zsh} --no-deps --no-build --pull=never -e TMUX= dev-shell ${@}"
 
