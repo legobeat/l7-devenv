@@ -71,7 +71,14 @@ When launching the environment or application, you will need to specify environm
 - `L7_XAUTHORITY`: The path to the Xauthority file
 - `L7_DISPLAY`: The DISPLAY number or path
 
-For example, to launch firefox in the current X session in a typical Linux environment:
+For example, to launch a new xterm window in the current X session in a typical Linux environment:
+
+```
+$ export L7_X11_SOCKET_VOLUME=/tmp/.X11-unix L7_DISPLAY=${DISPLAY:-:0} L7_XAUTHORITY="${HOME}/.Xauthority"
+$ podman compose run xterm
+```
+
+Or to launch firefox from inside the dev-shell:
 
 ```
 $ export L7_X11_SOCKET_VOLUME=/tmp/.X11-unix L7_DISPLAY=${DISPLAY:-:0} L7_XAUTHORITY="${HOME}/.Xauthority"
@@ -81,5 +88,5 @@ $ de
 
 You can also provide the options directly in an existing shell session:
 ```
-> L7_X11_SOCKET_VOLUME=/tmp/.X11-unix L7_DISPLAY=:0 L7_XAUTHORITY=/home/xyz/.Xauthority firefox
+> L7_X11_SOCKET_VOLUME=/tmp/.X11-unix L7_DISPLAY=:0 L7_XAUTHORITY=${HOME}/.Xauthority firefox
 ```
