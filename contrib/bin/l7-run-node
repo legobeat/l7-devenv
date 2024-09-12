@@ -10,8 +10,8 @@ is_react_native_project() {
 
 # TODO: figure out some nice mechanism for unifying/selecting right image for android/ios in react native projects...
 if is_react_native_project;  then
-  export RUNNER_IMAGE=${RUNNER_IMAGE:-${BUNDLER_RUNNER_IMAGE:-localhost/l7/node:ios-bookworm}}
-  if [ -n "BUILD_IOS" ]; then
+  export RUNNER_IMAGE=${RUNNER_IMAGE:-${BUNDLER_RUNNER_IMAGE:-localhost/l7/node:android-bookworm}}
+  if [ -n "${BUILD_IOS}" ]; then
     export RUNNER_IMAGE=${RUNNER_IMAGE:-${BUNDLER_RUNNER_IMAGE:-localhost/l7/node:ios-bookworm}}
   else
     if [[ -n "${L7_NODE_CACHE_DIR}" ]]; then
@@ -19,7 +19,6 @@ if is_react_native_project;  then
     elif [[ -n "${L7_GRADLE_CACHE_VOLUME}" ]]; then
       export RUNNER_VOLS="${L7_GRADLE_CACHE_VOLUME}:/home/node/.gradle/cache ${RUNNER_VOLS}"
     fi
-    export RUNNER_IMAGE=${RUNNER_IMAGE:-${BUNDLER_RUNNER_IMAGE:-localhost/l7/node:android-bookworm}}
   fi
 else
   export RUNNER_IMAGE="${RUNNER_IMAGE:-${NODE_RUNNER_IMAGE:-localhost/l7/node}}"

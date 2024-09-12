@@ -169,3 +169,12 @@ services:
       tags:
         - 'localhost/l7/vnc:ratpoison'
     image: 'localhost/l7/vnc:ratpoison'
+
+  android-sdk:
+    profiles:
+      - build
+      - android
+    build:
+      context: ../imags/android-sdk
+      dockerfile: ./Containerfile
+    image: 'localhost/l7/android-sdk:bookworm'

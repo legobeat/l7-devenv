@@ -1,57 +1,70 @@
 # syntax=docker/dockerfile:1.4-labs
-ARG NODE_VERSION=20
-FROM localhost/l7/node:${NODE_VERSION}-bookworm
+ARG BASE_IMAGE=docker.io/library/debian:bookworm-slim
+FROM ${BASE_IMAGE}
+# ARG NODE_VERSION=20
+# FROM localhost/l7/node:${NODE_VERSION}-bookworm
 USER root
-# /home/node is symlinked to /home/user in base image
 WORKDIR /tmp/tools
 
 # RUN dpkg --add-architecture i386
 RUN apt-get update \
   && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-    ca-certificates openjdk-17-jre-headless openjdk-17-jdk-headless unzip wget \
+    ca-certificates openjdk-17-jre-headless openjdk-17-jdk-headless \
+    curl unzip \
     # emulator
-    libx11-6 libpulse0 libdrm2 libxi6 libxkbfile1 \
-    #libncurses5:i386 libc6:i386 libstdc++6:i386 lib32gcc-s1 lib32ncurses6 lib32z1 zlib1g:i386 \
+    #libx11-6 libpulse0 libdrm2 libxi6 libxkbfile1 \
+    ##libncurses5:i386 libc6:i386 libstdc++6:i386 lib32gcc-s1 lib32ncurses6 lib32z1 zlib1g:i386 \
   && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+ARG UID=1000
+ARG GID=1000
+ARG SHELL=/bin/bash
+
+RUN bash -c "groupadd -g ${GID} userz || true" \
+  && bash -c "useradd -u ${UID} -g ${GID} -d /home/user -m user -s "${SHELL}" && chown -R ${UID}:${GID} /home/user || true" \
+  && chown -R "${UID}:${GID}" /home/user
 
 # install sdkmanager
 # TODO: checksum
 ARG ANDROID_SDK_TOOLS_URL="https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip"
-RUN wget -q "${ANDROID_SDK_TOOLS_URL}" -O android-sdk-tools.zip
+#RUN wget -q "${ANDROID_SDK_TOOLS_URL}" -O android-sdk-tools.zip
+
+
+RUN curl -fsSL "${ANDROID_SDK_TOOLS_URL}" -o android-sdk-tools.zip
 RUN unzip android-sdk-tools.zip \
   && mkdir -p /home/user/Android/Sdk/cmdline-tools \
   && mv cmdline-tools /home/user/Android/Sdk/cmdline-tools/tools
 
-ARG ANDROID_SDK_VERSION=33
-ARG ANDROID_BUILD_TOOLS_VERSION=${ANDROID_SDK_VERSION}.0.0
-ARG ANDROID_NDK_VERSION=24.0.8215888
-ARG CMAKE_VERSION=3.22.1
-#ARG ANDROID_IMAGE="system-images;android-34;default;arm64-v8a"
-ARG ANDROID_IMAGE="system-images;android-34;default;x86_64"
+#ARG ANDROID_SDK_VERSION=33
+#ARG ANDROID_BUILD_TOOLS_VERSION=${ANDROID_SDK_VERSION}.0.0
+#ARG ANDROID_NDK_VERSION=24.0.8215888
+#ARG CMAKE_VERSION=3.22.1
+##ARG ANDROID_IMAGE="system-images;android-34;default;arm64-v8a"
+#ARG ANDROID_IMAGE="system-images;android-34;default;x86_64"
 ## trust caddy ca cert, download sdk and ndk
 #RUN sh -c 'echo "changeit\nyes" | keytool -importcert -file /usr/local/share/ca-certificates/l7-fwd-proxy.crt -cacerts' \
 #  && sh -c 'yes | sdkmanager --sdk_root=/studio-data/Android/Sdk --licenses' \
 # https://stackoverflow.com/a/61176718
-ENV PATH=/home/user/Android/Sdk/cmdline-tools/latest/bin:/home/user/Android/Sdk/cmdline-tools/tools/bin:$PATH
+ENV PATH=/home/user/Android/Sdk/cmdline-tools/latest/bin:/home/user/Android/Sdk/cmdline-tools/tools/bin:/home/user/Android/Sdk/platform-tools:$PATH
 # download sdk and ndk
 RUN mkdir -p /home/user/.gradle \
   && mkdir -p /home/user/.java \
   && mkdir -p /home/user/.android \
   && sh -c 'yes | sdkmanager --sdk_root=/home/user/Android/Sdk --licenses' \
   && sdkmanager --sdk_root=/home/user/Android/Sdk --install \
-    ## metamask-mobile legacy dep \
-    "build-tools;30.0.3" \
-    "build-tools;33.0.0" \
-    "build-tools;${ANDROID_BUILD_TOOLS_VERSION}" \
-    "cmake;${CMAKE_VERSION}" \
-    "${ANDROID_IMAGE}" \
-    "emulator" \
-    "platform-tools" \
-    ## metamask-mobile legacy dep \
-    "platforms;android-33" \
-    "platforms;android-${ANDROID_SDK_VERSION}" \
+    ### metamask-mobile legacy dep \
+    #"build-tools;30.0.3" \
+    #"build-tools;33.0.0" \
+    #"build-tools;${ANDROID_BUILD_TOOLS_VERSION}" \
+    #"cmake;${CMAKE_VERSION}" \
+    #"${ANDROID_IMAGE}" \
+    #"emulator" \
+    "platform-tools"
+    ### metamask-mobile legacy dep \
+    #"platforms;android-33" \
+    #"platforms;android-${ANDROID_SDK_VERSION}" \
     #"sources;android-${ANDROID_SDK_VERSION}" \
-    "ndk;${ANDROID_NDK_VERSION}"
+    #"ndk;${ANDROID_NDK_VERSION}"
 
 ENV ANDROID_AVD_HOME=/home/user/.config/.android/avd
 
@@ -60,20 +73,17 @@ RUN echo '{"hasOptedIn":false,"lastOptinPromptVersion":"2024.1"}' > /home/user/.
 
 COPY 51-android.rules /etc/udev/rules.d/51-android.rules
 
-ARG UID=1000
-ARG GID=1000
-
 WORKDIR /home/user
 
-RUN usermod -aG plugdev node \
-  && chown -R ${UID}:${GID} /home/node /home/user
+RUN usermod -aG plugdev user \
+  && chown -R ${UID}:${GID} /home/user
 
 USER $UID:$GID
 # seed user gradle installation
 COPY --chown=$UID:$GID gradlew .
 COPY --chown=$UID:$GID gradle ./gradle
 RUN ./gradlew && rm -rf ./gradle*
-RUN avdmanager create avd -n pixel5 -d pixel_5 -k "${ANDROID_IMAGE}"
+#RUN avdmanager create avd -n pixel5 -d pixel_5 -k "${ANDROID_IMAGE}"
 ENV ANDROID_HOME=/home/user/Android/Sdk
 ARG TARGETARCH="amd64"
 ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-${TARGETARCH}

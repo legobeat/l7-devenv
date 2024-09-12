@@ -1,0 +1,62 @@
+# syntax=docker/dockerfile:1.4-labs
+ARG NODE_VERSION=20
+FROM localhost/l7/android-sdk:bookworm
+#FROM localhost/l7/node:${NODE_VERSION}-bookworm
+USER root
+# /home/node is symlinked to /home/user in base image
+#WORKDIR /tmp/tools
+
+# RUN dpkg --add-architecture i386
+#RUN apt-get update \
+#  && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+#    ca-certificates openjdk-17-jre-headless openjdk-17-jdk-headless \
+#  && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+RUN apt-get update \
+  && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+    # emulator
+    libx11-6 libxi6 libxkbfile1 \
+    net-tools \
+    procps \
+    socat \
+    # libx11-6 libpulse0 libdrm2 libxi6 libxkbfile1 \
+    # libncurses5:i386 libc6:i386 libstdc++6:i386 lib32gcc-s1 lib32ncurses6 lib32z1 zlib1g:i386 \
+  && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
+  && chmod 777 /var/log
+#COPY --from=androidsdk --chown=$UID:$GID /home/user/Android /home/user/Android
+#COPY --from=androidsdk --chown=$UID:$GID /home/user/.gradle /home/user/.gradle
+#COPY --from=androidsdk --chown=$UID:$GID /home/user/.java /home/user/.java
+#COPY --from=androidsdk --chown=$UID:$GID /home/user/.android /home/user/.android
+#COPY --from=androidsdk --chown=$UID:$GID /home/user/.config/.android /home/user/.config/.android
+
+USER user
+
+#ARG ANDROID_IMAGE="system-images;android-34;default;arm64-v8a"
+ARG ANDROID_SDK_VERSION=34
+ARG ANDROID_IMAGE="system-images;android-${ANDROID_SDK_VERSION};default;x86_64"
+
+# download sdk and ndk
+RUN sdkmanager --install \
+    "emulator" \
+    "platforms;android-${ANDROID_SDK_VERSION}" \
+    "${ANDROID_IMAGE}"
+
+ENV ANDROID_AVD_HOME=/home/user/.config/.android/avd
+ENV ANDROID_SDK_ROOT=/home/user/Android/Sdk
+
+ARG UID=1000
+ARG GID=1000
+
+COPY docker-entrypoint.sh /usr/bin/docker-entrypoint.sh
+USER $UID:$GID
+WORKDIR /home/user
+
+ARG AVD_DEVICE_MODEL=pixel_5
+RUN avdmanager create avd -n default -d "${AVD_DEVICE_MODEL}" -k "${ANDROID_IMAGE}"
+ENV ANDROID_HOME=/home/user/Android/Sdk
+ARG TARGETARCH="amd64"
+ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-${TARGETARCH}
+ENV PATH="/home/user/Android/Sdk/emulator:$PATH"
+
+WORKDIR /home/user
+ENTRYPOINT ["/usr/bin/docker-entrypoint.sh"]

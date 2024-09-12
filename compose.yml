@@ -6,6 +6,8 @@ include:
     #project_directory: .
   - path: compose/vnc.compose.yml
     #project_directory: .
+  - path: compose/android.compose.yml
+    #project_directory: .
 
 services:
   dev-shell:
