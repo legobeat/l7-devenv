@@ -1,0 +1,18 @@
+---
+services:
+  android-emulator:
+    profiles:
+      - android
+    build:
+      x-build-images:
+        - 'localhost/l7/android-sdk:bookworm'
+      context: ../imags/android-emulator
+      dockerfile: Containerfile
+    image: 'localhost/l7/android-emulator:bookworm'
+    devices:
+      - /dev/kvm
+    networks:
+      internal:
+        ipv4_address: 10.7.8.138
+
+

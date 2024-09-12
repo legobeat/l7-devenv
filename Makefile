@@ -227,15 +227,29 @@ image_runner_node_ios: image_runner_node
 		-f './imags/cocoapods-runner/Containerfile' \
 		./imags/cocoapods-runner
 
+image_android_sdk:
+	${CMD} buildx build \
+		${BUILD_OPTIONS} \
+		-t "${IMAGE_REPO}/android-sdk:bookworm" \
+		-f './imags/android-sdk/Containerfile' \
+		./imags/android-sdk
+
+image_android_emulator:
+	${CMD} buildx build \
+		${BUILD_OPTIONS} \
+		-t "${IMAGE_REPO}/android-emulator:bookworm" \
+		-f './imags/android-emulator/Containerfile' \
+		./imags/android-emulator
+
 image_runner_node_android : IMAGE_NAME = ${RUNNER_IMAGE_NAME}
 image_runner_node_android : IMAGE_TAG = ${RUNNER_IMAGE_TAG}
-image_runner_node_android: image_runner_node
+image_runner_node_android: image_android_sdk # image_runner_node
 	${CMD} buildx build \
 		${BUILD_OPTIONS} \
 		--build-arg "NODE_VERSION=20" \
 		-t "${IMAGE_NAME}:android-${IMAGE_TAG}" \
-		-f './imags/node-runner-android/Containerfile' \
-		./imags/node-runner-android
+		-f './imags/node-runner/Containerfile.android' \
+		./imags/node-runner
 
 image_runner_node_majors: image_runner_node_20 image_runner_node_18 image_runner_node_22
 image_runner_node_all: image_runner_node_majors image_runner_node_mobile
@@ -485,7 +499,7 @@ images: images_deps image_runner_node image_dnsmasq image_gpg_pk image_dev_shell
 images_gui: images image_xterm image_firefox image_vnc
 
 # these are optional and not enabled by default due to extra build time and disk usage
-images_opt: images_gui image_runner_node_all
+images_opt: images_gui image_runner_node_all image_runner_go image_android_emulator
 
 images_test: images image_nvim_test
 
