@@ -52,16 +52,16 @@ Refer to `imags/X11/vnc/skel/.ratpoisonrc` for customization and complete refere
 
 ### Basic key bindings
 
-- `Ctrl+Esc ?`: Display keybindings
-- `Ctrl+Esc c`: New terminal window
-- `Ctrl+Esc d`: Application launcher
-- `Ctrl+Esc w`: New firefox window
-- `Ctrl+Esc e`: New neovim window
-- `Ctrl+Esc n`: Next window
-- `Ctrl+Esc Tab`: Focus next
-- `Ctrl+Esc s`: Split horizontally
-- `Ctrl+Esc S`: Split vertically
-- `Ctrl+Esc L`: Reload `~/.ratpoisonrc`
+- `Ctrl+. ?`: Display keybindings
+- `Ctrl+. c`: New terminal window
+- `Ctrl+. d`: Application launcher
+- `Ctrl+. w`: New firefox window
+- `Ctrl+. e`: New neovim window
+- `Ctrl+. n`: Next window
+- `Ctrl+. Tab`: Focus next
+- `Ctrl+. s`: Split horizontally
+- `Ctrl+. S`: Split vertically
+- `Ctrl+. L`: Reload `~/.ratpoisonrc`
 
 ## 2. Using a provided X socket
 

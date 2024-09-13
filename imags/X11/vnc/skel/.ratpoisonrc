@@ -1,5 +1,5 @@
-# prefix: Ctrl+`
-escape C-Escape
+# prefix: Ctrl+.
+escape C-period
 
 # keybindings
 bind c meta
