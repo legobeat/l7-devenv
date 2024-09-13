@@ -63,6 +63,7 @@
 	path = imags/verdaccio
 	url = https://github.com/legobeat/verdaccio
 	branch = 5.x
+	depth = 1
 [submodule "imags/docker-compose"]
 	path = imags/docker-compose
 	url = https://github.com/legobeat/compose
