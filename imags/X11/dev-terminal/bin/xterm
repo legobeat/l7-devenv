@@ -3,10 +3,14 @@ if [ -z "${COMPOSE_PROJECT_NAME}" ]; then
   COMPOSE_PROJECT_NAME="$(basename "${ROOT_DIR:-${L7_ROOT_DIR}}")"
 fi
 export COMPOSE_PROJECT_NAME
+export DOCKER_HOST="${DOCKER_HOST:-${CONTAINER_HOST}}"
 
-DOCKER_HOST=${DOCKER_HOST:-${CONTAINER_HOST}} \
+if [ -f "/usr/bin/xterm" ]; then
+  DISPLAY="${L7_DISPLAY:-${DISPLAY:-:1}}" \
+    /usr/bin/xterm -e "/usr/local/bin/docker-compose --progress=quiet --project-directory=/app --project-name=${COMPOSE_PROJECT_NAME} --log-level=error run --rm -w /src --entrypoint=${USER_SHELL:-/bin/zsh} --no-deps --no-build --pull=never -e TMUX= dev-shell ${@}"
+else
   docker-compose --progress=quiet --log-level=error \
     --project-name="${COMPOSE_PROJECT_NAME}" --project-directory=/app \
     run --rm -w /src -e DISPLAY="${L7_DISPLAY:-${DISPLAY:-:1}}" --entrypoint=/usr/bin/xterm --no-deps --no-build --pull=never -e TMUX= \
-    xterm -e "/usr/local/bin/docker-compose --progress=quiet --project-directory=/app --project-name=${COMPOSE_PROJECT_NAME} --log-level=error run --rm -w /src --entrypoint=${USER_SHELL:-/bin/zsh} --no-deps --no-build --pull=never -e TMUX= dev-shell ${@}"
-
+      xterm -e "/usr/local/bin/docker-compose --progress=quiet --project-directory=/app --project-name=${COMPOSE_PROJECT_NAME} --log-level=error run --rm -w /src --entrypoint=${USER_SHELL:-/bin/zsh} --no-deps --no-build --pull=never -e TMUX= dev-shell ${@}"
+fi

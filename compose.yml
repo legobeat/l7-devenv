@@ -165,7 +165,7 @@ services:
       XAUTHORITY: '/etc/x11/xauthority/Xauthority'
       L7_XAUTHORITY: '${L7_XAUTHORITY:-${XAUTHORITY:-}}'
       L7_XAUTHORITY_VOLUME: '${L7_XAUTHORITY_VOLUME:-l7_dev_desktop_x11_xauthority}'
-    entrypoint: xterm
+    entrypoint: /usr/local/bin/xterm
 #########################################################
 
 volumes:
