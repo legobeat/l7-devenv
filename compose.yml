@@ -75,6 +75,7 @@ services:
       - path: "${HOME}/.config/l7ide/config/env"
         required: false
     environment:
+      SHELL:             '${USER_SHELL:-/bin/zsh}'
       CONTAINER_DNS:     '${CONTAINER_DNS:-10.7.8.133}'
       CONTAINER_HOST:    'tcp://10.7.9.2:2375'
       GO_RUNNER_IMAGE:   '${GO_RUNNER_IMAGE:-localhost/l7/go:1.22-bookworm}'
@@ -135,6 +136,7 @@ services:
       - '${L7_XAUTHORITY_VOLUME:-desktop_x11_xauthority}:/etc/x11/xauthority'
       - '${L7_X11_SOCKET_VOLUME:-desktop_x11_unix}:/tmp/.X11-unix'
     environment:
+      SHELL:             '${USER_SHELL:-/bin/zsh}'
       CONTAINER_DNS:     '${CONTAINER_DNS:-10.7.8.133}'
       CONTAINER_HOST:    'tcp://10.7.9.2:2375'
       DOCKER_HOST:       'tcp://10.7.9.2:2375'

@@ -275,7 +275,7 @@ if [[ -n "${DEBUG}" ]]; then
   env | sort
 fi
 
-entrypoint="${1:-${USER_SHELL:-${SHELL:-/bin/zsh}}}"
+entrypoint="${1:-${USER_SHELL:-/bin/zsh}}"
 
 # allow explicitly execing into named container
 EXEC_ARGS=${EXEC_ARGS:--it}
