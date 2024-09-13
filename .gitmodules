@@ -76,3 +76,7 @@
 [submodule "imags/X11/vscodium/extensions/gitlens"]
 	path = imags/X11/vscodium/extensions/gitlens
 	url = https://github.com/gitkraken/vscode-gitlens
+[submodule "imags/tailscale"]
+	path = imags/tailscale
+	url = https://github.com/tailscale/tailscale
+	branch = 2118d0cf419e6c7710ccacbda47121dcbe1930b1
