@@ -14,7 +14,7 @@ You should also be able to use this with Docker by replacing `podman` with `dock
 $ sudo apt-get update && sudo apt-get upgrade -y
 
 ## Install system dependencies
-$ sudo apt-get install --no-install-recommends coreutils make podman buildah catatonit slirp4netns netavark passt fuse-overlayfs uidmap gnu-which overlayroot containers-storage yq whois golang-github-containernetworking-plugin-dnsname docker-compose-v2
+$ sudo apt-get install --no-install-recommends coreutils make podman buildah catatonit slirp4netns netavark passt fuse-overlayfs uidmap gnu-which overlayroot containers-storage yq whois golang-github-containernetworking-plugin-dnsname aardvark-dns docker-compose-v2 docker-buildx
 ```
 
 <details><summary>Debian-specific</summary>
