@@ -318,7 +318,9 @@ jobs:
       - name: Build images
         run: |
           make image_caddy
-          make -j1 image_dev_shell image_runner_node_all
+          make image_dev_shell
+          podman image prune -f
+          make image_runner_node_all
         if: ${{ matrix.test == 'node_majors' }}
       - name: Build images
         run: |
