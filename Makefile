@@ -218,22 +218,28 @@ image_runner_node_22: submodules #image_caddy
 # with CocoaPods for iOS React Native dev
 image_runner_node_ios : IMAGE_NAME = ${RUNNER_IMAGE_NAME}
 image_runner_node_ios : IMAGE_TAG = ${RUNNER_IMAGE_TAG}
-image_runner_node_ios: submodules image_runner_node
+image_runner_node_ios: image_runner_node
 	${CMD} buildx build \
 		${BUILD_OPTIONS} \
 		--build-arg "SHELL=${USER_SHELL}" \
 		--build-arg "NODE_VERSION=20" \
 		-t "${IMAGE_NAME}:ios-${IMAGE_TAG}" \
 		-f './imags/cocoapods-runner/Containerfile' \
-		-f './imags/cocoapods-runner/Containerfile' \
 		./imags/cocoapods-runner
 
-image_runner_node_all: IMAGE_NAME = ${RUNNER_IMAGE_NAME}
-image_runner_node_all: IMAGE_TAG = ${RUNNER_IMAGE_TAG}
-image_runner_node_all: image_runner_node_20 image_runner_node_18 image_runner_node_22 # image_runner_node_ios
-	${CMD} tag \
-		"${IMAGE_NAME}:20-${IMAGE_TAG}" \
-	    "${IMAGE_NAME}:${IMAGE_TAG}"
+image_runner_node_android : IMAGE_NAME = ${RUNNER_IMAGE_NAME}
+image_runner_node_android : IMAGE_TAG = ${RUNNER_IMAGE_TAG}
+image_runner_node_android: image_runner_node
+	${CMD} buildx build \
+		${BUILD_OPTIONS} \
+		--build-arg "NODE_VERSION=20" \
+		-t "${IMAGE_NAME}:android-${IMAGE_TAG}" \
+		-f './imags/node-runner-android/Containerfile' \
+		./imags/node-runner-android
+
+image_runner_node_majors: image_runner_node_20 image_runner_node_18 image_runner_node_22
+image_runner_node_all: image_runner_node_majors image_runner_node_mobile
+image_runner_node_mobile: image_runner_node_android image_runner_node_ios
 
 image_runner_node: IMAGE_NAME = ${RUNNER_IMAGE_NAME}
 image_runner_node: IMAGE_TAG = ${RUNNER_IMAGE_TAG}
