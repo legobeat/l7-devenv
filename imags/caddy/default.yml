@@ -21,11 +21,17 @@ apps:
               - 'registry.yarnpkg.com'
               - 'registry.npmmirror.com'
               path_regexp:
-                pattern: '^/-/[^/]*/v[0-9]*/security/(advisories|audits)/'
+                pattern: '^/-/[^/]*/v[0-9]*/security/(advisories|audits)/((bulk|quick)/?)?'
               header:
                 'Npm-Command':
                   - audit
             handle:
+              - handler: headers
+                request:
+                  delete:
+                    - 'X-Forwarded-For'
+                    - 'If-None-Match'
+                    - 'Npm-Session'
               - handler: reverse_proxy
                 upstreams:
                   - dial: 'registry.npmjs.org:443'
@@ -63,6 +69,7 @@ apps:
             - method:
               - GET
               host:
+              - 'registry.npmjs.com'
               - 'registry.npmjs.org'
               - 'registry.yarnpkg.com'
               - 'registry.npmmirror.com'
@@ -75,6 +82,12 @@ apps:
                     replace: '$0/'
                   - find: '(\.t?gz)/$'
                     replace: '$1'
+              - handler: headers
+                request:
+                  delete:
+                    - 'X-Forwarded-For'
+                    - 'If-None-Match'
+                    - 'Npm-Session'
               - handler: reverse_proxy
                 upstreams:
                   - dial: '{env.PKG_PROXY_HOST}:{env.PKG_PROXY_PORT}'
@@ -84,6 +97,12 @@ apps:
             handle:
               - handler: rewrite
                 uri: '{http.request.host}{http.request.uri}'
+              - handler: headers
+                request:
+                  delete:
+                    - 'X-Forwarded-For'
+                    - 'If-None-Match'
+                    - 'Npm-Session'
               - handler: reverse_proxy
                 upstreams:
                   - dial: '{env.PKG_PROXY_HOST}:{env.PKG_PROXY_PORT}'
