@@ -477,6 +477,9 @@ export_runner_node: # image_runner_node
 image_tor:
 	podman compose build tor
 
+image_tailscale:
+	podman build -t localhost/l7/tailscale:1.74.0 --build-arg VERSION_LONG=1.74.0-2118d0c --build-arg VERSION_SHORT=1.74.0 --build-arg VERSION_GIT_HASH=2118d0cf419e6c7710ccacbda47121dcbe1930b1 imags/tailscale
+
 image_firefox: images_deps_firefox
 	podman compose build firefox
 

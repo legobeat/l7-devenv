@@ -136,6 +136,37 @@ services:
     volumes:
       - 'verdaccio_storage:/verdaccio/storage'
 
+  tailscale:
+    profiles:
+      - tailscale
+    image: 'localhost/l7/tailscale:1.74.0'
+    build:
+      context: ../imags/tailscale
+      dockerfile: Dockerfile
+      args:
+        VERSION_LONG: 1.74.0-2118d0c
+        VERSION_SHORT: 1.74.0
+        VERSION_GIT_HASH: 2118d0cf419e6c7710ccacbda47121dcbe1930b1
+    # https://tailscale.com/kb/1282/docker
+    environment:
+      TS_HOSTNAME: '${L7_TS_HOSTNAME:-devenv}'
+      TS_AUTH_ONCE: '${L7_TS_AUTH_ONCE:-true}'
+      TS_STATE_DIR: '/tailscale/state'
+      TS_AUTHKEY: '${L7_TS_AUTHKEY:-}'
+      TS_SOCKS5_SERVER: ':1055'
+      # TS_ACCEPT_DNS: 'false'
+      # TS_DEST_IP: ''
+    entrypoint: '/usr/local/bin/containerboot'
+    networks:
+      public:
+      internal:
+        ipv4_address: 10.7.8.140
+    ports:
+      - '1055:1055'
+    volumes:
+      - 'tailscale_storage:/tailscale'
+
+
   tor:
     profiles:
       - tor
@@ -159,6 +190,8 @@ volumes:
     name: l7_caddy_fwd_config
   verdaccio_storage:
     name: l7_dev_verdaccio_storage
+  tailscale_storage:
+    name: l7_dev_tailscale_storage
 
 networks:
   svcs:
