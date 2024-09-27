@@ -30,8 +30,9 @@ COPY --from=ruby /usr/local/share/man/ /usr/local/share/man/
 
 RUN sed -i '/en_US.UTF-8/s/^# //' /etc/locale.gen \
   && locale-gen
-ENV PATH=/home/user/.local/share/gem/ruby/${RUBY_LIB_VERSION}/bin:${PATH}
+ENV PATH=/home/user/.bundle/ruby/${RUBY_LIB_VERSION}/bin:/home/user/.local/share/gem/ruby/${RUBY_LIB_VERSION}/bin:${PATH}
 ENV BUNDLE_PATH=/home/user/.bundle
+ENV GEM_PATH=/home/user/.bundle/ruby/${RUBY_LIB_VERSION}
 ENV LANG=en_US.UTF-8
 ARG UID=1000
 ARG GID=1000
