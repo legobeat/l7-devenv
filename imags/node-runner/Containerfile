@@ -14,7 +14,7 @@ RUN apt-get update \
     build-essential ccache cmake cmake-format distcc zlib1g-dev libzlcore-dev libffi-dev libssl-dev libyaml-dev \
   && sed -i '/en_US.UTF-8/s/^# //' /etc/locale.gen \
   && locale-gen \
-  && echo 'export PATH="${HOME}/.npm-global/bin:${PATH}"' > /etc/profile.d/global-npm-bins-path \
+  && echo 'export PATH="${HOME}/.npm-global/bin:/usr/local/lib/node_modules/corepack/shims:${PATH}"' > /etc/profile.d/global-npm-bins-path \
   && rm -rf /var/{cache,lib}/apt
 
 
