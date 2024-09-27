@@ -26,8 +26,8 @@ FROM ${X11_BASE_IMAGE} AS x11_base
 FROM ${BASE_IMAGE}
 USER root
 
-ARG EXTRA_PKGS=''
-ARG FONT_PKGS='font-jetbrains-mono-nerd'
+ARG EXTRA_PKGS=
+ARG FONT_PKGS=font-jetbrains-mono-nerd
 
 RUN apk add --no-cache \
     #xhost \
