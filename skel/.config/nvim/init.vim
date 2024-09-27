@@ -54,6 +54,10 @@ endtry
 try
   runtime s-lsp.lua
 catch
+try
+  runtime s-telescope.lua
+catch
+endtry
 endtry
 try
   runtime s-toggleterm.lua
