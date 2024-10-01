@@ -1,0 +1,5 @@
+#!/bin/bash
+export RUNNER_IMAGE=localhost/l7/node:puppeteer-bookworm
+RUNNER_OPTS="${RUNNER_OPTS} -i "
+l7-run-node puppeteer ${@}
+

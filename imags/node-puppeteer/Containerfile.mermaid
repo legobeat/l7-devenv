@@ -1,0 +1,12 @@
+# syntax=docker/dockerfile:1.4-labs
+ARG BASE_IMAGE=localhost/l7/node-puppeteer:bookworm
+FROM ${BASE_IMAGE}
+USER root
+
+WORKDIR /usr/local/lib
+RUN NPM_CONFIG_PREFIX='' npm add 'git+https://github.com/legobeat/mermaid-cli/#02153e234a876c95b44e1af84d02bca65681f6d1' \
+  && chown -R node /home/user /home/node \
+  # allow user installing new engines but not modifying bundled ones \
+  && chown node /opt/puppeteer/ /opt/puppeteer/*
+
+USER node
