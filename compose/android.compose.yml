@@ -1,8 +1,26 @@
 ---
 services:
+  adb:
+    profiles:
+      - android
+    build:
+      x-build-images:
+        - 'localhost/l7/android-sdk:bookworm'
+      context: ../imags/adb
+      dockerfile: Containerfile
+    image: 'localhost/l7/adb:bookworm'
+    networks:
+      internal:
+        ipv4_address: 10.7.8.140
+    environment:
+      #ADB_SERVER_ADDRESS: 'localhost:5038'
+      ADB_SERVER_ADDRESS: 'localhost:5037'
+    command: '-a -P 5037 server nodaemon'
   android-emulator:
     profiles:
       - android
+    depends_on:
+      - adb
     build:
       x-build-images:
         - 'localhost/l7/android-sdk:bookworm'
@@ -11,8 +29,16 @@ services:
     image: 'localhost/l7/android-emulator:bookworm'
     devices:
       - /dev/kvm
+    environment:
+       ADB_DAEMON_ADDRESS: '10.7.8.140:5037'
+       ANDROID_EMULATOR_ADDRESS: '10.7.8.138'
+    # not respected
+    #  ADB_SERVER_ADDRESS: '10.7.8.140:5038'
+    #  ADB_SERVER_SOCKET: 'tcp:10.7.8.140:5038'
+    #  ADB_SERVER_PORT: '5038'
     networks:
       internal:
         ipv4_address: 10.7.8.138
+
 
 
