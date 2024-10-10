@@ -2,7 +2,7 @@
 
 is_react_native_project() {
   # TODO: look at git root as well as pwd
-  if [[ -f ios/Podfile ]] ||  [[ -f Podfile ]]; then
+  if [[ -n "${BUILD_ANDROID}" ]] || [[ -n "${BUILD_IOS}" ]] || [[ -f ios/Podfile ]] ||  [[ -f Podfile ]]; then
     return 0
   fi
   return -1
@@ -15,9 +15,15 @@ if is_react_native_project;  then
     export RUNNER_IMAGE=${RUNNER_IMAGE:-${BUNDLER_RUNNER_IMAGE:-localhost/l7/node:ios-bookworm}}
   else
     if [[ -n "${L7_NODE_CACHE_DIR}" ]]; then
-      export RUNNER_VOLS="${L7_NODE_CACHE_DIR}/gradle/cache:/home/user/.gradle/cache ${RUNNER_VOLS}"
-    elif [[ -n "${L7_GRADLE_CACHE_VOLUME}" ]]; then
-      export RUNNER_VOLS="${L7_GRADLE_CACHE_VOLUME}:/home/user/.gradle/cache ${RUNNER_VOLS}"
+      export RUNNER_VOLS="${L7_NODE_CACHE_DIR}/android/cache:/home/user/.android/cache ${RUNNER_VOLS}"
+      export RUNNER_VOLS="${L7_NODE_CACHE_DIR}/gradle/caches:/home/user/.gradle/caches ${RUNNER_VOLS}"
+    else
+      if [[ -n "${L7_ANDROID_CACHE_VOLUME}" ]]; then
+        export RUNNER_VOLS="${L7_ANDROID_CACHE_VOLUME}:/home/user/.android/cache ${RUNNER_VOLS}"
+      fi
+      if [[ -n "${L7_GRADLE_CACHE_VOLUME}" ]]; then
+        export RUNNER_VOLS="${L7_GRADLE_CACHE_VOLUME}:/home/user/.gradle/caches ${RUNNER_VOLS}"
+      fi
     fi
   fi
 else
