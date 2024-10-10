@@ -19,7 +19,8 @@ RUN apt-get update \
     net-tools \
     procps \
     socat \
-    # libx11-6 libpulse0 libdrm2 libxi6 libxkbfile1 \
+     libx11-6 libpulse0 libdrm2 libxi6 libxkbfile1 \
+     libvulkan1 mesa-vulkan-drivers \
     # libncurses5:i386 libc6:i386 libstdc++6:i386 lib32gcc-s1 lib32ncurses6 lib32z1 zlib1g:i386 \
   && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
   && chmod 777 /var/log
@@ -44,11 +45,8 @@ RUN sdkmanager --install \
 ENV ANDROID_AVD_HOME=/home/user/.config/.android/avd
 ENV ANDROID_SDK_ROOT=/home/user/Android/Sdk
 
-ARG UID=1000
-ARG GID=1000
 
 COPY docker-entrypoint.sh /usr/bin/docker-entrypoint.sh
-USER $UID:$GID
 WORKDIR /home/user
 
 ARG AVD_DEVICE_MODEL=pixel_5

@@ -29,6 +29,7 @@ if [[ "${RUNNER_IMAGE}" != *:* ]]; then
 fi
 
 export RUNNER_ENV="${RUNNER_ENV}
+ADB_SERVER_SOCKET=${L7_ADB_SERVER_SOCKET:-tcp:10.7.8.140:5037}
 NODE_OPTIONS=${NODE_OPTIONS}
 HOME=/home/node
 PATH=/home/node/.corepack/bin:/home/node/.npm-global/bin:/usr/local/lib/node_modules/.bin:/usr/local/lib/node_modules/corepack/shims:/home/node/Android/Sdk/platform-tools:/home/node/.rbenv/shims:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
