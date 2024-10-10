@@ -258,12 +258,9 @@ image_android_adb:
 		-f './imags/adb/Containerfile' \
 		./imags/adb
 
-image_runner_node_all: IMAGE_NAME = ${RUNNER_IMAGE_NAME}
-image_runner_node_all: IMAGE_TAG = ${RUNNER_IMAGE_TAG}
-image_runner_node_all: image_runner_node_20 image_runner_node_18 image_runner_node_22 image_runner_node_ios image_runner_node_android
-	${CMD} tag \
-		"${IMAGE_NAME}:20-${IMAGE_TAG}" \
-	    "${IMAGE_NAME}:${IMAGE_TAG}"
+image_runner_node_majors: image_runner_node_20 image_runner_node_18 image_runner_node_22
+image_runner_node_all: image_runner_node_majors image_runner_node_mobile
+image_runner_node_mobile: image_runner_node_android image_runner_node_ios
 
 image_runner_node: IMAGE_NAME = ${RUNNER_IMAGE_NAME}
 image_runner_node: IMAGE_TAG = ${RUNNER_IMAGE_TAG}
