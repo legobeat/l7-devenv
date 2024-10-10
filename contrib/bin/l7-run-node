@@ -15,9 +15,9 @@ if is_react_native_project;  then
     export RUNNER_IMAGE=${RUNNER_IMAGE:-${BUNDLER_RUNNER_IMAGE:-localhost/l7/node:ios-bookworm}}
   else
     if [[ -n "${L7_NODE_CACHE_DIR}" ]]; then
-      export RUNNER_VOLS="${L7_NODE_CACHE_DIR}/gradle/cache:/home/node/.gradle/cache ${RUNNER_VOLS}"
+      export RUNNER_VOLS="${L7_NODE_CACHE_DIR}/gradle/cache:/home/user/.gradle/cache ${RUNNER_VOLS}"
     elif [[ -n "${L7_GRADLE_CACHE_VOLUME}" ]]; then
-      export RUNNER_VOLS="${L7_GRADLE_CACHE_VOLUME}:/home/node/.gradle/cache ${RUNNER_VOLS}"
+      export RUNNER_VOLS="${L7_GRADLE_CACHE_VOLUME}:/home/user/.gradle/cache ${RUNNER_VOLS}"
     fi
   fi
 else
@@ -31,8 +31,8 @@ fi
 export RUNNER_ENV="${RUNNER_ENV}
 ADB_SERVER_SOCKET=${L7_ADB_SERVER_SOCKET:-tcp:10.7.8.140:5037}
 NODE_OPTIONS=${NODE_OPTIONS}
-HOME=/home/node
-PATH=/home/node/.corepack/bin:/home/node/.npm-global/bin:/usr/local/lib/node_modules/.bin:/usr/local/lib/node_modules/corepack/shims:/home/node/Android/Sdk/platform-tools:/home/node/.rbenv/shims:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+HOME=/home/user
+PATH=/home/user/.corepack/bin:/home/user/.npm-global/bin:/usr/local/lib/node_modules/.bin:/usr/local/lib/node_modules/corepack/shims:/home/user/Android/Sdk/platform-tools:/home/user/.rbenv/shims:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 "
 
 if [ -n "${NODE_OPTIONS}" ]; then
