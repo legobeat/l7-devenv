@@ -1,5 +1,4 @@
 #!/bin/bash
-export RUNNER_IMAGE="${NPM_RUNNER_IMAGE:-${NODE_RUNNER_IMAGE:-${RUNNER_IMAGE}}}"
 export RUNNER_ENV="${RUNNER_ENV}"
 export RUNNER_OPTS="${RUNNER_OPTS}"
 if [[ -n "${L7_NODE_CACHE_DIR}" ]]; then
