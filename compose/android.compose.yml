@@ -1,0 +1,50 @@
+---
+services:
+  adb:
+    profiles:
+      - android
+    build:
+      x-build-images:
+        - 'localhost/l7/android-sdk:bookworm'
+      context: ../imags/adb
+      dockerfile: Containerfile
+    image: 'localhost/l7/adb:bookworm'
+    networks:
+      internal:
+        ipv4_address: 10.7.8.140
+    environment:
+      #ADB_SERVER_ADDRESS: 'localhost:5038'
+      ADB_SERVER_ADDRESS: 'localhost:5037'
+    command: '-a -P 5037 server nodaemon'
+  android-emulator:
+    profiles:
+      - android
+    depends_on:
+      - adb
+    build:
+      x-build-images:
+        - 'localhost/l7/android-sdk:bookworm'
+      context: ../imags/android-emulator
+      dockerfile: Containerfile
+    image: 'localhost/l7/android-emulator:bookworm'
+    devices:
+      - /dev/kvm
+    environment:
+      ADB_DAEMON_ADDRESS: '10.7.8.140:5037'
+      ANDROID_EMULATOR_ADDRESS: '10.7.8.138'
+      DISPLAY: '${L7_DISPLAY:-:1}'
+      XAUTHORITY: '/etc/x11/xauthority/Xauthority'
+    # not respected
+    #  ADB_SERVER_ADDRESS: '10.7.8.140:5038'
+    #  ADB_SERVER_SOCKET: 'tcp:10.7.8.140:5038'
+    #  ADB_SERVER_PORT: '5038'
+    networks:
+      internal:
+        ipv4_address: 10.7.8.138
+    volumes:
+      - '${L7_XAUTHORITY_VOLUME:-desktop_x11_xauthority}:/etc/x11/xauthority'
+      - '${L7_X11_SOCKET_VOLUME:-desktop_x11_unix}:/tmp/.X11-unix'
+      - '${ANDROID_EMULATOR_CAMERA_IMAGE:-${PWD}/skel/.zsh/pure/screenshot.png}:/android-camera-image:ro'
+
+
+

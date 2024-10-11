@@ -1,0 +1,30 @@
+# syntax=docker/dockerfile:1.4-labs
+FROM localhost/l7/android-sdk:bookworm
+USER root
+
+RUN apt-get update \
+  && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+    net-tools \
+    procps \
+    socat \
+  && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
+  && chmod 777 /var/log
+
+USER user
+
+ENV ANDROID_SDK_ROOT=/home/user/Android/Sdk
+
+ARG UID=1000
+ARG GID=1000
+
+COPY docker-entrypoint.sh /usr/bin/docker-entrypoint.sh
+USER $UID:$GID
+WORKDIR /home/user
+
+ENV ANDROID_HOME=/home/user/Android/Sdk
+ARG TARGETARCH="amd64"
+ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-${TARGETARCH}
+
+WORKDIR /home/user
+ENTRYPOINT ["/usr/bin/docker-entrypoint.sh"]
+CMD ["-P", "5038", "server", "nodaemon"]
