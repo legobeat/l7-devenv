@@ -63,6 +63,7 @@ USER $UID:$GID
 ENV ANDROID_HOME=/home/user/Android/Sdk
 ARG TARGETARCH="amd64"
 ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-${TARGETARCH}
+ENV SENTRY_DISABLE_AUTO_UPLOAD=true
 
 WORKDIR /home/user
 
