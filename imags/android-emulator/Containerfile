@@ -47,14 +47,20 @@ ENV ANDROID_SDK_ROOT=/home/user/Android/Sdk
 
 
 COPY docker-entrypoint.sh /usr/bin/docker-entrypoint.sh
+COPY cameraimage.poster /tmp/cameraimage.poster
 WORKDIR /home/user
 
-ARG AVD_DEVICE_MODEL=pixel_5
-RUN avdmanager create avd -n default -d "${AVD_DEVICE_MODEL}" -k "${ANDROID_IMAGE}"
 ENV ANDROID_HOME=/home/user/Android/Sdk
+ARG AVD_DEVICE_MODEL=pixel_5
+
+RUN avdmanager create avd -n default -d "${AVD_DEVICE_MODEL}" -k "${ANDROID_IMAGE}" \
+  && cat /tmp/cameraimage.poster >> ${ANDROID_HOME}/emulator/resources/Toren1BD.posters
+
 ARG TARGETARCH="amd64"
 ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-${TARGETARCH}
 ENV PATH="/home/user/Android/Sdk/emulator:$PATH"
+COPY AVD.conf /home/user/.android/avd/default.avd/AVD.conf
+COPY ["Emulator.conf", "/home/user/.config/Android Open Source Project/Emulator.conf"]
 
 WORKDIR /home/user
 ENTRYPOINT ["/usr/bin/docker-entrypoint.sh"]

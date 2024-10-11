@@ -44,6 +44,7 @@ services:
     volumes:
       - '${L7_XAUTHORITY_VOLUME:-desktop_x11_xauthority}:/etc/x11/xauthority'
       - '${L7_X11_SOCKET_VOLUME:-desktop_x11_unix}:/tmp/.X11-unix'
+      - '${ANDROID_EMULATOR_CAMERA_IMAGE:-${PWD}/skel/.zsh/pure/screenshot.png}:/android-camera-image:ro'
 
 
 
