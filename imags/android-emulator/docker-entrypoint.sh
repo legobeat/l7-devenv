@@ -9,9 +9,10 @@ sh -c 'sleep 1; while true; do socat -s -d -lf /var/log/socat-5555.log TCP4-LIST
 
 sh -c "sleep 1; adb connect ${ANDROID_EMULATOR_ADDRESS}:5557" &
 
+#-no-window \
 /home/user/Android/Sdk/emulator/emulator \
   -avd default \
-  -no-window \
+  -no-boot-anim \
   -gpu off \
   -skip-adb-auth \
   -delay-adb \

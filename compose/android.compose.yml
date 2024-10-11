@@ -30,8 +30,10 @@ services:
     devices:
       - /dev/kvm
     environment:
-       ADB_DAEMON_ADDRESS: '10.7.8.140:5037'
-       ANDROID_EMULATOR_ADDRESS: '10.7.8.138'
+      ADB_DAEMON_ADDRESS: '10.7.8.140:5037'
+      ANDROID_EMULATOR_ADDRESS: '10.7.8.138'
+      DISPLAY: '${L7_DISPLAY:-:1}'
+      XAUTHORITY: '/etc/x11/xauthority/Xauthority'
     # not respected
     #  ADB_SERVER_ADDRESS: '10.7.8.140:5038'
     #  ADB_SERVER_SOCKET: 'tcp:10.7.8.140:5038'
@@ -39,6 +41,9 @@ services:
     networks:
       internal:
         ipv4_address: 10.7.8.138
+    volumes:
+      - '${L7_XAUTHORITY_VOLUME:-desktop_x11_xauthority}:/etc/x11/xauthority'
+      - '${L7_X11_SOCKET_VOLUME:-desktop_x11_unix}:/tmp/.X11-unix'
 
 
 
