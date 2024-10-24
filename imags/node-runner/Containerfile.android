@@ -1,0 +1,69 @@
+# syntax=docker/dockerfile:1.4-labs
+ARG NODE_VERSION=20
+FROM localhost/l7/android-sdk:bookworm AS androidsdk
+FROM localhost/l7/node:${NODE_VERSION}-bookworm
+USER root
+# /home/node is symlinked to /home/user in base image
+WORKDIR /tmp/tools
+
+# RUN dpkg --add-architecture i386
+RUN apt-get update \
+  && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+    ca-certificates openjdk-17-jre-headless openjdk-17-jdk-headless \
+  && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+ARG UID=1000
+ARG GID=1000
+
+COPY --from=androidsdk --chown=$UID:$GID /home/user/Android /home/user/Android
+COPY --from=androidsdk --chown=$UID:$GID /home/user/.gradle /home/user/.gradle
+COPY --from=androidsdk --chown=$UID:$GID /home/user/.java /home/user/.java
+#COPY --from=androidsdk --chown=$UID:$GID /home/user/.android /home/user/.android
+
+
+ARG ANDROID_SDK_VERSION=34
+ARG ANDROID_BUILD_TOOLS_VERSION=${ANDROID_SDK_VERSION}.0.0
+ARG ANDROID_NDK_VERSION=24.0.8215888
+ARG CMAKE_VERSION=3.22.1
+
+ENV PATH=/home/user/Android/Sdk/cmdline-tools/latest/bin:/home/user/Android/Sdk/cmdline-tools/tools/bin:/home/user/Android/Sdk/platform-tools:$PATH
+##ARG ANDROID_IMAGE="system-images;android-34;default;arm64-v8a"
+#ARG ANDROID_IMAGE="system-images;android-34;default;x86_64"
+# download sdk and ndk
+RUN sdkmanager --install \
+    "cmake;${CMAKE_VERSION}" \
+    ## metamask-mobile legacy dep \
+    "build-tools;30.0.3" \
+    "build-tools;33.0.0" \
+    "build-tools;${ANDROID_BUILD_TOOLS_VERSION}" \
+    ##"platform-tools" \
+    # metamask-mobile legacy dep \
+    "platforms;android-33" \
+    "platforms;android-${ANDROID_SDK_VERSION}" \
+    ##"sources;android-${ANDROID_SDK_VERSION}" \
+    # metamask-mobile legacy dep \
+    "ndk;23.1.7779620" \
+    "ndk;${ANDROID_NDK_VERSION}"
+
+ENV ANDROID_AVD_HOME=/home/user/.config/.android/avd
+
+#COPY 51-android.rules /etc/udev/rules.d/51-android.rules
+
+WORKDIR /home/user
+
+RUN usermod -aG plugdev node \
+  && chown -R ${UID}:${GID} /home/node /home/user
+
+USER $UID:$GID
+# seed user gradle installation
+#COPY --chown=$UID:$GID gradlew .
+#COPY --chown=$UID:$GID gradle ./gradle
+#RUN ./gradlew && rm -rf ./gradle*
+#RUN avdmanager create avd -n pixel5 -d pixel_5 -k "${ANDROID_IMAGE}"
+ENV ANDROID_HOME=/home/user/Android/Sdk
+ARG TARGETARCH="amd64"
+ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-${TARGETARCH}
+ENV SENTRY_DISABLE_AUTO_UPLOAD=true
+
+WORKDIR /home/user
+

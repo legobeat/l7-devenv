@@ -6,6 +6,8 @@ include:
     #project_directory: .
   - path: compose/vnc.compose.yml
     #project_directory: .
+  - path: compose/android.compose.yml
+    #project_directory: .
 
 services:
   dev-shell:
@@ -92,6 +94,8 @@ services:
       L7_PNPM_CACHE_VOLUME: 'l7_cache_node_pnpm'
       L7_YARN_BERRY_CACHE_VOLUME:   'l7_cache_node_yarn_berry'
       L7_YARN_CLASSIC_CACHE_VOLUME: 'l7_cache_node_yarn_classic'
+      L7_GRADLE_CACHE_VOLUME:       'l7_cache_gradle'
+      L7_ANDROID_CACHE_VOLUME:      'l7_cache_android'
       GPG_PK_VOLUME: '${GPG_PK_VOLUME:-l7_gpgvault_pk}'
       L7_COMPOSE_NETWORK_NAME_INTERNAL: 'l7_dev_internal'
       L7_RESOLV_CONF_PATH: '${L7_RESOLV_CONF_PATH:-${ROOT_DIR:-${PWD}}/compose/mounts/resolv-internal.conf}'
@@ -154,6 +158,8 @@ services:
       L7_PNPM_CACHE_VOLUME: 'l7_cache_node_pnpm'
       L7_YARN_BERRY_CACHE_VOLUME:   'l7_cache_node_yarn_berry'
       L7_YARN_CLASSIC_CACHE_VOLUME: 'l7_cache_node_yarn_classic'
+      L7_GRADLE_CACHE_VOLUME:       'l7_cache_gradle'
+      L7_ANDROID_CACHE_VOLUME:      'l7_cache_android'
       GPG_PK_VOLUME: '${GPG_PK_VOLUME:-l7_gpgvault_pk}'
       L7_COMPOSE_NETWORK_NAME_INTERNAL: 'l7_dev_internal'
       L7_RESOLV_CONF_PATH: '${L7_RESOLV_CONF_PATH:-${ROOT_DIR:-${PWD}}/compose/mounts/resolv-internal.conf}'
@@ -181,6 +187,10 @@ volumes:
     name: l7_cache_node_yarn_berry
   cache_node_yarn_classic:
     name: l7_cache_node_yarn_classic
+  cache_gradle:
+    name: l7_cache_gradle
+  cache_android:
+    name: l7_cache_android
   nvim_state:
     name: l7_nvim_state
   gpgvault_pk:
