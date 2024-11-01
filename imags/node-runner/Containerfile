@@ -11,6 +11,8 @@ RUN apt-get update \
     tar unzip \
     # node-gyp
     brotli libbrotli1 libvips-dev \
+    # electron bundling
+    file rpm \
     build-essential ccache cmake cmake-format distcc zlib1g-dev libzlcore-dev libffi-dev libssl-dev libyaml-dev \
   && sed -i '/en_US.UTF-8/s/^# //' /etc/locale.gen \
   && locale-gen \
