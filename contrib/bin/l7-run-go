@@ -4,11 +4,12 @@ export RUNNER_IMAGE="${RUNNER_IMAGE:-${GO_RUNNER_IMAGE}}"
 
 export RUNNER_ENV="${RUNNER_ENV}
 HOME=/home/user
-PATH=/go/bin:/home/user/.go/bin:/home/user/go/bin:/usr/local/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+PATH=/home/user/.go/bin:/home/user/go/bin:/go/bin:/usr/local/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 GOPATH=/home/user/.go
 "
 
 export RUNNER_VOLS="${L7_GO_HOME_DIR:-${L7_GO_HOME_VOLUME:-${HOME}/.local/share/l7ide/go-runner/go}}:/home/user/.go:z ${RUNNER_VOLS}"
+export RUNNER_VOLS="${L7_GO_BUILD_DIR:-${L7_GO_BUILD_VOLUME:-${BUILD}/.local/share/l7ide/go-runner/go-build}}:/home/user/.cache/go-build:z ${RUNNER_VOLS}"
 
 if [[ "$(basename $0)" = "l7-run-go" ]]; then
   COMMAND="$1"

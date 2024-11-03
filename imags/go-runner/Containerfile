@@ -34,6 +34,7 @@ RUN bash -c "groupadd -g ${GID} userz || true" \
   && update-ca-certificates
 
 USER ${UID}:${GID}
+ENV PATH=/home/user/.go/bin:/home/user/go/bin:/go/bin:/usr/local/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 ENV HOME=/home/user
 
 # go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.54.2 # supports 1.20 + 1.21

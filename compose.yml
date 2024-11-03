@@ -51,6 +51,8 @@ services:
       - 'cache_node_yarn_classic:/home/node/.cache/yarn:z,ro'
       - 'cache_node_pnpm:/home/node/.cache/pnpm:z,ro'
       - 'cache_node_npm:/home/node/.npm/_cacache:z,ro'
+      - 'cache_lsp_go:/home/user/.go/:z,ro'
+      - 'cache_lsp_go_build:/home/user/.cache/go-build/:z,ro'
       # TODO: tmpfs mounts not supported under podman-compose
       #- target: /tmp
       #  type: tmpfs
@@ -92,6 +94,8 @@ services:
       L7_PNPM_CACHE_VOLUME: 'l7_cache_node_pnpm'
       L7_YARN_BERRY_CACHE_VOLUME:   'l7_cache_node_yarn_berry'
       L7_YARN_CLASSIC_CACHE_VOLUME: 'l7_cache_node_yarn_classic'
+      L7_GO_HOME_VOLUME:            'l7_cache_lsp_go'
+      L7_GO_BUILD_VOLUME:           'l7_cache_lsp_go_build'
       GPG_PK_VOLUME: '${GPG_PK_VOLUME:-l7_gpgvault_pk}'
       L7_COMPOSE_NETWORK_NAME_INTERNAL: 'l7_dev_internal'
       L7_RESOLV_CONF_PATH: '${L7_RESOLV_CONF_PATH:-${ROOT_DIR:-${PWD}}/compose/mounts/resolv-internal.conf}'
@@ -154,6 +158,8 @@ services:
       L7_PNPM_CACHE_VOLUME: 'l7_cache_node_pnpm'
       L7_YARN_BERRY_CACHE_VOLUME:   'l7_cache_node_yarn_berry'
       L7_YARN_CLASSIC_CACHE_VOLUME: 'l7_cache_node_yarn_classic'
+      L7_GO_HOME_VOLUME:            'l7_cache_lsp_go'
+      L7_GO_BUILD_VOLUME:           'l7_cache_lsp_go_build'
       GPG_PK_VOLUME: '${GPG_PK_VOLUME:-l7_gpgvault_pk}'
       L7_COMPOSE_NETWORK_NAME_INTERNAL: 'l7_dev_internal'
       L7_RESOLV_CONF_PATH: '${L7_RESOLV_CONF_PATH:-${ROOT_DIR:-${PWD}}/compose/mounts/resolv-internal.conf}'
@@ -181,6 +187,10 @@ volumes:
     name: l7_cache_node_yarn_berry
   cache_node_yarn_classic:
     name: l7_cache_node_yarn_classic
+  cache_lsp_go:
+    name: l7_cache_lsp_go
+  cache_lsp_go_build:
+    name: l7_cache_lsp_go_build
   nvim_state:
     name: l7_nvim_state
   gpgvault_pk:

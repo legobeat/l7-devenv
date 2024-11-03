@@ -1,0 +1,13 @@
+ARG GO_VERSION=1.22
+ARG BASE_IMAGE=localhost/l7/go:${GO_VERSION}-bookworm
+FROM ${BASE_IMAGE}
+
+USER root
+ARG GOPLS_VERSION=v0.16.2
+RUN go install golang.org/x/tools/gopls@${GOPLS_VERSION}
+ENV PATH=/home/user/go/bin:/go/bin:/usr/local/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+ARG UID=1000
+ARG GID=1000
+USER ${UID}:${GID}
+ENTRYPOINT /home/user/go/bin/gopls

@@ -242,6 +242,20 @@ image_runner_node: image_runner_node_20 # image_runner_node_18 image_runner_node
 		"${IMAGE_NAME}:20-${IMAGE_TAG}" \
 	    "${IMAGE_NAME}:${IMAGE_TAG}"
 
+### LSP
+# gopls
+image_lsp_go : IMAGE_NAME = ${GO_RUNNER_IMAGE_NAME}
+image_lsp_go : IMAGE_TAG = ${GO_RUNNER_IMAGE_TAG}
+image_lsp_go: image_runner_go
+	${CMD} buildx build \
+		${BUILD_OPTIONS} \
+		--build-arg "SHELL=${USER_SHELL}" \
+		--build-arg "UID=${UID}" \
+		--build-arg "GID=${GID}" \
+		-t "${IMAGE_NAME}:lsp-${IMAGE_TAG}" \
+		-f './imags/LSP/gopls/Containerfile' \
+		./imags/LSP/gopls
+
 # tsserver typescript-language-server
 image_lsp_node: IMAGE_NAME = ${RUNNER_IMAGE_NAME}
 image_lsp_node: IMAGE_TAG = ${RUNNER_IMAGE_TAG}
@@ -344,6 +358,12 @@ test_lsp_node: # image_lsp_node
 	${CMD} run --rm \
 		"${IMAGE_NAME}:lsp-${IMAGE_TAG}" \
 		--version
+
+test_lsp_go: image_lsp_go
+	${CMD} run --rm \
+		--entrypoint sh \
+		"${IMAGE_REPO}/go:lsp-${GO_RUNNER_IMAGE_TAG}" \
+		-c 'gopls version'
 
 
 # inspect jobs here just for ci, not really useful otherwise
@@ -479,7 +499,7 @@ images: images_deps image_runner_node image_dnsmasq image_gpg_pk image_dev_shell
 images_gui: images image_xterm image_firefox image_vnc
 
 # these are optional and not enabled by default due to extra build time and disk usage
-images_opt: images_gui image_runner_node_all
+images_opt: images_gui image_runner_node_all image_runner_go image_lsp_go
 
 images_test: images image_nvim_test
 

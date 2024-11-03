@@ -1,0 +1,4 @@
+#!/bin/bash
+export RUNNER_IMAGE="${RUNNER_IMAGE:-${GOPLS_RUNNER_IMAGE:-localhost/l7/go:lsp-bookworm}}"
+export RUNNER_OPTS="${RUNNER_OPTS} -i "
+l7-run-go gopls ${@}

@@ -280,6 +280,7 @@ jobs:
           - ghauth
           - node_corepack
           - lsp_typescript
+          - lsp_golang
           - node_majors
           - xterm
         ubuntu-version:
@@ -327,6 +328,12 @@ jobs:
           make -j2 images_test
           make -j2 test_lsp_node
         if: ${{ matrix.test == 'lsp_typescript' }}
+      - name: Build images
+        run: |
+          make images_deps
+          make -j6 images
+          make -j2 test_lsp_go
+        if: ${{ matrix.test == 'lsp_golang' }}
       - run: |
           make images_deps
           make -j6 images
@@ -344,6 +351,8 @@ jobs:
         run: |
           podman network ls
           make test_e2e_${{ matrix.test }}
+          # TODO: #183
+        if: ${{ matrix.test != 'lsp_golang' }}
     env:
       DEBUG: ''
       L7_DISABLE_SELINUX: '1'
