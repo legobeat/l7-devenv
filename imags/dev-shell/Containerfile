@@ -40,6 +40,7 @@ RUN apk add --no-cache \
     fd \
     curl-zsh-completion bat-zsh-completion git-zsh-completion github-cli-zsh-completion ripgrep-zsh-completion util-linux-bash-completion gojq-zsh-completion tmux-zsh-completion \
     sshpass \
+    jujutsu jujutsu-doc jujutsu-zsh-completion jujutsu-bash-completion \
     git-machete git-machete-zsh-completion \
     git-lfs git-lfs-zsh-completion git-lfs-doc \
     lab lab-zsh-completion \
@@ -47,6 +48,7 @@ RUN apk add --no-cache \
     losetup dosfstools \
     yq-go yq-go-zsh-completion \
     netcat-openbsd netcat-openbsd-doc \
+    rsync rsync-doc \
     coreutils less grep sed findutils file which \
     mandoc busybox-doc coreutils-doc git-doc less-doc grep-doc sed-doc file-doc findutils-doc fzf-doc util-linux-doc zsh-doc \
     gettext-envsubst mkpasswd pwgen \
