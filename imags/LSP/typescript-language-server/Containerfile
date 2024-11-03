@@ -4,7 +4,7 @@ ARG BUILDER_IMAGE=${BASE_IMAGE}
 FROM ${BUILDER_IMAGE} AS tsserver-builder
 
 USER root
-COPY --chown=1002:1002 contrib/typescript-language-server /build/typescript-language-server
+COPY --chown=1002:1002 ./typescript-language-server /build/typescript-language-server
 RUN mkdir -p /out /build/typescript-language-server  /tmp/1002-home \
   && chmod 777 /out /build/typescript-language-server  /tmp/1002-home \
   && chown 1002:1002 /out /build/typescript-language-server /tmp/1002-home

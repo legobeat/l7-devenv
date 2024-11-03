@@ -29,7 +29,7 @@
 	path = contrib/nvim-plugins/nvim-window-picker
 	url = https://github.com/s1n7ax/nvim-window-picker
 [submodule "contrib/typescript-language-server"]
-	path = contrib/typescript-language-server
+	path = imags/LSP/typescript-language-server/typescript-language-server
 	url = https://github.com/typescript-language-server/typescript-language-server
 [submodule "contrib/nvim-plugins/lualine.nvim"]
 	path = contrib/nvim-plugins/lualine.nvim

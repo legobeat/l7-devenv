@@ -251,8 +251,8 @@ image_lsp_node: image_runner_node_20
 		--build-arg "SHELL=${USER_SHELL}" \
 		--build-arg "NODE_VERSION=20" \
 		-t "${IMAGE_NAME}:lsp-${IMAGE_TAG}" \
-		-f './imags/node-runner/Containerfile.lsp' \
-		.
+		-f './imags/LSP/typescript-language-server/Containerfile' \
+		./imags/LSP/typescript-language-server
 #### Tests
 
 test_compose_run: images_deps
