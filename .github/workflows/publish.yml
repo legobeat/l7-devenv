@@ -394,8 +394,8 @@ jobs:
               BASE_IMAGE=ghcr.io/legobeat/l7-devenv/nvim:${{ github.ref_name }}
               CADDY_IMAGE=ghcr.io/legobeat/l7-devenv/caddy:${{ github.ref_name }}
           - name: lsp-typescript
-            file: imags/node-runner/Containerfile.lsp
-            context: .
+            file: imags/LSP/typescript-language-server/Containerfile
+            context: imags/LSP/typescript-language-server
             tags: |
               ghcr.io/legobeat/l7-devenv/lsp/typescript:latest
               ghcr.io/legobeat/l7-devenv/lsp/typescript:${{ github.ref_name }}
