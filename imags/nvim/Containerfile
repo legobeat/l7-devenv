@@ -43,7 +43,7 @@ RUN apk add --no-cache \
     screen tmux \
     which \
     ${EXTRA_PKGS} \
-  && apk add  --no-cache --repository=https://dl-cdn.alpinelinux.org/alpine/edge/testing tree-sitter-markdown \
+  && apk add  --no-cache --repository=https://dl-cdn.alpinelinux.org/alpine/edge/community tree-sitter-markdown \
   && ln -sf nvim /usr/bin/vim
 
 COPY --chown=2:2 \
