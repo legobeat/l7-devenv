@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1.4-labs
-FROM docker.io/alpine:3.19
+FROM docker.io/alpine:3.20
 
 RUN apk upgrade --no-cache \
   && apk add --no-cache \
