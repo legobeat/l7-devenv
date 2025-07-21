@@ -8,7 +8,7 @@
   "dependencies": {
     "@lavamoat/allow-scripts": ">=3.3.2",
     "@lavamoat/preinstall-always-fail": ">=2.1.0",
-    "corepack": "^0.32.0",
+    "corepack": "^0.34.0",
     "semver": "^7.7.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.2",
